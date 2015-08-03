@@ -39,9 +39,11 @@ int main(int argc, char* argv[])
 		if (arg.find("--help") == 0) {
 			printUsage(arguments[0]);
 			cerr << "Options: " << std::endl;
-			cerr << "\t-G<generator>\t\tBuild system generator to use (default: '" << Generators::defaultName() << "')." << std::endl;
+			cerr << "\t-G<generator>\t\tBuild system generator to use (default: '" <<
+				Generators::defaultName() << "')." << std::endl;
 			// cerr << "\t-X<target>\tCross-compile to <target>." << std::endl; // TODO
-			cerr << "\t-C:<lang>:<compiler>\tCompiler for <lang> to use (default depends on target)." << std::endl;
+			cerr << "\t-C:<lang>:<compiler>\tCompiler for <lang> to use (default depends on target)." <<
+				std::endl;
 			return 1;
 		} else {
 			std::cout << FSUtil::which(arg);
