@@ -38,6 +38,11 @@ mkdir -p build-bootstrap
 PHOENIX_SRCS="
 	Phoenix.cpp
 	generators/Generators.cpp
+	language/FunctionObject.cpp
+	language/GlobalLanguageObject.cpp
+	language/MapObject.cpp
+	language/Object.cpp
+	language/Parser.cpp
 	util/FSUtil.cpp
 	util/StringUtil.cpp
 	"
