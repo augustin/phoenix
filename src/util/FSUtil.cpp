@@ -24,7 +24,7 @@ bool FSUtil::exists(const string& file)
 #endif
 
 	std::ifstream f(filename);
-	return f;
+	return static_cast<bool>(f);
 }
 
 string FSUtil::which(const string& program)
