@@ -33,7 +33,7 @@ string Object::typeName()
 	}
 }
 
-BooleanObject::BooleanObject(const bool value)
+BooleanObject::BooleanObject(const bool val)
 	:
 	Object(Type::Boolean),
 	value(val)
@@ -41,7 +41,7 @@ BooleanObject::BooleanObject(const bool value)
 }
 
 
-IntegerObject::IntegerObject(const int value)
+IntegerObject::IntegerObject(const int val)
 	:
 	Object(Type::Integer),
 	value(val)
