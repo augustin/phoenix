@@ -5,7 +5,7 @@
 
 CXX=${CXX-g++}
 LD=${LD-$CXX}
-CXXFLAGS="-std=c++11 -Wall -O2 $CXXFLAGS"
+CXXFLAGS="-std=c++0x -Wall -O2 $CXXFLAGS"
 LINKFLAGS="-O1 $LINKFLAGS"
 
 run_command()
