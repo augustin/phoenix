@@ -38,14 +38,14 @@ class BooleanObject : public Object
 {
 public:
 	BooleanObject(const bool val = false);
-	bool value = false;
+	bool value;
 };
 
 class IntegerObject : public Object
 {
 public:
 	IntegerObject(const int val = 0);
-	int value = 0;
+	int value;
 };
 
 class StringObject : public Object, public std::string
