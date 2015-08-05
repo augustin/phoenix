@@ -31,6 +31,11 @@ compile()
 	run_command "$LINKCMD"
 }
 
+if [ ! -f "Phoenixfile.phnx" ]; then
+	echo "Please run this script from the root of the repository."
+	exit 1
+fi
+
 # Create build directory
 mkdir -p build-bootstrap
 
