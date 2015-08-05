@@ -15,7 +15,7 @@ GlobalLanguageObject::GlobalLanguageObject()
 	MapObject()
 {
 	add("checkVersion", FunctionObject([&](const MapObject& params) -> Object {
-		return StringObject("Hello world.");
+		return BooleanObject(false);
 	}));
 }
 
