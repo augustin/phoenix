@@ -5,7 +5,7 @@ compiler:
 
 script:
   - ./tools/bootstrap.sh
-  - ./phoenix_bootstrapped
+  - ! ./phoenix_bootstrapped
 
 notifications:
   webhooks:
