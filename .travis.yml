@@ -1,0 +1,15 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+
+script:
+  - ./tools/bootstrap.sh
+  - ./phoenix_bootstrapped
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/7e83f2fe7e79082d1ad8
+    on_success: change
+    on_failure: always
