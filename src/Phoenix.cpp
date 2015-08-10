@@ -18,8 +18,8 @@ void printUsage(string program)
 	cerr << "Phoenix, version " PHOENIX_VERSION << ". ";
 	cerr << "(C) 2015 Augustin Cavalier." << std::endl << std::endl;
 	cerr << "Usage: " << std::endl;
-	cerr << "\t" << program << " [options] <path/to/source>" << std::endl;
-	cerr << "\t" << program << " [options] <path/to/build/directory>" << std::endl;
+	cerr << "\t" << program << " [options] <path/to/source> [<path/to/build/directory>]" << std::endl;
+	cerr << "\t" << program << " [options] <path/to/build/directory = .>" << std::endl;
 }
 
 int main(int argc, char* argv[])
