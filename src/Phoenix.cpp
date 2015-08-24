@@ -6,7 +6,13 @@
 #include <vector>
 
 #include "Phoenix.h"
+
 #include "generators/Generators.h"
+
+#include "language/GlobalLanguageObject.h"
+#include "language/Parser.h"
+#include "language/Stack.h"
+
 #include "util/FSUtil.h"
 
 using std::vector;
@@ -33,7 +39,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	string directory = ".";
+	string buildDirectory = ".", sourceDirectory = "";
 	for (int i = 1; i < argc; i++) {
 		string arg = arguments[i];
 		if (arg.find("--help") == 0) {
@@ -45,10 +51,30 @@ int main(int argc, char* argv[])
 			cerr << "\t-C:<lang>:<compiler>\tCompiler for <lang> to use (default depends on target)." <<
 				std::endl;
 			return 1;
-		} else {
-			std::cout << FSUtil::which(arg);
+		} else if (arg.find(".") || arg.find("/")) {
+			// Looks like a path.
+			if (sourceDirectory.length() > 0)
+				buildDirectory = arg;
+			else
+				sourceDirectory = arg;
 		}
 	}
 
-	return 0;
+	if (sourceDirectory.length() < 0 || buildDirectory.length() < 0) {
+		cerr << "No source directory specified!";
+		return 1;
+	}
+
+	int status = 0;
+	// Create the language stack on the heap, as it can get pretty large.
+	Language::Stack* stack = new Language::Stack();
+	stack->addSuperglobal("Phoenix", Language::GlobalLanguageObject());
+	try {
+		Language::Parse(stack, sourceDirectory);
+	} catch (Language::Exception e) {
+		e.print();
+		status = e.type();
+	}
+
+	return status;
 }

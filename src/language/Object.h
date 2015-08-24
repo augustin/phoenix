@@ -4,10 +4,42 @@
  */
 #pragma once
 
+#include <exception>
+#include <iostream>
 #include <string>
 #include <vector>
 
 namespace Language {
+
+class Exception final : public std::exception
+{
+public:
+	enum Type {
+		FileDoesNotExist = 2, // number here is return code, 1 is generic
+		SyntaxError,
+		AccessViolation
+	};
+	Exception(Type type, std::string what) : fWhat(what), fType(type) {}
+	virtual const char* what() const throw() { return fWhat.c_str(); }
+	inline Type type() { return fType; }
+
+	void print() {
+		std::cout << "error: ";
+		switch (fType) {
+		case FileDoesNotExist:
+			std::cout << "file '" << fWhat << "' does not exist.";
+		break;
+		default:
+			std::cout << "unknown error " << fType << ": '" << fWhat << "'.";
+		break;
+		}
+	}
+
+private:
+	std::string fWhat;
+	Type fType;
+};
+
 
 enum Type {
 	Undefined = 0,

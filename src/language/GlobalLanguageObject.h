@@ -10,7 +10,7 @@ namespace Language {
 
 class GlobalLanguageObject : public MapObject
 {
-protected:
+public:
 	GlobalLanguageObject();
 };
 

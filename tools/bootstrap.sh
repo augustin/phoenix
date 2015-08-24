@@ -48,6 +48,7 @@ PHOENIX_SRCS="
 	language/MapObject.cpp
 	language/Object.cpp
 	language/Parser.cpp
+	language/Stack.cpp
 	util/FSUtil.cpp
 	util/StringUtil.cpp
 	"

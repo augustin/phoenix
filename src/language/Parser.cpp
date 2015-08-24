@@ -4,9 +4,25 @@
  */
 #include "Parser.h"
 
+#include "util/FSUtil.h"
+#include "util/StringUtil.h"
+#include "Object.h"
+#include "Stack.h"
+
 using std::string;
 
-string Parser::defaultName()
+namespace Language {
+
+void Parse(Stack* stack, string path)
 {
-	return "None";
+	string filename;
+	if (StringUtil::endsWith(path, "Phoenixfile")) {
+		filename = path;
+	} else if (FSUtil::exists(path = FSUtil::combinePaths({path, "Phoenixfile"}))) {
+		filename = path;
+	}
+	if (filename.empty())
+		throw Exception(Exception::FileDoesNotExist, path);
 }
+
+};

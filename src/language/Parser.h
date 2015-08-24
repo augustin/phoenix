@@ -6,8 +6,11 @@
 
 #include <string>
 
-class Parser
-{
-public:
-	static std::string defaultName();
+namespace Language {
+
+// Predefinitions
+class Stack;
+
+void Parse(Stack* stack, std::string path);
+
 };
