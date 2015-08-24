@@ -18,7 +18,7 @@ MapObject::MapObject()
 
 void MapObject::add(string key, Object value)
 {
-	map<string, Object>::insert(std::pair<string, Object>(key, value));
+	map<string, Object>::insert({key, value});
 }
 
 };
