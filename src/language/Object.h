@@ -15,7 +15,7 @@ namespace Language {
 class Function;
 class ObjectMap;
 
-class Exception final : public std::exception
+class Exception : public std::exception
 {
 public:
 	enum Type {
