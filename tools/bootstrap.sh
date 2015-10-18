@@ -6,7 +6,7 @@
 CXX=${CXX-g++}
 LD=${LD-$CXX}
 CXXFLAGS="-std=c++0x -Wall -O2 $CXXFLAGS"
-LINKFLAGS="-O1 $LINKFLAGS"
+LINKFLAGS="$LINKFLAGS"
 
 run_command()
 {
@@ -43,10 +43,10 @@ mkdir -p build-bootstrap
 PHOENIX_SRCS="
 	Phoenix.cpp
 	generators/Generators.cpp
-	language/FunctionObject.cpp
+	language/Function.cpp
 	language/GlobalLanguageObject.cpp
-	language/MapObject.cpp
 	language/Object.cpp
+	language/ObjectMap.cpp
 	language/Parser.cpp
 	language/Stack.cpp
 	util/FSUtil.cpp

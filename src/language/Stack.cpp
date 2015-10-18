@@ -8,6 +8,8 @@ using std::string;
 
 namespace Language {
 
+std::map<std::string, Function> GlobalFunctions;
+
 Stack::Stack()
 {
 }

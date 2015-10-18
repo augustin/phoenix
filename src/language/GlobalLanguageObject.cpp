@@ -4,7 +4,9 @@
  */
 #include "GlobalLanguageObject.h"
 
-#include "FunctionObject.h"
+#include "Function.h"
+#include "ObjectMap.h"
+#include "Stack.h"
 
 using std::string;
 
@@ -12,11 +14,20 @@ namespace Language {
 
 GlobalLanguageObject::GlobalLanguageObject()
 	:
-	MapObject()
+	Object(Type::Map)
 {
-	add("checkVersion", FunctionObject([&](const MapObject& params) -> Object {
+	map = new ObjectMap;
+
+	// Instantiate this object
+	map->set("checkVersion", FunctionObject([&](ObjectMap& params) -> Object {
 		return BooleanObject(false);
 	}));
+
+	// Also instantiate the GlobalFunctions object
+	GlobalFunctions.insert({"funky_call", Function([&](ObjectMap& params) -> Object {
+		NativeFunction_COERCE_OR_THROW("some_param_thing", someParamThing, String);
+		return Object();
+	})});
 }
 
 };

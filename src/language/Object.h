@@ -11,79 +11,109 @@
 
 namespace Language {
 
+// Predefinitions
+class Function;
+class ObjectMap;
+
 class Exception final : public std::exception
 {
 public:
 	enum Type {
 		FileDoesNotExist = 2, // number here is return code, 1 is generic
 		SyntaxError,
+		TypeError,
 		AccessViolation
 	};
-	Exception(Type type, std::string what) : fWhat(what), fType(type) {}
+	Exception(Type type, std::string what, std::string file = "", uint32_t line = 0)
+		: fType(type), fWhat(what), fFile(file), fLine(line) {}
 	virtual const char* what() const throw() { return fWhat.c_str(); }
-	inline Type type() { return fType; }
 
-	void print() {
-		std::cout << "error: ";
-		switch (fType) {
-		case FileDoesNotExist:
-			std::cout << "file '" << fWhat << "' does not exist.";
-		break;
-		default:
-			std::cout << "unknown error " << fType << ": '" << fWhat << "'.";
-		break;
-		}
-	}
+	void print();
 
-private:
-	std::string fWhat;
+public:
 	Type fType;
+	std::string fWhat;
+	std::string fFile;
+	uint32_t fLine;
 };
 
 
-enum Type {
+enum class Type {
 	Undefined = 0,
 	Boolean,
 	Integer,
 	String,
 	Function,
 	List,
-	Map
+	Map,
+
+	// Used by the parser
+	Variable,
+	Operator,
 };
 
 class Object
 {
 public:
-	explicit Object();
+	Object(const Type type = Type::Undefined);
+	~Object();
 
-	inline Type type() { return fObjectType; }
+	inline Type type() const { return fObjectType; }
 	std::string typeName();
 
-protected:
-	Object(const Type type);
+public: // Data storage
+	bool boolean;
+	int integer;
+	std::string* string; bool string_dereferenced;
+	Function* function;
+	ObjectMap* map;
 
 private:
 	Type fObjectType;
 };
 
-class BooleanObject : public Object
-{
-public:
-	BooleanObject(const bool val = false);
-	bool value;
-};
+// Helper macros
+#define Language_POSSIBLY_DEREFERENCE(OBJECT) \
+	OBJECT = (OBJECT.type() == ::Language::Type::Variable) ? \
+		stack->get(*OBJECT.string) : OBJECT
+#define Language_COERCE_OR_THROW(WHAT, VARIABLE, TYPE) \
+	if (VARIABLE.type() != ::Language::Type::TYPE) { \
+		throw Exception(Exception::TypeError, \
+			std::string(WHAT " should be of type '" #TYPE "' but is of type '") \
+				.append(VARIABLE.typeName()).append("'")); \
+	}
 
-class IntegerObject : public Object
+// Convenience constructors
+inline Object BooleanObject(const bool value)
 {
-public:
-	IntegerObject(const int val = 0);
-	int value;
-};
-
-class StringObject : public Object, public std::string
+	Object ret(Type::Boolean);
+	ret.boolean = value;
+	return ret;
+}
+inline Object IntegerObject(const int value)
 {
-public:
-	StringObject(const std::string& str = "");
-};
+	Object ret(Type::Integer);
+	ret.integer = value;
+	return ret;
+}
+inline Object StringObject(const std::string& value)
+{
+	Object ret(Type::String);
+	ret.string = new std::string(value);
+	return ret;
+}
+// Internal parser types
+inline Object VariableObject(const std::string& variableName)
+{
+	Object ret(Type::Variable);
+	ret.string = new std::string(variableName);
+	return ret;
+}
+inline Object OperatorObject(const std::string& oper)
+{
+	Object ret(Type::Operator);
+	ret.string = new std::string(oper);
+	return ret;
+}
 
 };

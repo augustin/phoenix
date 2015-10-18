@@ -4,11 +4,11 @@
  */
 #pragma once
 
-#include "MapObject.h"
+#include "Object.h"
 
 namespace Language {
 
-class GlobalLanguageObject : public MapObject
+class GlobalLanguageObject : public Object
 {
 public:
 	GlobalLanguageObject();

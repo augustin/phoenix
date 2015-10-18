@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 		Language::Parse(stack, sourceDirectory);
 	} catch (Language::Exception e) {
 		e.print();
-		status = e.type();
+		status = e.fType;
 	}
 
 	return status;

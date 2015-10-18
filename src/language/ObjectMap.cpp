@@ -2,23 +2,27 @@
  * (C) 2015 Augustin Cavalier
  * All rights reserved. Distributed under the terms of the MIT license.
  */
-#include "MapObject.h"
+#include "ObjectMap.h"
 
 using std::map;
 using std::string;
 
 namespace Language {
 
-MapObject::MapObject()
+ObjectMap::ObjectMap()
 	:
-	Object(Type::Map),
 	map<string, Object>()
 {
 }
 
-void MapObject::add(string key, Object value)
+Object ObjectMap::get(string key)
 {
-	map<string, Object>::insert({key, value});
+	return (*this)[key];
+}
+
+void ObjectMap::set(string key, Object value)
+{
+	(*this)[key] = value;
 }
 
 };

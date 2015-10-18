@@ -8,9 +8,12 @@
 #include <string>
 #include <vector>
 
+#include "Function.h"
 #include "Object.h"
 
 namespace Language {
+
+extern std::map<std::string, Function> GlobalFunctions;
 
 class Stack
 {
