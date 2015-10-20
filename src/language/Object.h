@@ -5,7 +5,6 @@
 #pragma once
 
 #include <exception>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -19,7 +18,8 @@ class Exception : public std::exception
 {
 public:
 	enum Type {
-		FileDoesNotExist = 2, // number here is return code, 1 is generic
+		InternalError = 2, // number here is return code, 1 is generic
+		FileDoesNotExist,
 		SyntaxError,
 		TypeError,
 		AccessViolation
@@ -48,9 +48,10 @@ enum class Type {
 	List,
 	Map,
 
-	// Used by the parser
+	// Used by the parser/evaluator
 	Variable,
 	Operator,
+	Nonexistent
 };
 
 class Object
@@ -60,7 +61,19 @@ public:
 	~Object();
 
 	inline Type type() const { return fObjectType; }
-	std::string typeName();
+	std::string typeName() const;
+	std::string asString() const;
+
+	// Operators
+	static Object op_div(const Object& left, const Object& right);
+	static Object op_mult(const Object& left, const Object& right);
+	static Object op_subt(const Object& left, const Object& right);
+	static Object op_add(const Object& left, const Object& right);
+	static Object op_eq(const Object& left, const Object& right);
+	inline static Object op_neq(const Object& left, const Object& right)
+		{ Object o = op_eq(left, right); o.boolean = !o.boolean; return o; }
+	static Object op_and(const Object& left, const Object& right);
+	static Object op_or(const Object& left, const Object& right);
 
 public: // Data storage
 	bool boolean;
@@ -75,7 +88,7 @@ private:
 
 // Helper macros
 #define Language_POSSIBLY_DEREFERENCE(OBJECT) \
-	OBJECT = (OBJECT.type() == ::Language::Type::Variable) ? \
+	(OBJECT.type() == ::Language::Type::Variable) ? \
 		stack->get(*OBJECT.string) : OBJECT
 #define Language_COERCE_OR_THROW(WHAT, VARIABLE, TYPE) \
 	if (VARIABLE.type() != ::Language::Type::TYPE) { \

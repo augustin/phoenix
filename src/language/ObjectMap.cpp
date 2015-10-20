@@ -17,12 +17,19 @@ ObjectMap::ObjectMap()
 
 Object ObjectMap::get(string key)
 {
-	return (*this)[key];
+	map<string, Object>::iterator it = find(key);
+	if (it != end())
+		return it->second;
+	return Object(Type::Nonexistent);
 }
 
 void ObjectMap::set(string key, Object value)
 {
-	(*this)[key] = value;
+	map<string, Object>::iterator it = find(key);
+	if (it != end())
+		it->second = value;
+	else
+		insert({key, value});
 }
 
 };

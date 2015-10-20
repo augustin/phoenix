@@ -75,6 +75,5 @@ int main(int argc, char* argv[])
 		e.print();
 		status = e.fType;
 	}
-
 	return status;
 }

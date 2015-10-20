@@ -44,7 +44,6 @@ namespace Language {
 	THING == '\n' || \
 	THING == '\r')
 
-#include <iostream>
 #define UNEXPECTED_EOF Exception(Exception::SyntaxError, string("unexpected end of file"))
 #define UNEXPECTED_TOKEN \
 	Exception(Exception::SyntaxError, \
@@ -107,6 +106,7 @@ string EvalVariableName(Stack* stack, const string& code, uint32_t& line, string
 				return ret;
 			break;
 			}
+			i++;
 		}
 		throw UNEXPECTED_EOF;
 	}
@@ -244,7 +244,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			if (i != start)
 				expression.push_back(ParseAndEvalExpression(PARSER_PARAMS));
 		break;
-		case ';': // TODO: this should return undefined
+		case ';':
 		case ']':
 		case ')': // End of expression.
 			atEOE = true;
@@ -295,33 +295,26 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			IgnoreWhitespace(PARSER_PARAMS);
 		}
 	}
+	if (expression.size() == 0)
+		return Object();
 	if (expression[expression.size() - 1].type() == Type::Operator)
 		throw Exception(Exception::SyntaxError, string("incorrectly placed operator"));
-	if (expression.size() == 1) {
-		Object obj = expression[0];
-		Language_POSSIBLY_DEREFERENCE(obj);
-		return obj;
-	}
+	if (expression.size() == 1)
+		return Language_POSSIBLY_DEREFERENCE(expression[0]);
 
 #define GET_OPERATOR_OR_CONTINUE \
 	const Object& obj = expression[j]; \
 	if (obj.type() != Type::Operator) \
 		continue; \
-	const string& oper = *obj.string;
+	const string& oper = *obj.string
 #define UNKNOWN_OPERATOR \
 	Exception(Exception::SyntaxError, \
 		string("unknown operator '").append(oper).append("'"));
-#define IMPLEMENT_MATH_OPERATOR(OP_NAME, TOKEN) { \
+#define IMPLEMENT_OPERATOR(OP_NAME, TOKEN, TOKEQ_ALLOWED) { \
 	j--; \
-	Object left = expression[j]; \
-	Object right = expression[j + 2]; \
-	Language_POSSIBLY_DEREFERENCE(left); \
-	Language_POSSIBLY_DEREFERENCE(right); \
-	Language_COERCE_OR_THROW("left-hand side of " OP_NAME, left, Integer); \
-	Language_COERCE_OR_THROW("right-hand side of " OP_NAME, right, Integer); \
-	\
-	Object result = IntegerObject(left.integer TOKEN right.integer); \
-	if (oper == (#TOKEN "=")) { \
+	Object result = Object::op_##OP_NAME(Language_POSSIBLY_DEREFERENCE(expression[j]), \
+		Language_POSSIBLY_DEREFERENCE(expression[j + 2])); \
+	if (TOKEQ_ALLOWED && oper == (#TOKEN "=")) { \
 		if (expression[j].type() != Type::Variable) \
 			throw Exception(Exception::TypeError, string("the left-hand side of '" #TOKEN \
 				"=' must be a variable")); \
@@ -332,42 +325,59 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	expression[j] = result; \
 	expression.erase(expression.begin() + j + 1, expression.begin() + j + 3); }
 
-	// Pass 1: / *
+	// Pass 1: /, *
 	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
-		std::cout << expression.size() - j;
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper[0] == '/')
-			IMPLEMENT_MATH_OPERATOR("division", /)
+			IMPLEMENT_OPERATOR(/* operator name */ div,
+							   /* token */ 	       /,
+							   /* "TOKEN=" */      true)
 		else if (oper[0] == '*')
-			IMPLEMENT_MATH_OPERATOR("multiplication", *)
+			IMPLEMENT_OPERATOR(/* operator name */ mult,
+							   /* token */ 	       *,
+							   /* "TOKEN=" */      true)
 	}
-	// Pass 2: + -
+	// Pass 2: +, -. TODO: ++, --
 	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper[0] == '-')
-			IMPLEMENT_MATH_OPERATOR("subtraction", -)
+			IMPLEMENT_OPERATOR(/* operator name */ subt,
+							   /* token */ 	       -,
+							   /* "TOKEN=" */      true)
 		else if (oper[0] == '+')
-			IMPLEMENT_MATH_OPERATOR("addition", +)
+			IMPLEMENT_OPERATOR(/* operator name */ add,
+							   /* token */ 	       +,
+							   /* "TOKEN=" */      true)
 	}
-	return Object();
-
-	/*if (IS_END_OF_EXPRESSION()) {
-		// End of expression
-	} else if (oper == "==") {
-	} else if (oper == "===") {
-	} else if (oper == "!=") {
-	} else if (oper == "!==") {
-	} else if (oper == "&&") {
-	} else if (oper == "||") {
-	} else if (oper0 == '+') {
-		// +, +=, ++
-	} else if (oper0 == '-') {
-		// -, -=, --
-	} else if (oper0 == '*') {
-		// *, *=
-	} else if (oper0 == '/') {
-		// /, /=
-	}*/
+	// Pass 3: ==, !=, ||, &&
+	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
+		GET_OPERATOR_OR_CONTINUE;
+		if (oper == "==")
+			IMPLEMENT_OPERATOR(/* operator name */ eq,
+							   /* token */ 	       ==,
+							   /* "TOKEN=" */      false)
+		else if (oper == "!=")
+			IMPLEMENT_OPERATOR(/* operator name */ neq,
+							   /* token */ 	       !=,
+							   /* "TOKEN=" */      false)
+		else if (oper == "&&")
+			IMPLEMENT_OPERATOR(/* operator name */ and,
+							   /* token */ 	       &&,
+							   /* "TOKEN=" */      false)
+		else if (oper == "||")
+			IMPLEMENT_OPERATOR(/* operator name */ or,
+							   /* token */ 	       ||,
+							   /* "TOKEN=" */      false)
+	}
+	// Pass 4: throw if there are remaining operators
+	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
+		GET_OPERATOR_OR_CONTINUE;
+		throw UNKNOWN_OPERATOR;
+	}
+	if (expression.size() != 1)
+		throw Exception(Exception::TypeError,
+			string("evaluated expression does not have 1 return value"));
+	return expression[0];
 }
 
 void Parse(Stack* stack, string path)
@@ -392,7 +402,8 @@ void Parse(Stack* stack, string path)
 	try {
 		IgnoreWhitespace(PARSER_PARAMS);
 		while (i < code.length()) {
-			ParseAndEvalExpression(PARSER_PARAMS);
+			std::cout << ParseAndEvalExpression(PARSER_PARAMS).asString();
+			i++;
 			IgnoreWhitespace(PARSER_PARAMS);
 		}
 	} catch (Exception& e) {

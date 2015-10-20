@@ -19,16 +19,17 @@ Object Stack::get(string variableName)
 	if (variableName[0] == '$') {
 		// it's a superglobal
 		variableName.erase(1);
-		if (fSuperglobalScope.find(variableName) != fSuperglobalScope.end())
-			return fSuperglobalScope[variableName];
+		if (fSuperglobalScope.get(variableName).type() != Type::Nonexistent)
+			return fSuperglobalScope.get(variableName);
 		else
 			return Object(); // undefined
 	}
-	if (fCurrentScope.find(variableName) != fCurrentScope.end())
-		return fCurrentScope[variableName];
-	for (VariableMap::size_type i = fStack.size(); i >= 0; i--) {
-		if (fStack[i].find(variableName) != fStack[i].end())
-			return fStack[i][variableName];
+	if (fCurrentScope.get(variableName).type() != Type::Nonexistent)
+		return fCurrentScope.get(variableName);
+	if (fStack.size() > 0) for (ObjectMap::size_type i = fStack.size(); i >= 0; i--) {
+		Object ret = fStack[i].get(variableName);
+		if (ret.type() != Type::Nonexistent)
+			return ret;
 	}
 
 	return Object(); // undefined
@@ -38,24 +39,24 @@ void Stack::set(string variableName, Object value)
 {
 	if (variableName[0] == '$') {
 		// it's a superglobal
-		throw Exception(Exception::AccessViolation, "Superglobals are read-only.");
+		throw Exception(Exception::AccessViolation, "superglobals are read-only");
 	}
-	if (fCurrentScope.find(variableName) != fCurrentScope.end()) {
-		fCurrentScope[variableName] = value;
+	if (fCurrentScope.get(variableName).type() != Type::Nonexistent) {
+		fCurrentScope.set(variableName, value);
 		return;
 	}
-	for (VariableMap::size_type i = fStack.size(); i >= 0; i--) {
-		if (fStack[i].find(variableName) != fStack[i].end()) {
-			fStack[i][variableName] = value;
+	if (fStack.size() > 0) for (ObjectMap::size_type i = fStack.size() - 1; i >= 0; i--) {
+		if (fStack[i].get(variableName).type() != Type::Nonexistent) {
+			fStack[i].set(variableName, value);
 			return;
 		}
 	}
-	fCurrentScope.insert({variableName, value});
+	fCurrentScope.set(variableName, value);
 }
 
 void Stack::addSuperglobal(string variableName, Object value)
 {
-	fSuperglobalScope.insert({variableName, value});
+	fSuperglobalScope.set(variableName, value);
 }
 
 };

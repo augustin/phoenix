@@ -26,10 +26,9 @@ public:
 	void addSuperglobal(std::string variableName, Object value);
 
 private:
-	typedef std::map<std::string, Object> VariableMap;
-	VariableMap fSuperglobalScope;
-	std::vector<VariableMap> fStack;
-	VariableMap fCurrentScope;
+	ObjectMap fSuperglobalScope;
+	std::vector<ObjectMap> fStack;
+	ObjectMap fCurrentScope;
 };
 
 };
