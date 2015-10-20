@@ -11,6 +11,6 @@ namespace Language {
 // Predefinitions
 class Stack;
 
-void Parse(Stack* stack, std::string path);
+void Run(Stack* stack, std::string path);
 
 }

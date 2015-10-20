@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 	Language::Stack* stack = new Language::Stack();
 	stack->addSuperglobal("Phoenix", Language::GlobalLanguageObject());
 	try {
-		Language::Parse(stack, sourceDirectory);
+		Language::Run(stack, sourceDirectory);
 	} catch (Language::Exception e) {
 		e.print();
 		status = e.fType;

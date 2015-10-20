@@ -380,7 +380,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	return expression[0];
 }
 
-void Parse(Stack* stack, string path)
+void Run(Stack* stack, string path)
 {
 	string filename;
 	if (FSUtil::exists(path)) {
