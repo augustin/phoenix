@@ -25,6 +25,8 @@ public:
 
 	void addSuperglobal(std::string variableName, Object value);
 
+	void print();
+
 private:
 	ObjectMap fSuperglobalScope;
 	std::vector<ObjectMap> fStack;

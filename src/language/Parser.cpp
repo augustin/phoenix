@@ -103,6 +103,7 @@ string EvalVariableName(Stack* stack, const string& code, uint32_t& line, string
 
 			default:
 				// end of variable name
+				i--;
 				return ret;
 			break;
 			}
@@ -319,7 +320,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			throw Exception(Exception::TypeError, string("the left-hand side of '" #TOKEN \
 				"=' must be a variable")); \
 		stack->set(*expression[j].string, result); \
-	} else if (oper.length() > 1) \
+	} else if (oper == (#TOKEN "=") && oper.length() > 1) \
 		throw UNKNOWN_OPERATOR; \
 	/* Now update the expression vector */  \
 	expression[j] = result; \
@@ -349,7 +350,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* token */ 	       +,
 							   /* "TOKEN=" */      true)
 	}
-	// Pass 3: ==, !=, ||, &&
+	// Pass 3: ==, !=
 	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "==")
@@ -360,7 +361,26 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			IMPLEMENT_OPERATOR(/* operator name */ neq,
 							   /* token */ 	       !=,
 							   /* "TOKEN=" */      false)
-		else if (oper == "&&")
+	}
+	// Pass 4: =
+	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
+		GET_OPERATOR_OR_CONTINUE;
+		if (oper == "=") {
+			j--;
+			if (expression[j].type() != Type::Variable)
+				throw Exception(Exception::TypeError,
+					string("the left-hand side of '=' must be a variable"));
+			Object result = Language_POSSIBLY_DEREFERENCE(expression[j + 2]);
+			stack->set(*expression[j].string, result);
+			/* Now update the expression vector */
+			expression[j] = result;
+			expression.erase(expression.begin() + j + 1, expression.begin() + j + 3);
+		}
+	}
+	// Pass 5: &&, ||
+	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
+		GET_OPERATOR_OR_CONTINUE;
+		if (oper == "&&")
 			IMPLEMENT_OPERATOR(/* operator name */ and,
 							   /* token */ 	       &&,
 							   /* "TOKEN=" */      false)
@@ -369,7 +389,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* token */ 	       ||,
 							   /* "TOKEN=" */      false)
 	}
-	// Pass 4: throw if there are remaining operators
+	// Pass 6: throw if there are remaining operators
 	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		throw UNKNOWN_OPERATOR;

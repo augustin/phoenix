@@ -4,6 +4,9 @@
  */
 #include "Stack.h"
 
+#include <iostream>
+
+using std::cout;
 using std::string;
 
 namespace Language {
@@ -57,6 +60,24 @@ void Stack::set(string variableName, Object value)
 void Stack::addSuperglobal(string variableName, Object value)
 {
 	fSuperglobalScope.set(variableName, value);
+}
+
+void Stack::print()
+{
+	auto dump = [](int tabs, const ObjectMap& m) {
+		for (ObjectMap::const_iterator it = m.begin(); it != m.end(); it++) {
+			for (int i = 0; i < tabs; i++)
+				cout << "    ";
+			cout << it->first << ": " << it->second.asString() << "\n";
+		}
+	};
+	cout << "-- VM STACK DUMP --\n";
+	int tabs = 1;
+	for (const ObjectMap& m : fStack) {
+		dump(tabs, m);
+		tabs++;
+	}
+	dump(tabs, fCurrentScope);
 }
 
 }
