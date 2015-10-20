@@ -159,4 +159,4 @@ Object Object::op_or(const Object& left, const Object& right)
 	return BooleanObject(coerceToBoolean(left) || coerceToBoolean(right));
 }
 
-};
+}

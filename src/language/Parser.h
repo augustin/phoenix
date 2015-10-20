@@ -13,4 +13,4 @@ class Stack;
 
 void Parse(Stack* stack, std::string path);
 
-};
+}

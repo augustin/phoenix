@@ -23,4 +23,4 @@ Object Function::call(ObjectMap& args)
 	throw Exception(Exception::AccessViolation, "Attempted to call null function");
 }
 
-};
+}

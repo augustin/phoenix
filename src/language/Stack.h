@@ -31,4 +31,4 @@ private:
 	ObjectMap fCurrentScope;
 };
 
-};
+}

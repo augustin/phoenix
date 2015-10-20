@@ -32,4 +32,4 @@ void ObjectMap::set(string key, Object value)
 		insert({key, value});
 }
 
-};
+}

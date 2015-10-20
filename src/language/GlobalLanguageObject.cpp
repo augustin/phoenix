@@ -30,4 +30,4 @@ GlobalLanguageObject::GlobalLanguageObject()
 	})});
 }
 
-};
+}

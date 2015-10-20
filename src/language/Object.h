@@ -130,4 +130,4 @@ inline Object OperatorObject(const std::string& oper)
 	return ret;
 }
 
-};
+}

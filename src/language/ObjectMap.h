@@ -28,4 +28,4 @@ inline Object MapObject(ObjectMap* value)
 	return ret;
 }
 
-};
+}

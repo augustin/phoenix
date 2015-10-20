@@ -42,4 +42,4 @@ inline Object FunctionObject(Function* value)
 	return ret;
 }
 
-};
+}

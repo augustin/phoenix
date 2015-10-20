@@ -59,4 +59,4 @@ void Stack::addSuperglobal(string variableName, Object value)
 	fSuperglobalScope.set(variableName, value);
 }
 
-};
+}
