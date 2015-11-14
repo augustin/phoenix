@@ -284,7 +284,11 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				expression[expression.size() - 1].type() == Type::Operator) {
 				throw Exception(Exception::SyntaxError, string("incorrectly placed operator"));
 			}
-			expression.push_back(OperatorObject(oper));
+			if (oper == "++" || oper == "--") {
+				expression.push_back(OperatorObject(string(&oper[0], 1).append("=")));
+				expression.push_back(IntegerObject(1));
+			} else
+				expression.push_back(OperatorObject(oper));
 		} break;
 
 		default:
@@ -297,7 +301,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		}
 	}
 	if (expression.size() == 0)
-		return Object();
+		return Object(); // undefined
 	if (expression[expression.size() - 1].type() == Type::Operator)
 		throw Exception(Exception::SyntaxError, string("incorrectly placed operator"));
 	if (expression.size() == 1)
@@ -338,7 +342,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* token */ 	       *,
 							   /* "TOKEN=" */      true)
 	}
-	// Pass 2: +, -. TODO: ++, --
+	// Pass 2: +, -
 	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper[0] == '-')
