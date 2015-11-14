@@ -30,6 +30,8 @@ void printUsage(string program)
 
 int main(int argc, char* argv[])
 {
+	setlocale(LC_ALL, "C"); // Force C locale
+
 	vector<string> arguments(argv, argv + argc);
 	if (arguments.size() < 2) {
 		printUsage(arguments[0]);

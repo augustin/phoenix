@@ -172,7 +172,6 @@ Object ParseNumber(Stack* stack, const string& code, uint32_t& line, string::siz
 		}
 	}
 
-	// FIXME: locale
 	int ret = strtol(number.c_str(), NULL, 10);
 	return IntegerObject(ret);
 }
