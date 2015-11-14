@@ -302,10 +302,10 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	}
 	if (expression.size() == 0)
 		return Object(); // undefined
-	if (expression[expression.size() - 1].type() == Type::Operator)
-		throw Exception(Exception::SyntaxError, string("incorrectly placed operator"));
 	if (expression.size() == 1)
 		return Language_POSSIBLY_DEREFERENCE(expression[0]);
+	if (expression[expression.size() - 1].type() == Type::Operator)
+		throw Exception(Exception::SyntaxError, string("incorrectly placed operator"));
 
 #define GET_OPERATOR_OR_CONTINUE \
 	const Object& obj = expression[j]; \
@@ -336,11 +336,11 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		if (oper[0] == '/')
 			IMPLEMENT_OPERATOR(/* operator name */ div,
 							   /* token */ 	       /,
-							   /* "TOKEN=" */      true)
+							   /* "TOKEN="? */     true)
 		else if (oper[0] == '*')
 			IMPLEMENT_OPERATOR(/* operator name */ mult,
 							   /* token */ 	       *,
-							   /* "TOKEN=" */      true)
+							   /* "TOKEN="? */     true)
 	}
 	// Pass 2: +, -
 	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
@@ -348,11 +348,11 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		if (oper[0] == '-')
 			IMPLEMENT_OPERATOR(/* operator name */ subt,
 							   /* token */ 	       -,
-							   /* "TOKEN=" */      true)
+							   /* "TOKEN="? */     true)
 		else if (oper[0] == '+')
 			IMPLEMENT_OPERATOR(/* operator name */ add,
 							   /* token */ 	       +,
-							   /* "TOKEN=" */      true)
+							   /* "TOKEN="? */     true)
 	}
 	// Pass 3: ==, !=
 	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
@@ -360,11 +360,11 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		if (oper == "==")
 			IMPLEMENT_OPERATOR(/* operator name */ eq,
 							   /* token */ 	       ==,
-							   /* "TOKEN=" */      false)
+							   /* "TOKEN="? */     false)
 		else if (oper == "!=")
 			IMPLEMENT_OPERATOR(/* operator name */ neq,
 							   /* token */ 	       !=,
-							   /* "TOKEN=" */      false)
+							   /* "TOKEN="? */     false)
 	}
 	// Pass 4: =
 	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
@@ -387,11 +387,11 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		if (oper == "&&")
 			IMPLEMENT_OPERATOR(/* operator name */ and,
 							   /* token */ 	       &&,
-							   /* "TOKEN=" */      false)
+							   /* "TOKEN="? */     false)
 		else if (oper == "||")
 			IMPLEMENT_OPERATOR(/* operator name */ or,
 							   /* token */ 	       ||,
-							   /* "TOKEN=" */      false)
+							   /* "TOKEN="? */     false)
 	}
 	// Pass 6: throw if there are remaining operators
 	for (vector<Object>::size_type j = 0; j < expression.size(); j++) {
