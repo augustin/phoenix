@@ -68,6 +68,7 @@ string Object::typeName() const
 
 	case Type::Variable:	return "IPT:Variable";
 	case Type::Operator:	return "IPT:Operator";
+	case Type::Nonexistent:	return "IPT:Nonexistent";
 	default:				return "Unknown";
 	}
 }

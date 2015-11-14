@@ -25,14 +25,16 @@ namespace Language {
 #define NUMERIC_CASES \
 	'0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': \
 	case '8': case '9'
-#define ALPHANUMERIC_CASES \
+#define ALPHABET_CASES \
 	'A': case 'B': case 'C': case 'D': case 'E': case 'F': case 'G': case 'H': \
 	case 'I': case 'J': case 'K': case 'L': case 'M': case 'N': case 'O': case 'P': \
 	case 'Q': case 'R': case 'S': case 'T': case 'U': case 'V': case 'W': case 'X': \
 	case 'Y': case 'Z': case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': \
 	case 'g': case 'h': case 'i': case 'j': case 'k': case 'l': case 'm': case 'n': \
 	case 'o': case 'p': case 'q': case 'r': case 's': case 't': case 'u': case 'v': \
-	case 'w': case 'x': case 'y': case 'z': case NUMERIC_CASES: case '_'
+	case 'w': case 'x': case 'y': case 'z': case '_'
+#define ALPHANUMERIC_CASES \
+	ALPHABET_CASES: case NUMERIC_CASES
 #define OPERS_CASES \
 	'=': case '!': case '&': case '|': case '+': case '-': case '*': case '/': \
 	case '%'
@@ -178,56 +180,69 @@ Object ParseNumber(Stack* stack, const string& code, uint32_t& line, string::siz
 
 Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
 {
-	string funcname;
-	ObjectMap arguments;
-	bool past_end = false, past_paren = false;
-
 	// Parse function name
-	while (!past_paren && i < code.length()) {
+	string funcName;
+	bool pastEndOfFuncName = false;
+	while (!pastEndOfFuncName && i < code.length()) {
 		char c = code[i];
 		switch (c) {
 		case ALPHANUMERIC_CASES:
-			if (past_end)
-				throw UNEXPECTED_TOKEN_EXPECTED("(");
-			funcname += c;
+			funcName += c;
 		break;
-
-		case '#': // comment
-			// Ignore all following characters until next newline
-			while (code[i] != '\n' && i < code.length())
-				i++;
-			// fall through
-		case '\n':
-			line++;
-			// fall through
-		case ' ':
-		case '\t':
-		case '\r':
-			past_end = true;
-		break;
-
 		case '(':
-			past_paren = true;
+			pastEndOfFuncName = true;
 		break;
-
 		default:
-			throw UNEXPECTED_EOF;
+			throw UNEXPECTED_TOKEN;
 		break;
 		}
-		i++;
+		string::size_type iBefore = ++i;
+		IgnoreWhitespace(PARSER_PARAMS);
+		if (i > iBefore)
+			pastEndOfFuncName = true;
 	}
-	if (i >= code.length()) {
-		throw Exception(Exception::SyntaxError, string("unexpected end of file"));
-	}
+	if (i >= code.length())
+		throw UNEXPECTED_EOF;
 
 	// Check if this function really exists
-	if (GlobalFunctions.find(funcname) == GlobalFunctions.end()) {
+	auto funcIter = GlobalFunctions.find(funcName);
+	if (funcIter == GlobalFunctions.end()) {
 		throw Exception(Exception::SyntaxError, string("attempted to call function '")
-			.append(funcname).append("' which does not exist"));
+			.append(funcName).append("' which does not exist"));
 	}
-	throw Exception(Exception::SyntaxError, funcname);
+	Function func = funcIter->second;
 
 	// Parse & build argument map
+	ObjectMap arguments;
+	bool atEOC = false;
+	while (!atEOC) {
+		// Parse an argument
+		string paramName;
+		bool pastEndOfParamName = false;
+		while (!pastEndOfParamName && i < code.length()) {
+			char c = code[i];
+			switch (c) {
+			case ALPHANUMERIC_CASES: // FIXME: should begin with letter?
+				paramName += c;
+			break;
+			case ':':
+				pastEndOfParamName = true;
+			break;
+			default:
+				throw UNEXPECTED_TOKEN;
+			break;
+			}
+			i++;
+		}
+		arguments.set(paramName, ParseAndEvalExpression(PARSER_PARAMS));
+		if (code[i] == ')')
+			atEOC = true;
+		else {
+			i++;
+			IgnoreWhitespace(PARSER_PARAMS);
+		}
+	}
+	return func.call(arguments);
 }
 
 Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
@@ -244,6 +259,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			if (i != start)
 				expression.push_back(ParseAndEvalExpression(PARSER_PARAMS));
 		break;
+		case ',':
 		case ';':
 		case ']':
 		case ')': // End of expression.
@@ -258,6 +274,9 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		break;
 		case '\'': // String literal
 			expression.push_back(ParseString(PARSER_PARAMS, '\''));
+		break;
+		case ALPHABET_CASES: // Function call
+			expression.push_back(ParseCallAndEval(PARSER_PARAMS));
 		break;
 		case NUMERIC_CASES: // Number
 			expression.push_back(ParseNumber(PARSER_PARAMS));

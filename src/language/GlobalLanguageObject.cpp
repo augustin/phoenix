@@ -24,7 +24,7 @@ GlobalLanguageObject::GlobalLanguageObject()
 	}));
 
 	// Also instantiate the GlobalFunctions object
-	GlobalFunctions.insert({"funky_call", Function([&](ObjectMap& params) -> Object {
+	GlobalFunctions.insert({"funky_call", Function([](ObjectMap& params) -> Object {
 		NativeFunction_COERCE_OR_THROW("some_param_thing", someParamThing, String);
 		return Object();
 	})});
