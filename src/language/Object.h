@@ -22,7 +22,9 @@ public:
 		FileDoesNotExist,
 		SyntaxError,
 		TypeError,
-		AccessViolation
+		AccessViolation,
+
+		UserError,
 	};
 	Exception(Type type, std::string what, std::string file = "", uint32_t line = 0)
 		: fType(type), fWhat(what), fFile(file), fLine(line) {}

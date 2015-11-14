@@ -4,6 +4,8 @@
  */
 #include "GlobalLanguageObject.h"
 
+#include <iostream>
+
 #include "Function.h"
 #include "ObjectMap.h"
 #include "Stack.h"
@@ -24,9 +26,14 @@ GlobalLanguageObject::GlobalLanguageObject()
 	}));
 
 	// Also instantiate the GlobalFunctions object
-	GlobalFunctions.insert({"funky_call", Function([](ObjectMap& params) -> Object {
-		NativeFunction_COERCE_OR_THROW("some_param_thing", someParamThing, String);
+	GlobalFunctions.insert({"print", Function([](ObjectMap& params) -> Object {
+		NativeFunction_COERCE_OR_THROW("0", zero, String);
+		std::cout << "message: " << *zero.string << "\n";
 		return Object();
+	})});
+	GlobalFunctions.insert({"fatal", Function([](ObjectMap& params) -> Object {
+		NativeFunction_COERCE_OR_THROW("0", zero, String);
+		throw Exception(Exception::UserError, std::string(*zero.string));
 	})});
 }
 

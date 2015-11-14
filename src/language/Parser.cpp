@@ -215,30 +215,50 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 	// Parse & build argument map
 	ObjectMap arguments;
 	bool atEOC = false;
+	bool paramNum = 0;
 	while (!atEOC) {
 		// Parse an argument
 		string paramName;
-		bool pastEndOfParamName = false;
-		while (!pastEndOfParamName && i < code.length()) {
-			char c = code[i];
-			switch (c) {
-			case ALPHANUMERIC_CASES: // FIXME: should begin with letter?
-				paramName += c;
-			break;
-			case ':':
-				pastEndOfParamName = true;
-			break;
-			default:
-				throw UNEXPECTED_TOKEN;
-			break;
+
+		auto commaBeforeColon = [&]() {
+			string::size_type j = i;
+			while (j < code.length()) {
+				if (code[j] == ':')
+					return false;
+				if (code[j] == '(' || code[j] == ',' ||
+					code[j] == '$' || code[j] == '{')
+					return true;
+				j++;
 			}
-			i++;
+			throw UNEXPECTED_EOF;
+		};
+		if (paramNum == 0 && commaBeforeColon()) {
+			paramName = "0";
+		} else {
+			bool pastEndOfParamName = false;
+			while (!pastEndOfParamName && i < code.length()) {
+				char c = code[i];
+				switch (c) {
+				case ALPHANUMERIC_CASES: // FIXME: should begin with letter?
+					paramName += c;
+				break;
+				case ':':
+					pastEndOfParamName = true;
+				break;
+				default:
+					throw UNEXPECTED_TOKEN;
+				break;
+				}
+				i++;
+			}
 		}
+		if (i >= code.length())
+			throw UNEXPECTED_EOF;
 		arguments.set(paramName, ParseAndEvalExpression(PARSER_PARAMS));
-		if (code[i] == ')')
+		if (code[i] == ')') {
 			atEOC = true;
-		else {
-			i++;
+		} else {
+			i++; paramNum++;
 			IgnoreWhitespace(PARSER_PARAMS);
 		}
 	}

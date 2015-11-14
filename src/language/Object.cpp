@@ -21,6 +21,9 @@ void Exception::print()
 		// 'fWhat' is the file(path)
 		std::cout << "file '" << fWhat << "' does not exist";
 	break;
+	case UserError:
+		std::cout << "user-thrown: ";
+		// fall through
 	case SyntaxError:
 	case TypeError:
 	case AccessViolation:
