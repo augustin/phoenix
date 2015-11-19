@@ -61,6 +61,7 @@ public:
 	inline Type type() const { return fObjectType; }
 	std::string typeName() const;
 	std::string asString() const;
+	std::string asStringRaw() const;
 
 	// Operators
 	static Object op_div(const Object& left, const Object& right);

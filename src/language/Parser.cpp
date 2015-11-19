@@ -21,6 +21,56 @@ using std::vector;
 
 namespace Language {
 
+// AST
+Object ASTNode::toObject(Stack* stack)
+{
+	if (type == Literal)
+		return literal;
+	if (type == Variable)
+		return stack->get(variable[0]); // FIXME: longer variables
+	if (type == RawString) {
+		std::string str;
+		uint32_t line = 0;
+		for (std::string::size_type i = 0; i < string.size(); i++) {
+			char c = string[i];
+			switch (c) {
+			case '$':
+				// FIXME/TODO: there's probably a way to implement eval() using this
+				// but this is a build system, so screw it
+				try {
+					str += EvalVariableName(stack, string, line, i).toObject(stack).asStringRaw();
+				} catch (Exception& e) {
+					if (e.fLine == 0) {
+						e.fFile = "(string dereferencing)";
+						e.fLine = line;
+					}
+					throw e;
+				}
+			break;
+
+			case '\n':
+				line++;
+				str += c;
+				break;
+			break;
+
+			case '\\':
+				i++;
+				c = string[i];
+				// fall through
+			default:
+				str += c;
+			break;
+			}
+		}
+		return StringObject(str);
+	}
+	throw Exception(Exception::InternalError,
+		std::string("illegal conversion from ASTNode to Object, please file a bug!"));
+}
+
+// Parser
+
 #define PARSER_PARAMS stack, code, line, i
 
 #define NUMERIC_CASES \
@@ -99,6 +149,11 @@ ASTNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, strin
 		realRet.variable.push_back(ret + result.string);
 		return realRet;
 	} else {
+		auto endOfVariable = [&]() -> void {
+			// end of variable name
+			i--;
+			realRet.variable.push_back(ret);
+		};
 		while (i < code.length()) {
 			char c = code[i];
 			switch (c) {
@@ -107,15 +162,14 @@ ASTNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, strin
 			break;
 
 			default:
-				// end of variable name
-				i--;
-				realRet.variable.push_back(ret);
+				endOfVariable();
 				return realRet;
 			break;
 			}
 			i++;
 		}
-		throw UNEXPECTED_EOF;
+		endOfVariable();
+		return realRet;
 	}
 }
 
@@ -476,7 +530,7 @@ void Run(Stack* stack, string path)
 			IgnoreWhitespace(PARSER_PARAMS);
 		}
 	} catch (Exception& e) {
-		if(e.fLine != 0) {
+		if (e.fLine == 0) {
 			e.fFile = filename;
 			e.fLine = line;
 		}

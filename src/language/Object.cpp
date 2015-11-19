@@ -74,6 +74,7 @@ string Object::typeName() const
 }
 string Object::asString() const
 {
+	// Modify asStringRaw() below simultaneously with this one!
 	switch (fObjectType) {
 	case Type::Undefined:
 		return "<Undefined>";
@@ -86,7 +87,27 @@ string Object::asString() const
 	case Type::Function:
 		return std::string("<Function>");
 	case Type::Map:
-		return std::string("<Map[...]>");
+		return std::string("<Map[...]>"); // TODO
+	default:
+		return "<UNKNOWN>";
+	}
+}
+string Object::asStringRaw() const
+{
+	// Modify asString() above simultaneously with this one!
+	switch (fObjectType) {
+	case Type::Undefined:
+		return "<Undefined>";
+	case Type::Boolean:
+		return boolean ? "true" : "false";
+	case Type::Integer:
+		return std::to_string(integer);
+	case Type::String:
+		return string;
+	case Type::Function:
+		return std::string("<Function>");
+	case Type::Map:
+		return std::string("<Map[...]>"); // TODO
 	default:
 		return "<UNKNOWN>";
 	}

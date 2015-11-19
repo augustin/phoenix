@@ -32,16 +32,7 @@ public:
 	inline ASTNode(Type t, const std::vector<std::string>& var)
 		: type(t), variable(var) {}
 
-	inline Object toObject(Stack* stack) {
-		if (type == Literal)
-			return literal;
-		if (type == Variable)
-			return stack->get(variable[0]); // FIXME: longer variables
-		if (type == RawString)
-			return StringObject(string); // FIXME: dereference string
-		throw Exception(Exception::InternalError,
-			std::string("illegal conversion from ASTNode to Object, please file a bug!"));
-	}
+	Object toObject(Stack* stack);
 
 	Type type;
 	Object literal;
@@ -49,6 +40,7 @@ public:
 	std::vector<std::string> variable;
 };
 
+ASTNode EvalVariableName(Stack* stack, const std::string& code, uint32_t& line, std::string::size_type& i);
 void Run(Stack* stack, std::string path);
 
 }
