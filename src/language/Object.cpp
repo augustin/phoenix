@@ -119,7 +119,6 @@ Object Object::op_add(const Object& left, const Object& right)
 	else if (left.type() == Type::Integer && right.type() == Type::Integer)
 		return IntegerObject(left.integer + right.integer);
 	throw Exception(Exception::InternalError, "unimplemented: adding strings to numbers & vice versa");
-	return Object(); // to make GCC happy
 }
 Object Object::op_eq(const Object& left, const Object& right)
 {
@@ -147,7 +146,7 @@ bool coerceToBoolean(const Object& obj)
 	case Type::Integer:		return obj.integer != 0;
 	case Type::String:		return obj.string.length() != 0;
 	case Type::Function:	return true;
-	case Type::Map:			return true;
+	case Type::Map:			return obj.map->size() != 0;
 	default:
 		throw Exception(Exception::InternalError, "unexpected type for lowering");
 	}
