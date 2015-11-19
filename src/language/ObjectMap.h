@@ -16,7 +16,7 @@ class ObjectMap : public std::map<std::string, Object>
 public:
 	ObjectMap();
 
-	Object get(std::string key);
+	Object get(std::string key, bool returnNonexistent = false);
 	void set(std::string key, Object value);
 };
 

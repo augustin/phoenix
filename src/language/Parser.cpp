@@ -80,12 +80,13 @@ void IgnoreWhitespace(Stack* stack, const string& code, uint32_t& line, string::
 	}
 }
 
-string EvalVariableName(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
+ASTNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
 {
 	// TODO: assert code[i] == '$'
 	i++;
 
-	string ret = "";
+	ASTNode realRet(ASTNode::Variable);
+	std::string ret = "";
 	if (code[i] == '$') { // superglobal reference
 		ret += '$';
 		i++;
@@ -94,7 +95,8 @@ string EvalVariableName(Stack* stack, const string& code, uint32_t& line, string
 		// Dereference.
 		Object result = ParseAndEvalExpression(PARSER_PARAMS);
 		Language_COERCE_OR_THROW("expression return type", result, String);
-		return ret + *result.string;
+		realRet.variable.push_back(ret + result.string);
+		return realRet;
 	} else {
 		while (i < code.length()) {
 			char c = code[i];
@@ -106,7 +108,8 @@ string EvalVariableName(Stack* stack, const string& code, uint32_t& line, string
 			default:
 				// end of variable name
 				i--;
-				return ret;
+				realRet.variable.push_back(ret);
+				return realRet;
 			break;
 			}
 			i++;
@@ -115,7 +118,7 @@ string EvalVariableName(Stack* stack, const string& code, uint32_t& line, string
 	}
 }
 
-Object ParseString(Stack* stack, const string& code, uint32_t& line, string::size_type& i,
+ASTNode ParseString(Stack* stack, const string& code, uint32_t& line, string::size_type& i,
 	char starter)
 {
 	string ret = "";
@@ -144,9 +147,11 @@ Object ParseString(Stack* stack, const string& code, uint32_t& line, string::siz
 		}
 		i++;
 	}
-	Object str = StringObject(ret);
-	str.string_dereferenced = !needs_dereferencing && starter != '\'';
-	return str;
+
+	needs_dereferencing = needs_dereferencing && starter != '\'';
+	if (needs_dereferencing)
+		return ASTNode(ASTNode::RawString, ret);
+	return ASTNode(ASTNode::Literal, StringObject(ret));
 }
 
 Object ParseNumber(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
@@ -268,7 +273,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
 {
 	// Parse
-	vector<Object> expression;
+	vector<ASTNode> expression;
 	bool atEOE = false;
 	string::size_type start = i;
 	IgnoreWhitespace(PARSER_PARAMS);
@@ -277,7 +282,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		case '[':
 		case '(':
 			if (i != start)
-				expression.push_back(ParseAndEvalExpression(PARSER_PARAMS));
+				expression.push_back(ASTNode(ASTNode::Literal, ParseAndEvalExpression(PARSER_PARAMS)));
 		break;
 		case ',':
 		case ';':
@@ -287,7 +292,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		break;
 
 		case '$': // Variable reference.
-			expression.push_back(VariableObject(EvalVariableName(PARSER_PARAMS)));
+			expression.push_back(EvalVariableName(PARSER_PARAMS));
 		break;
 		case '"': // String
 			expression.push_back(ParseString(PARSER_PARAMS, '"'));
@@ -296,10 +301,10 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			expression.push_back(ParseString(PARSER_PARAMS, '\''));
 		break;
 		case ALPHABET_CASES: // Function call
-			expression.push_back(ParseCallAndEval(PARSER_PARAMS));
+			expression.push_back(ASTNode(ASTNode::Literal, ParseCallAndEval(PARSER_PARAMS)));
 		break;
 		case NUMERIC_CASES: // Number
-			expression.push_back(ParseNumber(PARSER_PARAMS));
+			expression.push_back(ASTNode(ASTNode::Literal, ParseNumber(PARSER_PARAMS)));
 		break;
 
 		case OPERS_CASES: {
@@ -319,14 +324,14 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				}
 			}
 			if (expression.size() == 0 ||
-				expression[expression.size() - 1].type() == Type::Operator) {
+				expression[expression.size() - 1].type == ASTNode::Operator) {
 				throw Exception(Exception::SyntaxError, string("incorrectly placed operator"));
 			}
 			if (oper == "++" || oper == "--") {
-				expression.push_back(OperatorObject(string(&oper[0], 1).append("=")));
-				expression.push_back(IntegerObject(1));
+				expression.push_back(ASTNode(ASTNode::Operator, string(&oper[0], 1).append("=")));
+				expression.push_back(ASTNode(ASTNode::Literal, IntegerObject(1)));
 			} else
-				expression.push_back(OperatorObject(oper));
+				expression.push_back(ASTNode(ASTNode::Operator, oper));
 		} break;
 
 		default:
@@ -341,31 +346,31 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	if (expression.size() == 0)
 		return Object(); // undefined
 	if (expression.size() == 1)
-		return Language_POSSIBLY_DEREFERENCE(expression[0]);
-	if (expression[expression.size() - 1].type() == Type::Operator)
+		return expression[0].toObject(stack);
+	if (expression[expression.size() - 1].type == ASTNode::Operator)
 		throw Exception(Exception::SyntaxError, string("incorrectly placed operator"));
 
 #define GET_OPERATOR_OR_CONTINUE \
-	const Object& obj = expression[j]; \
-	if (obj.type() != Type::Operator) \
+	const ASTNode& node = expression[j]; \
+	if (node.type != ASTNode::Operator) \
 		continue; \
-	const string& oper = *obj.string
+	const string& oper = node.string
 #define UNKNOWN_OPERATOR \
 	Exception(Exception::SyntaxError, \
 		string("unknown operator '").append(oper).append("'"));
 #define IMPLEMENT_OPERATOR(OP_NAME, TOKEN, TOKEQ_ALLOWED) { \
 	j--; \
-	Object result = Object::op_##OP_NAME(Language_POSSIBLY_DEREFERENCE(expression[j]), \
-		Language_POSSIBLY_DEREFERENCE(expression[j + 2])); \
+	Object result = Object::op_##OP_NAME(expression[j].toObject(stack), \
+		expression[j + 2].toObject(stack)); \
 	if (TOKEQ_ALLOWED && oper == (#TOKEN "=")) { \
-		if (expression[j].type() != Type::Variable) \
+		if (expression[j].type != ASTNode::Variable) \
 			throw Exception(Exception::TypeError, string("the left-hand side of '" #TOKEN \
 				"=' must be a variable")); \
-		stack->set(*expression[j].string, result); \
+		stack->set(expression[j].string, result); \
 	} else if (oper == (#TOKEN "=") && oper.length() > 1) \
 		throw UNKNOWN_OPERATOR; \
 	/* Now update the expression vector */  \
-	expression[j] = result; \
+	expression[j] = ASTNode(ASTNode::Literal, result); \
 	expression.erase(expression.begin() + j + 1, expression.begin() + j + 3); }
 
 	// Pass 1: /, *
@@ -409,13 +414,13 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "=") {
 			j--;
-			if (expression[j].type() != Type::Variable)
+			if (expression[j].type != ASTNode::Variable)
 				throw Exception(Exception::TypeError,
 					string("the left-hand side of '=' must be a variable"));
-			Object result = Language_POSSIBLY_DEREFERENCE(expression[j + 2]);
-			stack->set(*expression[j].string, result);
+			Object result = expression[j + 2].toObject(stack);
+			stack->set(expression[j].variable[0], result); // FIXME for objects!
 			/* Now update the expression vector */
-			expression[j] = result;
+			expression[j] = ASTNode(ASTNode::Literal, result);
 			expression.erase(expression.begin() + j + 1, expression.begin() + j + 3);
 		}
 	}
@@ -439,7 +444,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	if (expression.size() != 1)
 		throw Exception(Exception::TypeError,
 			string("evaluated expression does not have 1 return value"));
-	return expression[0];
+	return expression[0].toObject(stack);
 }
 
 void Run(Stack* stack, string path)

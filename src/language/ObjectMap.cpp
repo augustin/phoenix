@@ -15,12 +15,14 @@ ObjectMap::ObjectMap()
 {
 }
 
-Object ObjectMap::get(string key)
+Object ObjectMap::get(string key, bool returnNonexistent)
 {
 	map<string, Object>::iterator it = find(key);
 	if (it != end())
 		return it->second;
-	return Object(Type::Nonexistent);
+	if (returnNonexistent)
+		return Object(Type::Nonexistent);
+	return Object(Type::Undefined);
 }
 
 void ObjectMap::set(string key, Object value)

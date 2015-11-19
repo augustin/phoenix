@@ -43,17 +43,13 @@ public:
 
 enum class Type {
 	Undefined = 0,
+	Nonexistent, // internal type, shouldn't be seen externally
 	Boolean,
 	Integer,
 	String,
 	Function,
 	List,
 	Map,
-
-	// Used by the parser/evaluator
-	Variable,
-	Operator,
-	Nonexistent
 };
 
 class Object
@@ -80,8 +76,9 @@ public:
 public: // Data storage
 	bool boolean;
 	int integer;
-	std::string* string; bool string_dereferenced;
+	std::string string;
 	Function* function;
+	std::vector<Object>* list;
 	ObjectMap* map;
 
 private:
@@ -89,9 +86,6 @@ private:
 };
 
 // Helper macros
-#define Language_POSSIBLY_DEREFERENCE(OBJECT) \
-	(OBJECT.type() == ::Language::Type::Variable) ? \
-		stack->get(*OBJECT.string) : OBJECT
 #define Language_COERCE_OR_THROW(WHAT, VARIABLE, TYPE) \
 	if (VARIABLE.type() != ::Language::Type::TYPE) { \
 		throw Exception(Exception::TypeError, \
@@ -115,20 +109,7 @@ inline Object IntegerObject(const int value)
 inline Object StringObject(const std::string& value)
 {
 	Object ret(Type::String);
-	ret.string = new std::string(value);
-	return ret;
-}
-// Internal parser types
-inline Object VariableObject(const std::string& variableName)
-{
-	Object ret(Type::Variable);
-	ret.string = new std::string(variableName);
-	return ret;
-}
-inline Object OperatorObject(const std::string& oper)
-{
-	Object ret(Type::Operator);
-	ret.string = new std::string(oper);
+	ret.string = std::string(value);
 	return ret;
 }
 
