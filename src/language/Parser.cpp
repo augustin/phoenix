@@ -10,6 +10,7 @@
 #include "ObjectMap.h"
 #include "Stack.h"
 
+#include <cassert>
 #include <cmath>
 #include <iostream>
 #include <fstream>
@@ -82,7 +83,7 @@ void IgnoreWhitespace(Stack* stack, const string& code, uint32_t& line, string::
 
 ASTNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
 {
-	// TODO: assert code[i] == '$'
+	assert(code[i] == '$');
 	i++;
 
 	ASTNode realRet(ASTNode::Variable);
