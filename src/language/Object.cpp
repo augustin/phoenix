@@ -129,7 +129,12 @@ Object Object::op_eq(const Object& left, const Object& right)
 		return BooleanObject(left.integer == right.integer);
 	else if (left.type() == Type::Boolean && right.type() == Type::Boolean)
 		return BooleanObject(left.boolean == right.boolean);
+
 	else if (left.type() == Type::Undefined && right.type() == Type::Undefined)
+		return BooleanObject(true);
+	else if (left.type() == Type::Undefined && right.type() != Type::Undefined)
+		return BooleanObject(false);
+	else if (left.type() != Type::Undefined && right.type() == Type::Undefined)
 		return BooleanObject(true);
 	throw Exception(Exception::InternalError, "unimplemented: complex type comparison");
 }
