@@ -245,7 +245,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 			while (!pastEndOfParamName && i < code.length()) {
 				char c = code[i];
 				switch (c) {
-				case ALPHANUMERIC_CASES: // FIXME: should begin with letter?
+				case ALPHANUMERIC_CASES:
 					paramName += c;
 				break;
 				case ':':
@@ -351,6 +351,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	if (expression[expression.size() - 1].type == ASTNode::Operator)
 		throw Exception(Exception::SyntaxError, string("incorrectly placed operator"));
 
+	// Evaluate
 #define GET_OPERATOR_OR_CONTINUE \
 	const ASTNode& node = expression[j]; \
 	if (node.type != ASTNode::Operator) \
@@ -475,9 +476,10 @@ void Run(Stack* stack, string path)
 			IgnoreWhitespace(PARSER_PARAMS);
 		}
 	} catch (Exception& e) {
-		// FIXME: adapt for multifile
-		e.fFile = filename;
-		e.fLine = line;
+		if(e.fLine != 0) {
+			e.fFile = filename;
+			e.fLine = line;
+		}
 		throw e;
 	}
 }
