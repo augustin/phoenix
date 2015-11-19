@@ -19,17 +19,19 @@ Stack::Stack()
 
 Object Stack::get(string variableName)
 {
-	// TODO: cleanup variables/redundant .get()s in this file
+	Object ret;
 	if (variableName[0] == '$') {
 		// it's a superglobal
 		variableName.erase(1);
-		if (fSuperglobalScope.get(variableName, true).type() != Type::Nonexistent)
-			return fSuperglobalScope.get(variableName);
+		ret = fSuperglobalScope.get(variableName, true);
+		if (ret.type() != Type::Nonexistent)
+			return ret;
 		else
 			return Object(); // undefined
 	}
-	if (fCurrentScope.get(variableName, true).type() != Type::Nonexistent)
-		return fCurrentScope.get(variableName);
+	ret = fCurrentScope.get(variableName, true);
+	if (ret.type() != Type::Nonexistent)
+		return ret;
 	if (fStack.size() > 0) for (ObjectMap::size_type i = fStack.size(); i >= 0; i--) {
 		Object ret = fStack[i].get(variableName, true);
 		if (ret.type() != Type::Nonexistent)
