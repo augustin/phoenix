@@ -5,3 +5,6 @@
 #pragma once
 
 #define PHOENIX_VERSION "0.0.1"
+#define PHOENIX_VERSION_MAJOR (0)
+#define PHOENIX_VERSION_MINOR (0)
+#define PHOENIX_VERSION_PATCH (1)
