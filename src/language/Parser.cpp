@@ -277,7 +277,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 	i++;
 	ObjectMap arguments;
 	bool atEOC = false;
-	bool paramNum = 0;
+	int paramNum = 0;
 	while (!atEOC) {
 		// Parse an argument
 		string paramName;
