@@ -20,8 +20,12 @@ class Stack
 public:
 	Stack();
 
-	Object get(std::string variableName);
-	void set(std::string variableName, Object value);
+	void push();
+	void pop();
+
+	Object get(const std::vector<std::string> variable);
+	inline Object get(const std::string variable0) { return get({variable0}); }
+	void set(std::vector<std::string> variable, Object value);
 
 	void addSuperglobal(std::string variableName, Object value);
 
@@ -30,7 +34,8 @@ public:
 private:
 	ObjectMap fSuperglobalScope;
 	std::vector<ObjectMap> fStack;
-	ObjectMap fCurrentScope;
+
+	std::vector<ObjectMap>::size_type getPos(std::string variable);
 };
 
 }

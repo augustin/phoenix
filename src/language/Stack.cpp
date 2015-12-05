@@ -8,6 +8,7 @@
 
 using std::cout;
 using std::string;
+using std::vector;
 
 namespace Language {
 
@@ -15,49 +16,68 @@ std::map<std::string, Function> GlobalFunctions;
 
 Stack::Stack()
 {
+	push();
 }
 
-Object Stack::get(string variableName)
+void Stack::push()
 {
-	Object ret;
-	if (variableName[0] == '$') {
+	fStack.push_back(ObjectMap());
+}
+
+void Stack::pop()
+{
+	fStack.pop_back();
+}
+
+std::vector<ObjectMap>::size_type Stack::getPos(std::string variable)
+{
+	std::vector<ObjectMap>::size_type size = fStack.size() - 1;
+	for (std::vector<ObjectMap>::size_type i = 0; i <= size; i++) {
+		if (fStack[size - i].get_ptr(variable) != nullptr)
+			return i;
+	}
+	return fStack.size() - 1;
+}
+
+Object Stack::get(const vector<string> variable)
+{
+	Object* ret = nullptr;
+	if (variable[0][0] == '$') {
 		// it's a superglobal
-		variableName.erase(1);
-		ret = fSuperglobalScope.get(variableName, true);
-		if (ret.type() != Type::Nonexistent)
-			return ret;
-		else
-			return Object(); // undefined
-	}
-	ret = fCurrentScope.get(variableName, true);
-	if (ret.type() != Type::Nonexistent)
-		return ret;
-	if (fStack.size() > 0) for (ObjectMap::size_type i = fStack.size(); i >= 0; i--) {
-		Object ret = fStack[i].get(variableName, true);
-		if (ret.type() != Type::Nonexistent)
-			return ret;
+		string var = variable[0];
+		var = var.substr(1);
+		ret = fSuperglobalScope.get_ptr(var);
+	} else
+		ret = fStack[getPos(variable[0])].get_ptr(variable[0]);
+	for (vector<string>::size_type i = 1; i < variable.size(); i++) {
+		Language_COERCE_OR_THROW_PTR("referenced variable", ret, Map);
+		ret = ret->map->get_ptr(variable[i]);
 	}
 
-	return Object(); // undefined
+	if (ret != nullptr)
+		return *ret;
+	return Object();
 }
 
-void Stack::set(string variableName, Object value)
+void Stack::set(vector<string> variable, Object value)
 {
-	if (variableName[0] == '$') {
+	if (variable[0][0] == '$') {
 		// it's a superglobal
 		throw Exception(Exception::AccessViolation, "superglobals are read-only");
 	}
-	if (fCurrentScope.get(variableName, true).type() != Type::Nonexistent) {
-		fCurrentScope.set(variableName, value);
+	vector<ObjectMap>::size_type loc = getPos(variable[0]);
+	if (variable.size() == 1) {
+		fStack[loc].set(variable[0], value);
 		return;
 	}
-	if (fStack.size() > 0) for (ObjectMap::size_type i = fStack.size() - 1; i >= 0; i--) {
-		if (fStack[i].get(variableName, true).type() != Type::Nonexistent) {
-			fStack[i].set(variableName, value);
-			return;
-		}
+
+	Object* res = fStack[loc].get_ptr(variable[0]);
+	Language_COERCE_OR_THROW_PTR("referenced variable", res, Map);
+	for (vector<string>::size_type i = 1; i < variable.size() - 1; i++) {
+		res = res->map->get_ptr(variable[i]);
+		Language_COERCE_OR_THROW_PTR("referenced variable", res, Map);
 	}
-	fCurrentScope.set(variableName, value);
+	res->map->set(variable[variable.size() - 1], value);
 }
 
 void Stack::addSuperglobal(string variableName, Object value)
@@ -67,20 +87,16 @@ void Stack::addSuperglobal(string variableName, Object value)
 
 void Stack::print()
 {
-	auto dump = [](int tabs, const ObjectMap& m) {
-		for (ObjectMap::const_iterator it = m.begin(); it != m.end(); it++) {
-			for (int i = 0; i < tabs; i++)
-				cout << "    ";
-			cout << it->first << ": " << it->second.asString() << "\n";
-		}
-	};
 	cout << "-- VM STACK DUMP --\n";
 	int tabs = 1;
 	for (const ObjectMap& m : fStack) {
-		dump(tabs, m);
+		for (ObjectMap::const_iterator it = m.begin(); it != m.end(); it++) {
+			for (int i = 0; i < tabs; i++)
+				cout << "    ";
+			cout << it->first << ": " << it->second->asString() << "\n";
+		}
 		tabs++;
 	}
-	dump(tabs, fCurrentScope);
 }
 
 }

@@ -22,8 +22,6 @@ void Exception::print()
 		std::cout << "file '" << fWhat << "' does not exist";
 	break;
 	case UserError:
-		std::cout << "user-thrown: ";
-		// fall through
 	case SyntaxError:
 	case TypeError:
 	case AccessViolation:
@@ -63,7 +61,6 @@ string Object::typeName() const
 {
 	switch (fObjectType) {
 	case Type::Undefined:	return "Undefined";
-	case Type::Nonexistent:	return "<ILT:Nonexistent>";
 	case Type::Boolean:		return "Boolean";
 	case Type::Integer:		return "Integer";
 	case Type::String:		return "String";

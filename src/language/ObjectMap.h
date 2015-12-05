@@ -11,13 +11,22 @@
 
 namespace Language {
 
-class ObjectMap : public std::map<std::string, Object>
+class ObjectMap : private std::map<std::string, Object*>
 {
+	typedef std::map<std::string, Object*> _inherited;
 public:
 	ObjectMap();
+	~ObjectMap();
 
-	Object get(std::string key, bool returnNonexistent = false);
+	typedef _inherited::const_iterator const_iterator;
+	const_iterator begin() const { return _inherited::begin(); }
+	const_iterator end() const { return _inherited::end(); }
+
+	Object get(std::string key);
+	Object* get_ptr(std::string key);
 	void set(std::string key, Object value);
+
+	size_type size() const { return _inherited::size(); }
 };
 
 // Convenience constructors

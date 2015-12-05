@@ -43,7 +43,6 @@ public:
 
 enum class Type {
 	Undefined = 0,
-	Nonexistent, // internal type, shouldn't be seen externally
 	Boolean,
 	Integer,
 	String,
@@ -92,6 +91,16 @@ private:
 		throw Exception(Exception::TypeError, \
 			std::string(WHAT " should be of type '" #TYPE "' but is of type '") \
 				.append(VARIABLE.typeName()).append("'")); \
+	}
+#define Language_COERCE_OR_THROW_PTR(WHAT, VARIABLE, TYPE) \
+	if (VARIABLE == nullptr) { \
+		throw Exception(Exception::TypeError, \
+			std::string(WHAT " should be of type '" #TYPE "' but is of type 'Undefined'")); \
+	} \
+	if (VARIABLE->type() != ::Language::Type::TYPE) { \
+		throw Exception(Exception::TypeError, \
+			std::string(WHAT " should be of type '" #TYPE "' but is of type '") \
+				.append(VARIABLE->typeName()).append("'")); \
 	}
 
 // Convenience constructors

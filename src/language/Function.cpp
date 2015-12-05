@@ -9,6 +9,11 @@ using std::string;
 
 namespace Language {
 
+Function::Function()
+	:
+	fIsNative(false)
+{
+}
 Function::Function(std::function<Object(ObjectMap&)> nativeFunction)
 	:
 	fNativeFunction(nativeFunction),

@@ -27,7 +27,7 @@ Object ASTNode::toObject(Stack* stack)
 	if (type == Literal)
 		return literal;
 	if (type == Variable)
-		return stack->get(variable[0]); // FIXME: longer variables
+		return stack->get(variable);
 	if (type == RawString) {
 		std::string str;
 		uint32_t line = 0;
@@ -89,13 +89,8 @@ Object ASTNode::toObject(Stack* stack)
 #define OPERS_CASES \
 	'=': case '!': case '&': case '|': case '+': case '-': case '*': case '/': \
 	case '%'
-
-#define IS_WHITESPACE(THING) ( \
-	THING == ' ' || \
-	THING == '#' || \
-	THING == '\t' || \
-	THING == '\n' || \
-	THING == '\r')
+#define WHITESPACE_CASES \
+	' ': case '#': case '\t': case '\n': case '\r'
 
 #define UNEXPECTED_EOF Exception(Exception::SyntaxError, string("unexpected end of file"))
 #define UNEXPECTED_TOKEN \
@@ -107,11 +102,14 @@ Object ASTNode::toObject(Stack* stack)
 
 Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, string::size_type& i);
 
-void IgnoreWhitespace(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
+void IgnoreWhitespace(Stack* stack, const string& code, uint32_t& line, string::size_type& i,
+	bool ignoreComments = true)
 {
 	while (i < code.length()) {
 		switch (code[i]) {
 		case '#': // comment
+			if (!ignoreComments)
+				return;
 			// Ignore all following characters until next newline
 			while (code[i] != '\n' && i < code.length())
 				i++;
@@ -142,44 +140,62 @@ ASTNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, strin
 		ret += '$';
 		i++;
 	}
-	if (code[i] == '[') {
-		// Dereference.
-		Object result = ParseAndEvalExpression(PARSER_PARAMS);
-		Language_COERCE_OR_THROW("expression return type", result, String);
-		realRet.variable.push_back(ret + result.string);
-		return realRet;
-	} else {
-		auto endOfVariable = [&]() -> void {
-			// end of variable name
-			i--;
-			realRet.variable.push_back(ret);
-		};
-		while (i < code.length()) {
-			char c = code[i];
-			switch (c) {
-			case ALPHANUMERIC_CASES:
-				ret += c;
-			break;
-
-			default:
-				endOfVariable();
-				return realRet;
-			break;
-			}
-			i++;
-		}
-		endOfVariable();
-		return realRet;
+	if (code[i] == '{') { // reference guard
+		i++;
 	}
+	bool atEOE = false;
+	while (!atEOE && i < code.length()) {
+		char c = code[i];
+		switch (c) {
+		case ALPHANUMERIC_CASES:
+			ret += c;
+		break;
+
+		case '[': {
+			if (ret.size() > 0) {
+				realRet.variable.push_back(ret);
+				ret = "";
+			}
+			Object result = ParseAndEvalExpression(PARSER_PARAMS);
+			Language_COERCE_OR_THROW("expression return type", result, String);
+			realRet.variable.push_back(result.string);
+		} break;
+
+		case '.':
+		case WHITESPACE_CASES: {
+			if (ret.size() > 0) {
+				realRet.variable.push_back(ret);
+				ret = "";
+			}
+			string::size_type iBefore = i;
+			IgnoreWhitespace(PARSER_PARAMS, false);
+			if (i > iBefore)
+				i--;
+		} break;
+
+		case '}':
+			i++;
+			// fall through
+		default:
+			i--;
+			if (ret.size() > 0)
+				realRet.variable.push_back(ret);
+			return realRet;
+		break;
+		}
+		i++;
+	}
+	i--; // so we're 1 before the last in the str
+	return realRet;
 }
 
 ASTNode ParseString(Stack* stack, const string& code, uint32_t& line, string::size_type& i,
-	char starter)
+	char endChar)
 {
 	string ret = "";
 	i++;
 	bool needs_dereferencing = false;
-	while (i < code.length() && code[i] != starter) {
+	while (i < code.length() && code[i] != endChar) {
 		char c = code[i];
 		switch (c) {
 		case '\\':
@@ -203,7 +219,7 @@ ASTNode ParseString(Stack* stack, const string& code, uint32_t& line, string::si
 		i++;
 	}
 
-	needs_dereferencing = needs_dereferencing && starter != '\'';
+	needs_dereferencing = needs_dereferencing && endChar != '\'';
 	if (needs_dereferencing)
 		return ASTNode(ASTNode::RawString, ret);
 	return ASTNode(ASTNode::Literal, StringObject(ret));
@@ -238,41 +254,27 @@ Object ParseNumber(Stack* stack, const string& code, uint32_t& line, string::siz
 	return IntegerObject(ret);
 }
 
-Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
+Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string::size_type& i,
+	const vector<string>& funcRef, bool variable = false)
 {
-	// Parse function name
-	string funcName;
-	bool pastEndOfFuncName = false;
-	while (!pastEndOfFuncName && i < code.length()) {
-		char c = code[i];
-		switch (c) {
-		case ALPHANUMERIC_CASES:
-			funcName += c;
-		break;
-		case '(':
-			pastEndOfFuncName = true;
-		break;
-		default:
-			throw UNEXPECTED_TOKEN;
-		break;
+	Function func;
+	// Try to find the function
+	if (variable) {
+		Object o = stack->get(funcRef);
+		Language_COERCE_OR_THROW("referenced variable", o, Function);
+		func = *o.function;
+	} else {
+		auto funcIter = GlobalFunctions.find(funcRef[0]);
+		if (funcIter == GlobalFunctions.end()) {
+			throw Exception(Exception::SyntaxError, string("attempted to call function '")
+				.append(funcRef[0]).append("' which does not exist"));
 		}
-		string::size_type iBefore = ++i;
-		IgnoreWhitespace(PARSER_PARAMS);
-		if (i > iBefore)
-			pastEndOfFuncName = true;
+		func = funcIter->second;
 	}
-	if (i >= code.length())
-		throw UNEXPECTED_EOF;
-
-	// Check if this function really exists
-	auto funcIter = GlobalFunctions.find(funcName);
-	if (funcIter == GlobalFunctions.end()) {
-		throw Exception(Exception::SyntaxError, string("attempted to call function '")
-			.append(funcName).append("' which does not exist"));
-	}
-	Function func = funcIter->second;
 
 	// Parse & build argument map
+	assert(i != '(');
+	i++;
 	ObjectMap arguments;
 	bool atEOC = false;
 	bool paramNum = 0;
@@ -336,13 +338,20 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		switch (code[i]) {
 		case '[':
 		case '(':
-			if (i != start)
+			if (i == start)
+				break;
+			if (expression.size() > 0 && expression[expression.size() - 1].type == ASTNode::Variable)
+				expression[expression.size() - 1] =
+					ASTNode(ASTNode::Literal, ParseCallAndEval(PARSER_PARAMS,
+						expression[expression.size() - 1].variable, true));
+			else
 				expression.push_back(ASTNode(ASTNode::Literal, ParseAndEvalExpression(PARSER_PARAMS)));
 		break;
 		case ',':
 		case ';':
 		case ']':
-		case ')': // End of expression.
+		case ')':
+			// End of expression.
 			atEOE = true;
 		break;
 
@@ -355,12 +364,39 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		case '\'': // String literal
 			expression.push_back(ParseString(PARSER_PARAMS, '\''));
 		break;
-		case ALPHABET_CASES: // Function call
-			expression.push_back(ASTNode(ASTNode::Literal, ParseCallAndEval(PARSER_PARAMS)));
-		break;
 		case NUMERIC_CASES: // Number
 			expression.push_back(ASTNode(ASTNode::Literal, ParseNumber(PARSER_PARAMS)));
 		break;
+		case ALPHABET_CASES: { // something else
+			string thing;
+			bool pastEndOfThing = false;
+			while (!pastEndOfThing && i < code.length()) {
+				char c = code[i];
+				switch (c) {
+				case ALPHANUMERIC_CASES:
+					thing += c;
+				break;
+
+				case '(':
+				default:
+					pastEndOfThing = true;
+				break;
+				}
+				i++;
+			}
+			i--;
+			i--; // to get us back to last character of thing
+			if (thing == "true")
+				expression.push_back(ASTNode(ASTNode::Literal, BooleanObject(true)));
+			else if (thing == "false")
+				expression.push_back(ASTNode(ASTNode::Literal, BooleanObject(false)));
+			else if (thing == "undefined")
+				expression.push_back(ASTNode(ASTNode::Literal, Object()));
+			else { // assume function call
+				i++;
+				expression.push_back(ASTNode(ASTNode::Literal, ParseCallAndEval(PARSER_PARAMS, {thing})));
+			}
+		} break;
 
 		case OPERS_CASES: {
 			string oper = "";
@@ -422,7 +458,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		if (expression[j].type != ASTNode::Variable) \
 			throw Exception(Exception::TypeError, string("the left-hand side of '" #TOKEN \
 				"=' must be a variable")); \
-		stack->set(expression[j].string, result); \
+		stack->set(expression[j].variable, result); \
 	} else if (oper == (#TOKEN "=") && oper.length() > 1) \
 		throw UNKNOWN_OPERATOR; \
 	/* Now update the expression vector */  \
@@ -474,7 +510,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				throw Exception(Exception::TypeError,
 					string("the left-hand side of '=' must be a variable"));
 			Object result = expression[j + 2].toObject(stack);
-			stack->set(expression[j].variable[0], result); // FIXME for objects!
+			stack->set(expression[j].variable, result);
 			/* Now update the expression vector */
 			expression[j] = ASTNode(ASTNode::Literal, result);
 			expression.erase(expression.begin() + j + 1, expression.begin() + j + 3);

@@ -19,6 +19,7 @@ namespace Language {
 class Function
 {
 public:
+	Function();
 	Function(std::function<Object(ObjectMap&)> nativeFunction);
 
 	Object call(ObjectMap& args);
