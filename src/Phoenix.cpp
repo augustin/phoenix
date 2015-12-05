@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	if (sourceDirectory.length() < 0 || buildDirectory.length() < 0) {
+	if (sourceDirectory.empty() || buildDirectory.empty()) {
 		cerr << "No source directory specified!";
 		return 1;
 	}

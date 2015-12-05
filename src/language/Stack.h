@@ -24,7 +24,9 @@ public:
 	void pop();
 
 	Object get(const std::vector<std::string> variable);
-	inline Object get(const std::string variable0) { return get({variable0}); }
+	inline Object get(const std::string variable0) {
+		std::vector<std::string> variable = {variable0};
+		return get(variable); }
 	void set(std::vector<std::string> variable, Object value);
 
 	void addSuperglobal(std::string variableName, Object value);
