@@ -58,6 +58,9 @@ GlobalLanguageObject::GlobalLanguageObject()
 		NativeFunction_COERCE_OR_THROW("0", zero, String);
 		throw Exception(Exception::UserError, std::string(zero.string));
 	})});
+	GlobalFunctions.insert({"Map", Function([](ObjectMap& params) -> Object {
+		return MapObject(new ObjectMap(params));
+	})});
 }
 
 }
