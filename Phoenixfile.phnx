@@ -1,7 +1,7 @@
 ############
 ### Project Setup
 ############
-$$Phoenix.checkVersion(minimum: 0.0.1);
+$$Phoenix.checkVersion(minimum: "0.0.1");
 $$Phoenix.setPolicy(OutOfTreeBuild, required);
 
 ######
@@ -9,13 +9,13 @@ $$Phoenix.setPolicy(OutOfTreeBuild, required);
 ######
 $phoenix = CreateTarget("phoenix", language: "C++");
 $phoenix.setStandardsMode("C++11", strict);
-$phoenix.definitions += { DATA_DIR: $$dataDir };
+$phoenix.addDefinitions(DATA_DIR: $$dataDir);
 $phoenix.addSourceDirectory("src", recursive);
-$phoenix.install(to: $$binDir, dependencies: autodetect);
+$phoenix.install(to: $$binDir, dependencies: 'autodetect');
 
 ######
 ## language support files
 ######
 $datafiles = CreateTarget(language: "static-files");
-$datafiles.addSourceDirectory("data", extensions: ["phnx"], recurseive);
+$datafiles.addSourceDirectory("data", extensions: ["phnx"], recursive);
 $datafiles.install(to: "$$dataDir/phoenix/");
