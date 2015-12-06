@@ -294,6 +294,8 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 			}
 			throw UNEXPECTED_EOF;
 		};
+
+		bool treatAsTrueBoolean = false;
 		if (paramNum == 0 && commaBeforeColon()) {
 			paramName = "0";
 		} else {
@@ -304,19 +306,31 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 				case ALPHANUMERIC_CASES:
 					paramName += c;
 				break;
+
+				case ')':
+				case ',':
+					treatAsTrueBoolean = true;
+					// fallthrough
 				case ':':
 					pastEndOfParamName = true;
 				break;
+
 				default:
 					throw UNEXPECTED_TOKEN;
 				break;
 				}
 				i++;
+				// TODO/FIXME: handle whitespace
 			}
 		}
 		if (i >= code.length())
 			throw UNEXPECTED_EOF;
-		arguments.set(paramName, ParseAndEvalExpression(PARSER_PARAMS));
+
+		if (!treatAsTrueBoolean)
+			arguments.set(paramName, ParseAndEvalExpression(PARSER_PARAMS));
+		else
+			arguments.set(paramName, BooleanObject(true));
+
 		if (code[i] == ')') {
 			atEOC = true;
 		} else {
