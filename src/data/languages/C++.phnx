@@ -1,0 +1,48 @@
+############
+### C++ language support
+############
+
+return Map(
+	type: "CompiledToMachineCode",
+	sourceExtensions: [".cpp", ".cxx", ".c++", ".cc"],
+	extraExtensions: [".h", ".hxx", ".hpp", ".h++"],
+	compilerEnviron: "CC",
+	preprocessor: true,
+	compilers: Map(
+		"Clang": Map(
+			binary: "clang++",
+			detect: Map(arguments: "--version", contains: "clang version"),
+			compile: "-c ",
+			definition: "-D",
+			include: "-I"
+		),
+		"GCC": Map(
+			binary: "g++",
+			detect: Map(arguments: "--version", contains: ["g++", "Free Software Foundation"]),
+			compile: "-c ",
+			definition: "-D",
+			include: "-I"
+		),
+		"MSVC": Map(
+			binary: "cl",
+			detect: Map(arguments: "", contains: "Microsoft (R) C/C++ Optimizing Compiler"),
+			compile: "/c ",
+			definition: "/D",
+			include: "/I"
+		)
+	),
+	standardsModes: Map(
+		"98": Map(
+			test: "int main(){#if __cplusplus == 199711L\nreturn 0;\n#else\nreturn 1;\n#endif}",
+			"GCC": Map(normal: "-std=gnu++98", strict: "-std=c++98"),
+			"Clang": Map(normal: "-std=gnu++98", strict: "-std=c++98"),
+			"MSVC": Map(normal: "", strict: "")
+		),
+		"11": Map(
+			test: "int main(){#if __cplusplus == 201103L\nreturn 0;\n#else\nreturn 1;\n#endif}",
+			"GCC": Map(normal: "-std=gnu++0x", strict: "-std=c++0x"),
+			"Clang": Map(normal: "-std=gnu++0x", strict: "-std=c++0x"),
+			"MSVC": Map(normal: "", strict: "")
+		)
+	)
+);

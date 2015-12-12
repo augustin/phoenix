@@ -1,0 +1,54 @@
+############
+### C language support
+############
+
+return Map(
+	type: "CompiledToMachineCode",
+	sourceExtensions: [".c"],
+	extraExtensions: [".h"],
+	compilerEnviron: "CC",
+	preprocessor: true,
+	compilers: Map(
+		"Clang": Map(
+			binary: "clang",
+			detect: Map(arguments: "--version", contains: "clang version"),
+			compile: "-c ",
+			definition: "-D",
+			include: "-I"
+		),
+		"GCC": Map(
+			binary: "gcc",
+			detect: Map(arguments: "--version", contains: ["gcc", "Free Software Foundation"]),
+			compile: "-c ",
+			definition: "-D",
+			include: "-I"
+		),
+		"MSVC": Map(
+			binary: "cl",
+			detect: Map(arguments: "", contains: "Microsoft (R) C/C++ Optimizing Compiler"),
+			compile: "/c ",
+			definition: "/D",
+			include: "/I"
+		)
+	),
+	standardsModes: Map(
+		"89": Map(
+			test: "int main(){return ((int)(90-(-4.5//**/\n-4.5)))-89;}",
+			"GCC": Map(normal: "-std=gnu89", strict: "-std=c89"),
+			"Clang": Map(normal: "-std=gnu89", strict: "-std=c89"),
+			"MSVC": Map(normal: "", strict: "")
+		),
+		"99": Map(
+			test: "int main(){return ((int)(90-(-4.5//**/\n-4.5)))-99;}",
+			"GCC": Map(normal: "-std=gnu99", strict: "-std=c99"),
+			"Clang": Map(normal: "-std=gnu99", strict: "-std=c99"),
+			"MSVC": Map(normal: "", strict: "")
+		),
+		"11": Map(
+			test: "int main(){return !(__STDC_VERSION__ >= 201112L);}",
+			"GCC": Map(normal: "-std=gnu11", strict: "-std=c11"),
+			"Clang": Map(normal: "-std=gnu11", strict: "-std=c11"),
+			"MSVC": Map(normal: "", strict: "")
+		)
+	)
+);
