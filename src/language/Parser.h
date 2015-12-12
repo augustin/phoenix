@@ -41,6 +41,6 @@ public:
 };
 
 ASTNode EvalVariableName(Stack* stack, const std::string& code, uint32_t& line, std::string::size_type& i);
-void Run(Stack* stack, std::string path);
+Object Run(Stack* stack, std::string path);
 
 }

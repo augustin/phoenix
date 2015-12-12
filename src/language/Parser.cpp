@@ -102,14 +102,16 @@ Object ASTNode::toObject(Stack* stack)
 
 Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, string::size_type& i);
 
-void IgnoreWhitespace(Stack* stack, const string& code, uint32_t& line, string::size_type& i,
+// Returns whether or not it ignored whitespace
+bool IgnoreWhitespace(Stack* stack, const string& code, uint32_t& line, string::size_type& i,
 	bool ignoreComments = true)
 {
+	const string::size_type oldi = i;
 	while (i < code.length()) {
 		switch (code[i]) {
 		case '#': // comment
 			if (!ignoreComments)
-				return;
+				return oldi < i;
 			// Ignore all following characters until next newline
 			while (code[i] != '\n' && i < code.length())
 				i++;
@@ -123,10 +125,11 @@ void IgnoreWhitespace(Stack* stack, const string& code, uint32_t& line, string::
 			// Ignore.
 		break;
 		default:
-			return;
+			return oldi < i;
 		}
 		i++;
 	}
+	return oldi < i;
 }
 
 ASTNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
@@ -167,9 +170,7 @@ ASTNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, strin
 				realRet.variable.push_back(ret);
 				ret = "";
 			}
-			string::size_type iBefore = i;
-			IgnoreWhitespace(PARSER_PARAMS, false);
-			if (i > iBefore)
+			if (IgnoreWhitespace(PARSER_PARAMS, false))
 				i--;
 		} break;
 
@@ -299,12 +300,27 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 		if (paramNum == 0 && commaBeforeColon()) {
 			paramName = "0";
 		} else {
-			bool pastEndOfParamName = false;
-			while (!pastEndOfParamName && i < code.length()) {
+			bool pastColon = false, pastEndOfParamName = false;
+			while (!pastColon && i < code.length()) {
+				if (IgnoreWhitespace(PARSER_PARAMS) && !paramName.empty())
+					pastEndOfParamName = true;
 				char c = code[i];
 				switch (c) {
 				case ALPHANUMERIC_CASES:
+					if (pastEndOfParamName)
+						throw UNEXPECTED_TOKEN;
 					paramName += c;
+				break;
+
+				case '\'':
+				case '"':
+					if (pastEndOfParamName)
+						throw UNEXPECTED_TOKEN;
+					if (paramName.length() == 0) {
+						paramName = ParseString(PARSER_PARAMS, c).toObject(stack).string;
+						pastEndOfParamName = true;
+					} else
+						throw UNEXPECTED_TOKEN;
 				break;
 
 				case ')':
@@ -312,7 +328,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 					treatAsTrueBoolean = true;
 					// fallthrough
 				case ':':
-					pastEndOfParamName = true;
+					pastColon = true;
 				break;
 
 				default:
@@ -320,7 +336,6 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 				break;
 				}
 				i++;
-				// TODO/FIXME: handle whitespace
 			}
 		}
 		if (i >= code.length())
@@ -341,25 +356,87 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 	return func.call(arguments);
 }
 
+Object ParseList(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
+{
+	assert(i != '[');
+	i++;
+
+	vector<Object>* ret = new vector<Object>;
+	bool pastEndOfEntry = false, atEndOfList = false;
+	while (!atEndOfList && i < code.length()) {
+		IgnoreWhitespace(PARSER_PARAMS);
+		char c = code[i];
+		switch (c) {
+		case '\'':
+		case '"':
+			if (pastEndOfEntry)
+				throw UNEXPECTED_TOKEN_EXPECTED(",' or ']");
+			ret->push_back(ParseString(PARSER_PARAMS, c).toObject(stack));
+			pastEndOfEntry = true;
+		break;
+
+		case NUMERIC_CASES:
+			if (pastEndOfEntry)
+				throw UNEXPECTED_TOKEN_EXPECTED(",' or ']");
+			ret->push_back(ParseNumber(PARSER_PARAMS));
+			pastEndOfEntry = true;
+		break;
+
+		case ',':
+			pastEndOfEntry = false;
+		break;
+
+		case ']':
+			atEndOfList = true;
+			i--;
+		break;
+
+		default:
+			throw UNEXPECTED_TOKEN;
+		break;
+		}
+		i++;
+	}
+	if (i >= code.length())
+		throw UNEXPECTED_EOF;
+	return ListObject(ret);
+}
+
+
+class ReturnValue : public std::exception
+{
+public:
+	ReturnValue(Object val) { value = val; }
+	virtual ~ReturnValue() throw() {}
+	virtual const char* what() const throw() { return "ReturnValue"; }
+
+	Object value;
+};
+
 Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
 {
 	// Parse
 	vector<ASTNode> expression;
-	bool atEOE = false;
+	bool atEOE = false, isReturn = false;
 	string::size_type start = i;
+
 	IgnoreWhitespace(PARSER_PARAMS);
 	while (!atEOE && i < code.length()) {
 		switch (code[i]) {
-		case '[':
 		case '(':
+			if (i == start)
+				break;
+			expression.push_back(ASTNode(ASTNode::Literal, ParseAndEvalExpression(PARSER_PARAMS)));
+		break;
+		case '[':
 			if (i == start)
 				break;
 			if (expression.size() > 0 && expression[expression.size() - 1].type == ASTNode::Variable)
 				expression[expression.size() - 1] =
 					ASTNode(ASTNode::Literal, ParseCallAndEval(PARSER_PARAMS,
 						expression[expression.size() - 1].variable, true));
-			else
-				expression.push_back(ASTNode(ASTNode::Literal, ParseAndEvalExpression(PARSER_PARAMS)));
+			else // Assume list
+				expression.push_back(ASTNode(ASTNode::Literal, ParseList(PARSER_PARAMS)));
 		break;
 		case ',':
 		case ';':
@@ -406,7 +483,11 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				expression.push_back(ASTNode(ASTNode::Literal, BooleanObject(false)));
 			else if (thing == "undefined")
 				expression.push_back(ASTNode(ASTNode::Literal, Object()));
-			else { // assume function call
+			else if (thing == "return") {
+				if (expression.size() != 0)
+					throw Exception(Exception::SyntaxError, string("incorrectly placed 'return'"));
+				isReturn = true;
+			} else { // assume function call
 				i++;
 				expression.push_back(ASTNode(ASTNode::Literal, ParseCallAndEval(PARSER_PARAMS, {thing})));
 			}
@@ -448,10 +529,14 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			IgnoreWhitespace(PARSER_PARAMS);
 		}
 	}
-	if (expression.size() == 0)
-		return Object(); // undefined
-	if (expression.size() == 1)
-		return expression[0].toObject(stack);
+
+#define RETURN(x) if (isReturn) { throw ReturnValue(x); } else { return x; }
+	if (expression.size() == 0) {
+		RETURN(Object()); // undefined
+	}
+	if (expression.size() == 1) {
+		RETURN(expression[0].toObject(stack));
+	}
 	if (expression[expression.size() - 1].type == ASTNode::Operator)
 		throw Exception(Exception::SyntaxError, string("incorrectly placed operator"));
 
@@ -550,17 +635,17 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	if (expression.size() != 1)
 		throw Exception(Exception::TypeError,
 			string("evaluated expression does not have 1 return value"));
-	return expression[0].toObject(stack);
+	RETURN(expression[0].toObject(stack));
+#undef RETURN
 }
 
-void Run(Stack* stack, string path)
+Object Run(Stack* stack, string path)
 {
 	string filename;
-	if (FSUtil::exists(path)) {
+	if (FSUtil::exists(path))
 		filename = path;
-	} else if (FSUtil::exists(path = FSUtil::combinePaths({path, "Phoenixfile"}))) {
+	else if (FSUtil::exists(path = FSUtil::combinePaths({path, "Phoenixfile.phnx"})))
 		filename = path;
-	}
 	if (filename.empty())
 		throw Exception(Exception::FileDoesNotExist, path);
 	string code; {
@@ -579,6 +664,8 @@ void Run(Stack* stack, string path)
 			i++;
 			IgnoreWhitespace(PARSER_PARAMS);
 		}
+	} catch (ReturnValue& e) {
+		return e.value;
 	} catch (Exception& e) {
 		if (e.fLine == 0) {
 			e.fFile = filename;
@@ -586,6 +673,7 @@ void Run(Stack* stack, string path)
 		}
 		throw e;
 	}
+	return Object(); // undefined
 }
 
 }

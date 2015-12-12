@@ -88,7 +88,7 @@ private:
 // Helper macros
 #define Language_COERCE_OR_THROW(WHAT, VARIABLE, TYPE) \
 	if (VARIABLE.type() != ::Language::Type::TYPE) { \
-		throw Exception(Exception::TypeError, \
+		throw Language::Exception(Language::Exception::TypeError, \
 			std::string(WHAT " should be of type '" #TYPE "' but is of type '") \
 				.append(VARIABLE.typeName()).append("'")); \
 	}
@@ -120,6 +120,12 @@ inline Object StringObject(const std::string& value)
 {
 	Object ret(Type::String);
 	ret.string = std::string(value);
+	return ret;
+}
+inline Object ListObject(std::vector<Object>* value)
+{
+	Object ret(Type::List);
+	ret.list = value;
 	return ret;
 }
 
