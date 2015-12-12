@@ -36,6 +36,17 @@ vector<string> StringUtil::split(const string& str, const string& delimiter)
 	return ret;
 }
 
+string StringUtil::join(const vector<string>& array, const string& delimiter)
+{
+	string ret = "";
+	for (vector<string>::size_type i = 0; i < array.size(); i++) {
+		if (i != 0)
+			ret += delimiter;
+		ret += array[i];
+	}
+	return ret;
+}
+
 bool StringUtil::startsWith(const string& haystack, const string& needle)
 {
 	size_t haystackLen = haystack.length(), needleLen = needle.length();

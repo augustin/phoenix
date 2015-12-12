@@ -13,6 +13,8 @@ public:
 	static int count(const std::string& str, const std::string& thing);
 	static std::vector<std::string> split(const std::string& str,
 		const std::string& delimiter);
+	static std::string join(const std::vector<std::string>& array,
+		const std::string& delimiter);
 
 	static bool startsWith(const std::string& haystack, const std::string& needle);
 	static bool endsWith(const std::string& haystack, const std::string& needle);
