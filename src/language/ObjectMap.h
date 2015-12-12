@@ -22,7 +22,7 @@ public:
 	const_iterator begin() const { return _inherited::begin(); }
 	const_iterator end() const { return _inherited::end(); }
 
-	Object get(std::string key);
+	Object get(std::string key) const;
 	Object* get_ptr(std::string key);
 	void set(std::string key, Object value);
 

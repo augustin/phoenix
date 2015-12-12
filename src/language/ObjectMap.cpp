@@ -17,13 +17,13 @@ ObjectMap::ObjectMap()
 ObjectMap::~ObjectMap()
 {
 	for (_inherited::const_iterator it = begin(); it != end(); it++) {
-		delete it->second;
+		//delete it->second; //FIXME
 	}
 }
 
-Object ObjectMap::get(string key)
+Object ObjectMap::get(string key) const
 {
-	_inherited::iterator it = find(key);
+	_inherited::const_iterator it = find(key);
 	if (it != end())
 		return *it->second;
 	return Object(Type::Undefined);
