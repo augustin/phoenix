@@ -42,7 +42,9 @@ mkdir -p build-bootstrap
 # Build phoenix_bootstrapped
 PHOENIX_SRCS="
 	Phoenix.cpp
-	generators/Generators.cpp
+	build/Generators.cpp
+	build/LanguageInfo.cpp
+	build/Target.cpp
 	language/Function.cpp
 	language/GlobalLanguageObject.cpp
 	language/Object.cpp

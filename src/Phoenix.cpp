@@ -7,7 +7,9 @@
 
 #include "Phoenix.h"
 
-#include "generators/Generators.h"
+#include "build/Generators.h"
+#include "build/LanguageInfo.h"
+#include "build/Target.h"
 
 #include "language/GlobalLanguageObject.h"
 #include "language/Parser.h"
@@ -71,6 +73,8 @@ int main(int argc, char* argv[])
 	// Create the language stack on the heap, as it can get pretty large.
 	Language::Stack* stack = new Language::Stack();
 	stack->addSuperglobal("Phoenix", Language::GlobalLanguageObject());
+	Target::addGlobalFunction();
+	LanguageInfo::sStack = stack;
 	try {
 		Language::Run(stack, sourceDirectory);
 	} catch (Language::Exception e) {
