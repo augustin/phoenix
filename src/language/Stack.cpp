@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#include "util/StringUtil.h"
+
 using std::cout;
 using std::string;
 using std::vector;
@@ -50,7 +52,9 @@ Object Stack::get(const vector<string> variable)
 	} else
 		ret = fStack[getPos(variable[0])].get_ptr(variable[0]);
 	for (vector<string>::size_type i = 1; i < variable.size(); i++) {
-		Language_COERCE_OR_THROW_PTR("referenced variable", ret, Map);
+		std::string what = string("referenced variable '")
+			.append(StringUtil::join(variable, ".")).append("'");
+		Language_COERCE_OR_THROW_PTR(what + , ret, Map);
 		ret = ret->map->get_ptr(variable[i]);
 	}
 
