@@ -29,6 +29,15 @@ bool FSUtil::exists(const string& file)
 
 string FSUtil::which(const string& program)
 {
+	if (program[0] == '/'
+#if defined(_WIN32) || defined(WIN32)
+		|| (program[0] == '\\' || (program[1] == ':' && program[2] == '\\'))
+#endif
+		)
+		return program; // already an absolute path
+	if (program.empty())
+		return program;
+
 #if defined(_WIN32) || defined(WIN32)
 	auto permutePathExt = [](const string& path) {
 		vector<string> PathExts = StringUtil::split(getenv("PATHEXT"), ";");
