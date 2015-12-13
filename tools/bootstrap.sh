@@ -53,6 +53,7 @@ PHOENIX_SRCS="
 	language/Stack.cpp
 	util/FSUtil.cpp
 	util/PrintUtil.cpp
+	util/ProcessUtil.cpp
 	util/StringUtil.cpp
 	"
 compile "$PHOENIX_SRCS" "-iquotesrc" "-o phoenix_bootstrapped"
