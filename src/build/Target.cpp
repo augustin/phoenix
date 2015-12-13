@@ -10,7 +10,6 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
 
 using Language::Function;
 using Language::ObjectMap;
@@ -21,17 +20,16 @@ Target::Target(const ObjectMap& params)
 	NativeFunction_COERCE_OR_THROW("0", name, String);
 	std::vector<std::string> languages;
 	const Object obj = params.get("language");
-	if (obj.type() == Language::Type::String) {
-		languages.push_back(obj.string);
-	} else { // TODO: type=list for multilingual programs
-		throw Exception(Language::Exception::TypeError,
-			std::string("parameter 'name' should be of type 'String' but is of type '")
-				.append(obj.typeName()).append("'"));
-	}
+	if (obj.type() == Language::Type::List) {
+		for (const Object& o : *obj.list) {
+			languages.push_back(o.asStringRaw());
+		}
+	} else
+		languages.push_back(obj.asStringRaw());
 
 	for (std::string lang : languages) {
-		Object* info = LanguageInfo::getLanguageInfo(lang);
-		std::cout << info->string;
+		LanguageInfo* info = LanguageInfo::getLanguageInfo(lang);
+		//std::cout << info->string;
 	}
 }
 

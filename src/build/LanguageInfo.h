@@ -4,17 +4,31 @@
  */
 #pragma once
 
+#include <map>
 #include <string>
+#include <vector>
 
 #include "language/Object.h"
-#include "language/Stack.h"
 
 class LanguageInfo
 {
 public:
-	static Language::Object* getLanguageInfo(std::string langName);
-	static Language::Stack* sStack;
+	LanguageInfo(std::string langName, Language::Object info);
+
+	static LanguageInfo* getLanguageInfo(std::string langName);
 
 private:
-	static Language::ObjectMap sData;
+	std::string fName;
+	std::vector<std::string> fSourceExtensions;
+	std::vector<std::string> fExtraExtensions;
+	std::string fCompilerEnviron;
+
+	// Compiler info
+	std::string fCompilerName;
+	std::string fCompilerBinary;
+	std::string fCompilerCompile;
+	std::string fCompilerDefinition;
+	std::string fCompilerInclude;
+
+	static std::map<std::string, LanguageInfo*> sData;
 };

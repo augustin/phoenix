@@ -8,7 +8,6 @@
 #include "Phoenix.h"
 
 #include "build/Generators.h"
-#include "build/LanguageInfo.h"
 #include "build/Target.h"
 
 #include "language/GlobalLanguageObject.h"
@@ -74,7 +73,6 @@ int main(int argc, char* argv[])
 	Language::Stack* stack = new Language::Stack();
 	stack->addSuperglobal("Phoenix", Language::GlobalLanguageObject());
 	Target::addGlobalFunction();
-	LanguageInfo::sStack = stack;
 	try {
 		Language::Run(stack, sourceDirectory);
 	} catch (Language::Exception e) {
