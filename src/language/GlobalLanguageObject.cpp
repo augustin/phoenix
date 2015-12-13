@@ -4,7 +4,6 @@
  */
 #include "GlobalLanguageObject.h"
 
-#include <iostream>
 #include <vector>
 
 #include "Phoenix.h"
@@ -12,6 +11,8 @@
 #include "Function.h"
 #include "ObjectMap.h"
 #include "Stack.h"
+
+#include "util/PrintUtil.h"
 #include "util/StringUtil.h"
 
 using std::vector;
@@ -48,10 +49,12 @@ GlobalLanguageObject::GlobalLanguageObject()
 	// Also instantiate the GlobalFunctions object
 	GlobalFunctions.insert({"print", Function([](ObjectMap& params) -> Object {
 		Object zero = params.get("0");
+		std::string message;
 		if (zero.type() == Type::String)
-			std::cout << "message: " << zero.string << "\n";
+			message += zero.string;
 		else
-			std::cout << "message: " << zero.asString() << "\n";
+			message += zero.asString();
+		PrintUtil::message(message);
 		return Object();
 	})});
 	GlobalFunctions.insert({"fatal", Function([](ObjectMap& params) -> Object {

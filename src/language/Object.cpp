@@ -7,7 +7,7 @@
 #include "Function.h"
 #include "ObjectMap.h"
 
-#include <iostream>
+#include "util/PrintUtil.h"
 
 using std::string;
 
@@ -15,27 +15,28 @@ namespace Language {
 
 void Exception::print()
 {
-	std::cout << "error: ";
+	string error;
 	switch (fType) {
 	case FileDoesNotExist:
 		// 'fWhat' is the file(path)
-		std::cout << "file '" << fWhat << "' does not exist";
+		error += "file '" + fWhat + "' does not exist";
 	break;
 	case UserError:
 	case SyntaxError:
 	case TypeError:
 	case AccessViolation:
 		// 'fWhat' is the error string
-		std::cout << fWhat;
+		error += fWhat;
 	break;
 	default:
-		std::cout << "unknown error " << fType << ": \"" << fWhat << "\"";
+		error += "unknown error " + std::to_string(fType) + ": \"" + fWhat + "\"";
 	break;
 	}
 	if (!fFile.empty() && fLine > 0) {
-		std::cout << " at line " << fLine << " of '" << fFile << "'";
+		error += " at line " + std::to_string(fLine) + " of '" + fFile + "'";
 	}
-	std::cout << ".\n";
+	error += ".";
+	PrintUtil::error(error);
 }
 
 
