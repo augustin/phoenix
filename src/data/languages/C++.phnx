@@ -6,7 +6,7 @@ return Map(
 	type: "CompiledToMachineCode",
 	sourceExtensions: [".cpp", ".cxx", ".c++", ".cc"],
 	extraExtensions: [".h", ".hxx", ".hpp", ".h++"],
-	compilerEnviron: "CC",
+	compilerEnviron: "CXX",
 	preprocessor: true,
 	compilers: Map(
 		"Clang": Map(
