@@ -41,8 +41,8 @@ GlobalLanguageObject::GlobalLanguageObject()
 			parts[1] > PHOENIX_VERSION_MINOR ||
 			parts[2] > PHOENIX_VERSION_PATCH)
 			throw Exception(Exception::UserError,
-				std::string("minimum version required is ").append(minimum.string)
-				 .append(" and this is Phoenix " PHOENIX_VERSION));
+				std::string("minimum version of Phoenix required is ").append(minimum.string)
+				 .append(" and this is " PHOENIX_VERSION));
 		return Object();
 	}));
 
