@@ -11,8 +11,6 @@
 #include "Stack.h"
 
 #include <cassert>
-#include <cmath>
-#include <iostream>
 #include <fstream>
 #include <vector>
 
@@ -426,17 +424,18 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		case '(':
 			if (i == start)
 				break;
-			expression.push_back(ASTNode(ASTNode::Literal, ParseAndEvalExpression(PARSER_PARAMS)));
-		break;
-		case '[':
-			if (i == start)
-				break;
 			if (expression.size() > 0 && expression[expression.size() - 1].type == ASTNode::Variable)
 				expression[expression.size() - 1] =
 					ASTNode(ASTNode::Literal, ParseCallAndEval(PARSER_PARAMS,
 						expression[expression.size() - 1].variable, true));
-			else // Assume list
-				expression.push_back(ASTNode(ASTNode::Literal, ParseList(PARSER_PARAMS)));
+			else
+				expression.push_back(ASTNode(ASTNode::Literal, ParseAndEvalExpression(PARSER_PARAMS)));
+		break;
+		case '[':
+			if (i == start)
+				break;
+			// Assume list
+			expression.push_back(ASTNode(ASTNode::Literal, ParseList(PARSER_PARAMS)));
 		break;
 		case ',':
 		case ';':
@@ -660,7 +659,7 @@ Object Run(Stack* stack, string path)
 	try {
 		IgnoreWhitespace(PARSER_PARAMS);
 		while (i < code.length()) {
-			std::cout << ParseAndEvalExpression(PARSER_PARAMS).asString();
+			ParseAndEvalExpression(PARSER_PARAMS);
 			i++;
 			IgnoreWhitespace(PARSER_PARAMS);
 		}
