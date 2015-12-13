@@ -94,11 +94,11 @@ private:
 	}
 #define Language_COERCE_OR_THROW_PTR(WHAT, VARIABLE, TYPE) \
 	if (VARIABLE == nullptr) { \
-		throw Exception(Exception::TypeError, \
+		throw Language::Exception(Language::Exception::TypeError, \
 			std::string(WHAT " should be of type '" #TYPE "' but is of type 'Undefined'")); \
 	} \
 	if (VARIABLE->type() != ::Language::Type::TYPE) { \
-		throw Exception(Exception::TypeError, \
+		throw Language::Exception(Language::Exception::TypeError, \
 			std::string(WHAT " should be of type '" #TYPE "' but is of type '") \
 				.append(VARIABLE->typeName()).append("'")); \
 	}
