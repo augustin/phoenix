@@ -5,7 +5,6 @@
 #include "PrintUtil.h"
 
 #include <iostream>
-#include <io.h>
 
 using std::string;
 
