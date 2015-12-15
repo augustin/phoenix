@@ -56,7 +56,8 @@ int main(int argc, char* argv[])
 			cerr << "\t-C:<lang>:<compiler>\tPreferred ompiler for <lang> to use." <<
 				std::endl;
 			return 1;
-		} else if (arg.find(".") != string::npos || arg.find("/") != string::npos) {
+		} else if (arg.find(".") != string::npos || arg.find("/") != string::npos ||
+				   arg.find("\\") != string::npos) {
 			// Looks like a path.
 			if (sourceDirectory.length() > 0)
 				buildDirectory = arg;
@@ -68,7 +69,7 @@ int main(int argc, char* argv[])
 				cerr << "error: -C passed but did not have the expected -C:<lang>:<compiler> syntax.";
 				return 1;
 			}
-			LanguageInfo::sPreferredCompiler.insert_or_assign(item[1], item[2]);
+			LanguageInfo::sPreferredCompiler.insert({item[1], item[2]});
 		} else {
 			cerr << "error: unrecognized option '" << arg << "'.";
 			return 1;
