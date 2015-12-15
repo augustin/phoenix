@@ -17,10 +17,10 @@ public:
 
 	static LanguageInfo* getLanguageInfo(std::string langName);
 
-private:
 	std::string fName;
 	std::vector<std::string> fSourceExtensions;
 	std::vector<std::string> fExtraExtensions;
+	bool fPreprocessor;
 	std::string fCompilerEnviron;
 
 	// Compiler info
@@ -30,5 +30,6 @@ private:
 	std::string fCompilerDefinition;
 	std::string fCompilerInclude;
 
+private:
 	static std::map<std::string, LanguageInfo*> sData;
 };

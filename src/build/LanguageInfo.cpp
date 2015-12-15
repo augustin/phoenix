@@ -37,6 +37,8 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 			fExtraExtensions.push_back(obj.asStringRaw());
 	}
 
+	fPreprocessor = info.map->get("preprocessor").boolean;
+
 	Object envir = info.map->get("compilerEnviron");
 	if (envir.type() != Language::Type::Undefined)
 		fCompilerEnviron = envir.asStringRaw();
@@ -95,7 +97,12 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 				break;
 		}
 	}
-	PrintUtil::checkFinished(fCompilerName + " ('" + fCompilerBinary + "')");
+	if (fCompilerName.empty()) {
+		PrintUtil::checkFinished("none found", 0);
+		throw Language::Exception(Language::Exception::UserError,
+			string("cannot find a compiler for " + langName));
+	} else
+		PrintUtil::checkFinished(fCompilerName + " ('" + fCompilerBinary + "')", 2);
 }
 
 LanguageInfo* LanguageInfo::getLanguageInfo(string langName)
