@@ -8,6 +8,7 @@ return Map(
 	extraExtensions: [".h"],
 	compilerEnviron: "CC",
 	preprocessor: true,
+	test: "int main(){\n#ifdef __cplusplus\n#error Cpp not C\n#endif\nreturn 0;}",
 	compilers: Map(
 		"Clang": Map(
 			binary: "clang",
@@ -33,19 +34,19 @@ return Map(
 	),
 	standardsModes: Map(
 		"89": Map(
-			test: "int main(){return ((int)(90-(-4.5//**/\n-4.5)))-89;}",
+			test: "int main(){\n#if __STDC_VERSION__ <= 199409L\n#error Not C89\n#endif\nreturn 0;}",
 			"GNU": Map(normal: "-std=gnu89", strict: "-std=c89"),
 			"Clang": Map(normal: "-std=gnu89", strict: "-std=c89"),
 			"MSVC": Map(normal: "", strict: "")
 		),
 		"99": Map(
-			test: "int main(){return ((int)(90-(-4.5//**/\n-4.5)))-99;}",
+			test: "int main(){\n#if __STDC_VERSION__ != 199901L\n#error Not C99\n#endif\nreturn 0;}",
 			"GNU": Map(normal: "-std=gnu99", strict: "-std=c99"),
 			"Clang": Map(normal: "-std=gnu99", strict: "-std=c99"),
 			"MSVC": Map(normal: "", strict: "")
 		),
 		"11": Map(
-			test: "int main(){return !(__STDC_VERSION__ >= 201112L);}",
+			test: "int main(){\n#if __STDC_VERSION__ != 201112L\n#error Not C11\n#endif\nreturn 0;}",
 			"GNU": Map(normal: "-std=gnu11", strict: "-std=c11"),
 			"Clang": Map(normal: "-std=gnu11", strict: "-std=c11"),
 			"MSVC": Map(normal: "", strict: "")

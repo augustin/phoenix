@@ -8,6 +8,7 @@ return Map(
 	extraExtensions: [".h", ".hxx", ".hpp", ".h++"],
 	compilerEnviron: "CXX",
 	preprocessor: true,
+	test: "int main(){\n#ifndef __cplusplus\n#error Not Cpp\n#endif\nreturn 0;}",
 	compilers: Map(
 		"Clang": Map(
 			binary: "clang++",
@@ -33,13 +34,13 @@ return Map(
 	),
 	standardsModes: Map(
 		"98": Map(
-			test: "int main(){#if __cplusplus == 199711L\nreturn 0;\n#else\nreturn 1;\n#endif}",
+			test: "int main(){\n#if __cplusplus != 199711L\n#error Not Cpp98\n#endif\nreturn 0;}",
 			"GNU": Map(normal: "-std=gnu++98", strict: "-std=c++98"),
 			"Clang": Map(normal: "-std=gnu++98", strict: "-std=c++98"),
 			"MSVC": Map(normal: "", strict: "")
 		),
 		"11": Map(
-			test: "int main(){#if __cplusplus == 201103L\nreturn 0;\n#else\nreturn 1;\n#endif}",
+			test: "int main(){\n#if __cplusplus != 201103L\n#error Not Cpp11\n#endif\nreturn 0;}",
 			"GNU": Map(normal: "-std=gnu++0x", strict: "-std=c++0x"),
 			"Clang": Map(normal: "-std=gnu++0x", strict: "-std=c++0x"),
 			"MSVC": Map(normal: "", strict: "")
