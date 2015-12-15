@@ -12,8 +12,7 @@ bool PrintUtil::sChecking;
 
 void PrintUtil::error(const string& str)
 {
-	// TODO: queue message if (sChecking)
-	std::cout << "error: " << str << "\n";
+	std::cerr << "error: " << str << "\n";
 }
 
 void PrintUtil::message(const string& str)
