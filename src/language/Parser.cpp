@@ -640,9 +640,9 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 Object Run(Stack* stack, string path)
 {
 	string filename;
-	if (!FSUtil::isDir(path))
+	if (FSUtil::isFile(path))
 		filename = path;
-	else if (!FSUtil::isDir(path = FSUtil::combinePaths({path, "Phoenixfile.phnx"})))
+	else if (FSUtil::isFile(path = FSUtil::combinePaths({path, "Phoenixfile.phnx"})))
 		filename = path;
 	if (filename.empty())
 		throw Exception(Exception::FileDoesNotExist, path);

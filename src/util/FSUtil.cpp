@@ -16,9 +16,9 @@
 using std::string;
 using std::vector;
 
-bool FSUtil::exists(const string& file)
+bool FSUtil::exists(const string& path)
 {
-	string filename = file;
+	string filename = path;
 #ifdef _WIN32
 	StringUtil::replaceAll(filename, "/", "\\");
 #endif
@@ -27,10 +27,20 @@ bool FSUtil::exists(const string& file)
 	return static_cast<bool>(f);
 }
 
-bool FSUtil::isDir(const string& file)
+bool FSUtil::isFile(const string& path)
 {
 	struct stat statbuf;
-	if (stat(file.c_str(), &statbuf) == -1)
+	if (stat(path.c_str(), &statbuf) == -1)
+		return false;
+	if (statbuf.st_mode & S_IFREG)
+		return true;
+	return false;
+}
+
+bool FSUtil::isDir(const string& path)
+{
+	struct stat statbuf;
+	if (stat(path.c_str(), &statbuf) == -1)
 		return false;
 	if (statbuf.st_mode & S_IFDIR)
 		return true;
