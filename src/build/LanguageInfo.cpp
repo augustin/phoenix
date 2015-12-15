@@ -14,6 +14,7 @@
 using std::string;
 using Language::Object;
 
+std::map<string, string> LanguageInfo::sPreferredCompiler;
 std::map<string, LanguageInfo*> LanguageInfo::sData;
 
 LanguageInfo::LanguageInfo(string langName, Object info)
@@ -81,14 +82,16 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	};
 
 	PrintUtil::checking("what " + langName + " compiler to use");
-	string compilerBin;
-	if (!compilerEnviron.empty()) {
+	if (!sPreferredCompiler[langName].empty()) {
+		tryCompiler(sPreferredCompiler[langName]);
+	}
+	if (compilerName.empty() && !compilerEnviron.empty()) {
 		const char* env = getenv(compilerEnviron.c_str());
 		if (env != nullptr)
-			compilerBin = string(env);
+			tryCompiler(string(env));
 	}
-	if (!tryCompiler(compilerBin)) {
-		// Environ didn't work, try everything in succession instead
+	if (compilerName.empty()) {
+		// Preferred & environ didn't work, try everything in succession instead
 		for (Language::ObjectMap::const_iterator it =
 			 comps.map->begin(); it != comps.map->end(); it++) {
 			Object* comp = it->second;

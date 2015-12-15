@@ -17,6 +17,7 @@ public:
 
 	static LanguageInfo* getLanguageInfo(std::string langName);
 
+	// Basic info
 	std::string name;
 	std::vector<std::string> sourceExtensions;
 	std::vector<std::string> extraExtensions;
@@ -30,6 +31,8 @@ public:
 	std::string compilerDefinition;
 	std::string compilerInclude;
 
+	// From command-line flags & the like.
+	static std::map<std::string, std::string> sPreferredCompiler;
 private:
 	static std::map<std::string, LanguageInfo*> sData;
 };
