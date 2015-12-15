@@ -19,7 +19,7 @@ using std::vector;
 bool FSUtil::exists(const string& file)
 {
 	string filename = file;
-#if defined(_WIN32) || defined(WIN32)
+#ifdef _WIN32
 	StringUtil::replaceAll(filename, "/", "\\");
 #endif
 
@@ -30,7 +30,7 @@ bool FSUtil::exists(const string& file)
 string FSUtil::which(const string& program)
 {
 	if (program[0] == '/'
-#if defined(_WIN32) || defined(WIN32)
+#ifdef _WIN32
 		|| (program[0] == '\\' || (program.length() > 2 && program[1] == ':' && program[2] == '\\'))
 #endif
 		)
@@ -38,7 +38,7 @@ string FSUtil::which(const string& program)
 	if (program.empty())
 		return program;
 
-#if defined(_WIN32) || defined(WIN32)
+#ifdef _WIN32
 	auto permutePathExt = [](const string& path) {
 		vector<string> PathExts = StringUtil::split(getenv("PATHEXT"), ";");
 		for (string ext : PathExts) {
@@ -52,7 +52,7 @@ string FSUtil::which(const string& program)
 
 	// The program's name contains a slash, ignore PATH
 	if (program.find('/') != string::npos
-#if defined(_WIN32) || defined(WIN32)
+#ifdef _WIN32
 		|| program.find('\\') != string::npos
 #endif
 		) {
@@ -62,7 +62,7 @@ string FSUtil::which(const string& program)
 			// TODO: return absolute path
 			return normd;
 		}
-#if defined(_WIN32) || defined(WIN32)
+#ifdef _WIN32
 		else
 			return permutePathExt(normalizePath(program));
 #endif
@@ -70,7 +70,7 @@ string FSUtil::which(const string& program)
 	}
 
 	vector<string> PATHs =
-#if defined(_WIN32) || defined(WIN32)
+#ifdef _WIN32
 		StringUtil::split(getenv("PATH"), ";");
 #else
 		StringUtil::split(getenv("PATH"), ":");
@@ -80,7 +80,7 @@ string FSUtil::which(const string& program)
 		return "";
 	for (string path : PATHs) {
 		string fullPath =
-#if defined(_WIN32) || defined(WIN32)
+#ifdef _WIN32
 			permutePathExt(combinePaths({path, program}));
 #else
 			combinePaths({path, program});
@@ -97,7 +97,7 @@ string FSUtil::normalizePath(const string& path)
 		return path;
 
 	string ret = path;
-#if defined(_WIN32) || defined(WIN32)
+#ifdef _WIN32
 	StringUtil::replaceAll(ret, "\\", "/");
 #endif
 	vector<string> orig = StringUtil::split(ret, "/"), normd;
@@ -118,7 +118,7 @@ string FSUtil::normalizePath(const string& path)
 		ret += normd[i];
 	}
 
-#if defined(_WIN32) || defined(WIN32)
+#ifdef _WIN32
 	if (ret[0] == '/') {
 		ret[0] = toupper(ret[1]);
 		ret[1] = ':';
@@ -134,7 +134,7 @@ string FSUtil::combinePaths(const vector<string>& paths)
 		bool endsInSeparator =
 			ret.length() == 0 ||
 			StringUtil::endsWith(ret, "/")
-#if defined(_WIN32) || defined(WIN32)
+#ifdef _WIN32
 			|| StringUtil::endsWith(ret, "\\")
 #endif
 			;
