@@ -27,7 +27,17 @@ bool FSUtil::exists(const string& file)
 	return static_cast<bool>(f);
 }
 
-std::string FSUtil::getContents(const std::string& file)
+bool FSUtil::isDir(const string& file)
+{
+	struct stat statbuf;
+	if (stat(file.c_str(), &statbuf) == -1)
+		return false;
+	if (statbuf.st_mode & S_IFDIR)
+		return true;
+	return false;
+}
+
+std::string FSUtil::getContents(const string& file)
 {
 	std::ifstream filestream(file);
 	// extra ()s here are mandatory

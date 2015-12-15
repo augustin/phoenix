@@ -11,6 +11,7 @@ class FSUtil
 {
 public:
 	static bool exists(const std::string& file);
+	static bool isDir(const std::string& file);
 	static std::string getContents(const std::string& file);
 
 	static std::string which(const std::string& program);
