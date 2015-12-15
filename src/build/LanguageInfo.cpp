@@ -17,7 +17,7 @@ using Language::Object;
 std::map<string, LanguageInfo*> LanguageInfo::sData;
 
 LanguageInfo::LanguageInfo(string langName, Object info)
-	: fName(langName)
+	: name(langName)
 {
 	Language_COERCE_OR_THROW("language information", info, Map);
 	Object type = info.map->get("type");
@@ -30,25 +30,25 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	Object srcExts = info.map->get("sourceExtensions");
 	Language_COERCE_OR_THROW("languageInfo.sourceExtensions", srcExts, List);
 	for (const Object& obj : *srcExts.list)
-		fSourceExtensions.push_back(obj.asStringRaw());
+		sourceExtensions.push_back(obj.asStringRaw());
 	Object extraExts = info.map->get("extraExtensions");
 	if (extraExts.type() == Language::Type::List) {
 		for (const Object& obj : *extraExts.list)
-			fExtraExtensions.push_back(obj.asStringRaw());
+			extraExtensions.push_back(obj.asStringRaw());
 	}
 
-	fPreprocessor = info.map->get("preprocessor").boolean;
+	preprocessor = info.map->get("preprocessor").boolean;
 
 	Object envir = info.map->get("compilerEnviron");
 	if (envir.type() != Language::Type::Undefined)
-		fCompilerEnviron = envir.asStringRaw();
+		compilerEnviron = envir.asStringRaw();
 
 	// Figure out what compiler we're using
 	Object comps = info.map->get("compilers");
 	Language_COERCE_OR_THROW("languageInfo.compilers", comps, Map);
 	auto tryCompiler = [&](const string& binary) -> bool {
-		string compilerBinary = FSUtil::which(binary);
-		if (FSUtil::exists(compilerBinary)) {
+		string compilerBin = FSUtil::which(binary);
+		if (FSUtil::exists(compilerBin)) {
 			// Which compiler is this?
 			for (Language::ObjectMap::const_iterator it =
 				 comps.map->begin(); it != comps.map->end(); it++) {
@@ -68,11 +68,11 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 						OK = false;
 				}
 				if (OK) {
-					fCompilerName = it->first;
-					fCompilerBinary = compilerBinary;
-					fCompilerCompile = comp->map->get("compile").asStringRaw();
-					fCompilerDefinition = comp->map->get("definition").asStringRaw();
-					fCompilerInclude = comp->map->get("include").asStringRaw();
+					compilerName = it->first;
+					compilerBinary = compilerBin;
+					compilerCompile = comp->map->get("compile").asStringRaw();
+					compilerDefinition = comp->map->get("definition").asStringRaw();
+					compilerInclude = comp->map->get("include").asStringRaw();
 					return true;
 				}
 			}
@@ -81,13 +81,13 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	};
 
 	PrintUtil::checking("what " + langName + " compiler to use");
-	string compilerBinary;
-	if (!fCompilerEnviron.empty()) {
-		const char* env = getenv(fCompilerEnviron.c_str());
+	string compilerBin;
+	if (!compilerEnviron.empty()) {
+		const char* env = getenv(compilerEnviron.c_str());
 		if (env != nullptr)
-			compilerBinary = string(env);
+			compilerBin = string(env);
 	}
-	if (!tryCompiler(compilerBinary)) {
+	if (!tryCompiler(compilerBin)) {
 		// Environ didn't work, try everything in succession instead
 		for (Language::ObjectMap::const_iterator it =
 			 comps.map->begin(); it != comps.map->end(); it++) {
@@ -97,12 +97,12 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 				break;
 		}
 	}
-	if (fCompilerName.empty()) {
+	if (compilerName.empty()) {
 		PrintUtil::checkFinished("none found", 0);
 		throw Language::Exception(Language::Exception::UserError,
 			string("cannot find a compiler for " + langName));
 	} else
-		PrintUtil::checkFinished(fCompilerName + " ('" + fCompilerBinary + "')", 2);
+		PrintUtil::checkFinished(compilerName + " ('" + compilerBinary + "')", 2);
 }
 
 LanguageInfo* LanguageInfo::getLanguageInfo(string langName)
