@@ -12,6 +12,11 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#ifndef _MSC_VER
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
 
 using std::string;
 using std::vector;
