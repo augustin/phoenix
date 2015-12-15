@@ -13,7 +13,8 @@ public:
 	static void message(const std::string& str);
 
 	static void checking(const std::string& str);
-	static void checkFinished(const std::string& str);
+	// 0 is failed, 1 is warning, 2 is succeeded
+	static void checkFinished(const std::string& str, int status = 2);
 
 private:
 	static bool sChecking;

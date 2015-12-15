@@ -26,7 +26,7 @@ void PrintUtil::checking(const std::string& str)
 	sChecking = true;
 	std::cout << "checking " << str << "... ";
 }
-void PrintUtil::checkFinished(const std::string& str)
+void PrintUtil::checkFinished(const std::string& str, int)
 {
 	sChecking = false;
 	std::cout << str << "\n";
