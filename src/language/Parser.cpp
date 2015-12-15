@@ -11,7 +11,6 @@
 #include "Stack.h"
 
 #include <cassert>
-#include <fstream>
 #include <vector>
 
 using std::string;
@@ -647,12 +646,7 @@ Object Run(Stack* stack, string path)
 		filename = path;
 	if (filename.empty())
 		throw Exception(Exception::FileDoesNotExist, path);
-	string code; {
-		std::ifstream filestream(filename);
-		// extra ()s here are mandatory
-		code = string((std::istreambuf_iterator<char>(filestream)),
-			std::istreambuf_iterator<char>());
-	}
+	string code = FSUtil::getContents(filename);
 
 	uint32_t line = 1;
 	string::size_type i = 0;

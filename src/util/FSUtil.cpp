@@ -27,6 +27,14 @@ bool FSUtil::exists(const string& file)
 	return static_cast<bool>(f);
 }
 
+std::string FSUtil::getContents(const std::string& file)
+{
+	std::ifstream filestream(file);
+	// extra ()s here are mandatory
+	return string((std::istreambuf_iterator<char>(filestream)),
+		std::istreambuf_iterator<char>());
+}
+
 string FSUtil::which(const string& program)
 {
 	if (program[0] == '/'

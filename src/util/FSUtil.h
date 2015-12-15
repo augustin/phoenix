@@ -11,6 +11,8 @@ class FSUtil
 {
 public:
 	static bool exists(const std::string& file);
+	static std::string getContents(const std::string& file);
+
 	static std::string which(const std::string& program);
 
 	static std::string normalizePath(const std::string& path);
