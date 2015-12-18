@@ -152,7 +152,8 @@ string FSUtil::normalizePath(const string& path)
 	}
 
 #ifdef _WIN32
-	if (ret[0] == '/') {
+	// Check for Cygwin/MSYS-style path
+	if (ret[0] == '/' && ret[2] == '/') {
 		ret[0] = toupper(ret[1]);
 		ret[1] = ':';
 	}
@@ -178,4 +179,10 @@ string FSUtil::combinePaths(const vector<string>& paths)
 		ret += path;
 	}
 	return normalizePath(ret);
+}
+
+string FSUtil::parentDirectory(const string& path)
+{
+	string ret = normalizePath(path);
+	return ret.substr(0, ret.rfind("/", ret.length() - 1 /* in case it ends with a '/' */));
 }

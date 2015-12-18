@@ -19,4 +19,5 @@ public:
 
 	static std::string normalizePath(const std::string& path);
 	static std::string combinePaths(const std::vector<std::string>& paths);
+	static std::string parentDirectory(const std::string& path);
 };
