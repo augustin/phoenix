@@ -14,6 +14,7 @@ return Map(
 			binary: "clang++",
 			detect: Map(arguments: "--version", contains: ["clang version"]),
 			compile: "-c ",
+			output: "-o ",
 			definition: "-D",
 			include: "-I"
 		),
@@ -21,6 +22,7 @@ return Map(
 			binary: "g++",
 			detect: Map(arguments: "--version", contains: ["g++", "Free Software Foundation"]),
 			compile: "-c ",
+			output: "-o ",
 			definition: "-D",
 			include: "-I"
 		),
@@ -28,6 +30,7 @@ return Map(
 			binary: "cl",
 			detect: Map(arguments: "", contains: ["Microsoft (R) C/C++ Optimizing Compiler"]),
 			compile: "/c ",
+			output: "/o ",
 			definition: "/D",
 			include: "/I"
 		)
