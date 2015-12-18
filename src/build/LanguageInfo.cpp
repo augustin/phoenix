@@ -7,9 +7,10 @@
 #include <string>
 
 #include "language/Parser.h"
+#include "util/FSUtil.h"
 #include "util/PrintUtil.h"
 #include "util/ProcessUtil.h"
-#include "util/FSUtil.h"
+#include "util/StringUtil.h"
 
 using std::string;
 using Language::Object;
@@ -71,7 +72,8 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 				if (OK) {
 					compilerName = it->first;
 					compilerBinary = compilerBin;
-					compilerCompile = comp->map->get("compile").asStringRaw();
+					compilerCompileFlag = comp->map->get("compile").asStringRaw();
+					compilerOutputFlag = comp->map->get("output").asStringRaw();
 					compilerDefinition = comp->map->get("definition").asStringRaw();
 					compilerInclude = comp->map->get("include").asStringRaw();
 					return true;
@@ -106,6 +108,21 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 			string("cannot find a compiler for " + langName));
 	} else
 		PrintUtil::checkFinished(compilerName + " ('" + compilerBinary + "')", 2);
+
+	// Check that the compiler works
+	PrintUtil::checking("if the " + langName + " compiler works");
+	FSUtil::mkdir("PhoenixFiles");
+	string testFile = "PhoenixFiles/test" + langName + sourceExtensions[0];
+	FSUtil::putContents(testFile, info.map->get("test").asStringRaw());
+	ProcessUtil::ExecResult res = ProcessUtil::exec(compilerBinary +
+		" " + testFile + " " + compilerOutputFlag + testFile + OBJECT_FILE_EXT);
+	if (res.exitcode == 0)
+		PrintUtil::checkFinished("yes", 2);
+	else {
+		PrintUtil::checkFinished("no", 0);
+		throw Language::Exception(Language::Exception::UserError,
+			string("complier for " + langName + " is broken: '" + res.output + "'"));
+	}
 }
 
 LanguageInfo* LanguageInfo::getLanguageInfo(string langName)
@@ -115,10 +132,9 @@ LanguageInfo* LanguageInfo::getLanguageInfo(string langName)
 		return ret;
 
 	// FIXME/TODO: this is bootstrap-only Phoenix, load hardcoded location
-	Language::Stack* stack = new Language::Stack;
-	Object info = Language::Run(stack,
+	Language::Stack stack;
+	Object info = Language::Run(&stack,
 		FSUtil::combinePaths({FSUtil::parentDirectory(__FILE__), "../data/languages/" + langName + ".phnx"}));
-	delete stack;
 	LanguageInfo* langInfo = new LanguageInfo(langName, info);
 	sData.insert({langName, langInfo});
 	return langInfo;

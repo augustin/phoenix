@@ -10,6 +10,13 @@
 
 #include "language/Object.h"
 
+// TODO: per-compiler rules, maybe?
+#ifdef _WIN32
+#define OBJECT_FILE_EXT ".obj"
+#else
+#define OBJECT_FILE_EXT ".o"
+#endif
+
 class LanguageInfo
 {
 public:
@@ -27,7 +34,8 @@ public:
 	// Compiler info
 	std::string compilerName;
 	std::string compilerBinary;
-	std::string compilerCompile;
+	std::string compilerCompileFlag;
+	std::string compilerOutputFlag;
 	std::string compilerDefinition;
 	std::string compilerInclude;
 
