@@ -116,7 +116,8 @@ LanguageInfo* LanguageInfo::getLanguageInfo(string langName)
 
 	// FIXME/TODO: this is bootstrap-only Phoenix, load hardcoded location
 	Language::Stack* stack = new Language::Stack;
-	Object info = Language::Run(stack, "src/data/languages/" + langName + ".phnx");
+	Object info = Language::Run(stack,
+		FSUtil::combinePaths({FSUtil::parentDirectory(__FILE__), "../data/languages/" + langName + ".phnx"}));
 	delete stack;
 	LanguageInfo* langInfo = new LanguageInfo(langName, info);
 	sData.insert({langName, langInfo});
