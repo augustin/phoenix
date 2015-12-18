@@ -56,13 +56,6 @@ int main(int argc, char* argv[])
 			cerr << "\t-C:<lang>:<compiler>\tPreferred ompiler for <lang> to use." <<
 				std::endl;
 			return 1;
-		} else if (arg.find(".") != string::npos || arg.find("/") != string::npos ||
-				   arg.find("\\") != string::npos) {
-			// Looks like a path.
-			if (sourceDirectory.length() > 0)
-				buildDirectory = arg;
-			else
-				sourceDirectory = arg;
 		} else if (StringUtil::startsWith(arg, "-C:")) {
 			vector<string> item = StringUtil::split(arg, ":");
 			if (item.size() != 3) {
@@ -70,6 +63,13 @@ int main(int argc, char* argv[])
 				return 1;
 			}
 			LanguageInfo::sPreferredCompiler.insert({item[1], item[2]});
+		} else if (arg.find(".") != string::npos || arg.find("/") != string::npos ||
+				   arg.find("\\") != string::npos) {
+			// Looks like a path.
+			if (sourceDirectory.length() > 0)
+				buildDirectory = arg;
+			else
+				sourceDirectory = arg;
 		} else {
 			cerr << "error: unrecognized option '" << arg << "'.";
 			return 1;
