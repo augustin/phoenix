@@ -13,11 +13,15 @@ public:
 	static bool exists(const std::string& path);
 	static bool isFile(const std::string& path);
 	static bool isDir(const std::string& path);
+
 	static std::string getContents(const std::string& file);
+	static void putContents(const std::string& file, const std::string& contents);
 
 	static std::string which(const std::string& program);
 
 	static std::string normalizePath(const std::string& path);
 	static std::string combinePaths(const std::vector<std::string>& paths);
 	static std::string parentDirectory(const std::string& path);
+
+	static void mkdir(const std::string& dirname);
 };

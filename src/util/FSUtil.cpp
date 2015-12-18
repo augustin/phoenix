@@ -16,6 +16,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#else /* _MSC_VER */
+#include <direct.h>
 #endif
 
 using std::string;
@@ -58,6 +60,12 @@ std::string FSUtil::getContents(const string& file)
 	// extra ()s here are mandatory
 	return string((std::istreambuf_iterator<char>(filestream)),
 		std::istreambuf_iterator<char>());
+}
+
+void FSUtil::putContents(const std::string& file, const std::string& contents)
+{
+	std::ofstream filestream(file);
+	filestream << contents;
 }
 
 string FSUtil::which(const string& program)
@@ -185,4 +193,14 @@ string FSUtil::parentDirectory(const string& path)
 {
 	string ret = normalizePath(path);
 	return ret.substr(0, ret.rfind("/", ret.length() - 1 /* in case it ends with a '/' */));
+}
+
+void FSUtil::mkdir(const string& path)
+{
+	// TODO: error handling?
+#ifdef _MSC_VER
+	_mkdir(path.c_str());
+#else
+	mkdir(path.c_str());
+#endif
 }
