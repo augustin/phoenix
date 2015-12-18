@@ -23,10 +23,10 @@ void PrintUtil::message(const string& str)
 void PrintUtil::checking(const std::string& str)
 {
 	sChecking = true;
-	std::cout << "checking " << str << "... ";
+	std::cout << "checking " << str << "... " << std::flush;
 }
 void PrintUtil::checkFinished(const std::string& str, int)
 {
 	sChecking = false;
-	std::cout << str << std::endl;
+	std::cout << str << std::endl << std::flush;
 }
