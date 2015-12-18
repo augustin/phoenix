@@ -12,12 +12,12 @@ bool PrintUtil::sChecking;
 
 void PrintUtil::error(const string& str)
 {
-	std::cerr << "error: " << str << "\n";
+	std::cerr << "error: " << str << std::endl;
 }
 
 void PrintUtil::message(const string& str)
 {
-	std::cout << "message: " << str << "\n";
+	std::cout << "message: " << str << std::endl;
 }
 
 void PrintUtil::checking(const std::string& str)
@@ -28,5 +28,5 @@ void PrintUtil::checking(const std::string& str)
 void PrintUtil::checkFinished(const std::string& str, int)
 {
 	sChecking = false;
-	std::cout << str << "\n";
+	std::cout << str << std::endl;
 }

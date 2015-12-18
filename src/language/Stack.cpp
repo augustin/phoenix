@@ -91,13 +91,13 @@ void Stack::addSuperglobal(string variableName, Object value)
 
 void Stack::print()
 {
-	cout << "-- VM STACK DUMP --\n";
+	cout << "-- VM STACK DUMP --" << std::endl;
 	int tabs = 1;
 	for (const ObjectMap& m : fStack) {
 		for (ObjectMap::const_iterator it = m.begin(); it != m.end(); it++) {
 			for (int i = 0; i < tabs; i++)
 				cout << "    ";
-			cout << it->first << ": " << it->second->asString() << "\n";
+			cout << it->first << ": " << it->second->asString() << std::endl;
 		}
 		tabs++;
 	}
