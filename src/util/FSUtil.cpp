@@ -199,8 +199,8 @@ void FSUtil::mkdir(const string& path)
 {
 	// TODO: error handling?
 #ifdef _MSC_VER
-	_mkdir(path.c_str());
+	::_mkdir(path.c_str());
 #else
-	mkdir(path.c_str());
+	::mkdir(path.c_str());
 #endif
 }
