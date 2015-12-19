@@ -201,6 +201,10 @@ void FSUtil::mkdir(const string& path)
 #ifdef _MSC_VER
 	::_mkdir(path.c_str());
 #else
-	::mkdir(path.c_str());
+	::mkdir(path.c_str()
+#ifndef _WIN32
+		, 0755 // mode
+#endif
+		);
 #endif
 }
