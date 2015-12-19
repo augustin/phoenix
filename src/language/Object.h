@@ -58,6 +58,7 @@ public:
 	~Object();
 
 	inline Type type() const { return fObjectType; }
+	static std::string typeName(Type type);
 	std::string typeName() const;
 	std::string asString() const;
 	std::string asStringRaw() const;
@@ -85,23 +86,30 @@ private:
 	Type fObjectType;
 };
 
-// Helper macros
-#define Language_COERCE_OR_THROW(WHAT, VARIABLE, TYPE) \
-	if (VARIABLE.type() != ::Language::Type::TYPE) { \
-		throw Language::Exception(Language::Exception::TypeError, \
-			std::string(WHAT " should be of type '" #TYPE "' but is of type '") \
-				.append(VARIABLE.typeName()).append("'")); \
+// Helper functions
+inline void CoerceOrThrow(const std::string& what, const Object& variable, Type type)
+{
+	if (variable.type() != type) {
+		throw Exception(Exception::TypeError,
+			std::string(what).append(" should be of type '")
+				.append(Object::typeName(type)).append("' but is of type '")
+				.append(variable.typeName()).append("'"));
 	}
-#define Language_COERCE_OR_THROW_PTR(WHAT, VARIABLE, TYPE) \
-	if (VARIABLE == nullptr) { \
-		throw Language::Exception(Language::Exception::TypeError, \
-			std::string(WHAT " should be of type '" #TYPE "' but is of type 'Undefined'")); \
-	} \
-	if (VARIABLE->type() != ::Language::Type::TYPE) { \
-		throw Language::Exception(Language::Exception::TypeError, \
-			std::string(WHAT " should be of type '" #TYPE "' but is of type '") \
-				.append(VARIABLE->typeName()).append("'")); \
+}
+inline void CoerceOrThrowPtr(const std::string& what, const Object* variable, Type type)
+{
+	if (variable == nullptr) {
+		throw Exception(Exception::TypeError,
+			std::string(what).append(" should be of type '").append(Object::typeName(type))
+				.append("' but is of type 'Undefined'"));
 	}
+	if (variable->type() != type) {
+		throw Exception(Exception::TypeError,
+			std::string(what).append(" should be of type '")
+				.append(Object::typeName(type)).append("' but is of type '")
+				.append(variable->typeName()).append("'"));
+	}
+}
 
 // Convenience constructors
 inline Object BooleanObject(const bool value)

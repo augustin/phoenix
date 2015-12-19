@@ -14,7 +14,7 @@ namespace Language {
 // Utilities for native function declarations
 #define NativeFunction_COERCE_OR_THROW(NAME, VARIABLE, TYPE) \
 	Language::Object VARIABLE = params.get(NAME); \
-	Language_COERCE_OR_THROW("parameter '" NAME "'", VARIABLE, TYPE)
+	Language::CoerceOrThrow("parameter '" NAME "'", VARIABLE, TYPE)
 
 class Function
 {

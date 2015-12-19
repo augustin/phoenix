@@ -17,7 +17,7 @@ using Language::Exception;
 
 Target::Target(const ObjectMap& params)
 {
-	NativeFunction_COERCE_OR_THROW("0", name, String);
+	NativeFunction_COERCE_OR_THROW("0", name, Language::Type::String);
 	std::vector<std::string> languages;
 	const Object obj = params.get("language");
 	if (obj.type() == Language::Type::List) {

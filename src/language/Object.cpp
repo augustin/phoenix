@@ -58,9 +58,9 @@ Object::~Object()
 	//delete map;
 }
 
-string Object::typeName() const
+string Object::typeName(Type type)
 {
-	switch (fObjectType) {
+	switch (type) {
 	case Type::Undefined:	return "Undefined";
 	case Type::Boolean:		return "Boolean";
 	case Type::Integer:		return "Integer";
@@ -70,6 +70,11 @@ string Object::typeName() const
 	default:				return "Unknown";
 	}
 }
+string Object::typeName() const
+{
+	return typeName(fObjectType);
+}
+
 string Object::asString() const
 {
 	// Modify asStringRaw() below simultaneously with this one!
@@ -113,20 +118,20 @@ string Object::asStringRaw() const
 
 Object Object::op_div(const Object& left, const Object& right)
 {
-	Language_COERCE_OR_THROW("left-hand side of '/'", left, Integer);
-	Language_COERCE_OR_THROW("right-hand side of '/'", right, Integer);
+	CoerceOrThrow("left-hand side of '/'", left, Type::Integer);
+	CoerceOrThrow("right-hand side of '/'", right, Type::Integer);
 	return IntegerObject(left.integer / right.integer);
 }
 Object Object::op_mult(const Object& left, const Object& right)
 {
-	Language_COERCE_OR_THROW("left-hand side of '*'", left, Integer);
-	Language_COERCE_OR_THROW("right-hand side of '*'", right, Integer);
+	CoerceOrThrow("left-hand side of '*'", left, Type::Integer);
+	CoerceOrThrow("right-hand side of '*'", right, Type::Integer);
 	return IntegerObject(left.integer * right.integer);
 }
 Object Object::op_subt(const Object& left, const Object& right)
 {
-	Language_COERCE_OR_THROW("left-hand side of '-'", left, Integer);
-	Language_COERCE_OR_THROW("right-hand side of '-'", right, Integer);
+	CoerceOrThrow("left-hand side of '-'", left, Type::Integer);
+	CoerceOrThrow("right-hand side of '-'", right, Type::Integer);
 	return IntegerObject(left.integer - right.integer);
 }
 Object Object::op_add(const Object& left, const Object& right)

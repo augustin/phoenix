@@ -54,7 +54,7 @@ Object Stack::get(const vector<string> variable)
 	for (vector<string>::size_type i = 1; i < variable.size(); i++) {
 		std::string what = string("referenced variable '")
 			.append(StringUtil::join(variable, ".")).append("'");
-		Language_COERCE_OR_THROW_PTR(what + , ret, Map);
+		CoerceOrThrowPtr(what, ret, Type::Map);
 		ret = ret->map->get_ptr(variable[i]);
 	}
 
@@ -76,10 +76,10 @@ void Stack::set(vector<string> variable, Object value)
 	}
 
 	Object* res = fStack[loc].get_ptr(variable[0]);
-	Language_COERCE_OR_THROW_PTR("referenced variable", res, Map);
+	CoerceOrThrowPtr("referenced variable", res, Type::Map);
 	for (vector<string>::size_type i = 1; i < variable.size() - 1; i++) {
 		res = res->map->get_ptr(variable[i]);
-		Language_COERCE_OR_THROW_PTR("referenced variable", res, Map);
+		CoerceOrThrowPtr("referenced variable", res, Type::Map);
 	}
 	res->map->set(variable[variable.size() - 1], value);
 }

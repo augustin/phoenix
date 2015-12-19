@@ -27,7 +27,7 @@ GlobalLanguageObject::GlobalLanguageObject()
 
 	// Instantiate this object
 	map->set("checkVersion", FunctionObject([&](ObjectMap& params) -> Object {
-		NativeFunction_COERCE_OR_THROW("minimum", minimum, String);
+		NativeFunction_COERCE_OR_THROW("minimum", minimum, Type::String);
 		vector<std::string> components = StringUtil::split(minimum.string, ".");
 		if (components.size() == 0)
 			throw Exception(Exception::TypeError,
@@ -58,7 +58,7 @@ GlobalLanguageObject::GlobalLanguageObject()
 		return Object();
 	})});
 	GlobalFunctions.insert({"fatal", Function([](ObjectMap& params) -> Object {
-		NativeFunction_COERCE_OR_THROW("0", zero, String);
+		NativeFunction_COERCE_OR_THROW("0", zero, Type::String);
 		throw Exception(Exception::UserError, std::string(zero.string));
 	})});
 	GlobalFunctions.insert({"Map", Function([](ObjectMap& params) -> Object {

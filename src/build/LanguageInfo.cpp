@@ -14,6 +14,7 @@
 
 using std::string;
 using Language::Object;
+using Language::Type;
 
 std::map<string, string> LanguageInfo::sPreferredCompiler;
 std::map<string, LanguageInfo*> LanguageInfo::sData;
@@ -21,16 +22,16 @@ std::map<string, LanguageInfo*> LanguageInfo::sData;
 LanguageInfo::LanguageInfo(string langName, Object info)
 	: name(langName)
 {
-	Language_COERCE_OR_THROW("language information", info, Map);
+	Language::CoerceOrThrow("language information", info, Type::Map);
 	Object type = info.map->get("type");
-	Language_COERCE_OR_THROW("languageInfo.type", type, String);
+	Language::CoerceOrThrow("languageInfo.type", type, Type::String);
 	if (type.string != "CompiledToMachineCode")
 		throw Language::Exception(Language::Exception::Type::UserError,
 			"only 'CompiledToMachineCode' is supported at this time");
 
 	// File extensions
 	Object srcExts = info.map->get("sourceExtensions");
-	Language_COERCE_OR_THROW("languageInfo.sourceExtensions", srcExts, List);
+	Language::CoerceOrThrow("languageInfo.sourceExtensions", srcExts, Type::List);
 	for (const Object& obj : *srcExts.list)
 		sourceExtensions.push_back(obj.asStringRaw());
 	Object extraExts = info.map->get("extraExtensions");
@@ -47,7 +48,7 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 
 	// Figure out what compiler we're using
 	Object comps = info.map->get("compilers");
-	Language_COERCE_OR_THROW("languageInfo.compilers", comps, Map);
+	Language::CoerceOrThrow("languageInfo.compilers", comps, Type::Map);
 	auto tryCompiler = [&](const string& binary) -> bool {
 		string compilerBin = FSUtil::which(binary);
 		if (FSUtil::exists(compilerBin)) {
@@ -55,15 +56,15 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 			for (Language::ObjectMap::const_iterator it =
 				 comps.map->begin(); it != comps.map->end(); it++) {
 				Object* comp = it->second;
-				Language_COERCE_OR_THROW_PTR("languageInfo.compiler", comp, Map);
+				Language::CoerceOrThrowPtr("languageInfo.compiler", comp, Type::Map);
 				Object detect = comp->map->get("detect");
-				Language_COERCE_OR_THROW("languageInfo.compiler.detect", detect, Map);
+				Language::CoerceOrThrow("languageInfo.compiler.detect", detect, Type::Map);
 				ProcessUtil::ExecResult res =
 					ProcessUtil::exec(binary + " " + detect.map->get("arguments").asStringRaw());
 				if (res.exitcode != 0)
 					continue; // did not exit with 0 -- something wrong
 				Object contains = detect.map->get("contains");
-				Language_COERCE_OR_THROW("languageInfo.compiler.detect.contains", contains, List);
+				Language::CoerceOrThrow("languageInfo.compiler.detect.contains", contains, Type::List);
 				bool OK = true;
 				for (const Object& obj : *contains.list) {
 					if (OK && res.output.find(obj.asStringRaw()) == string::npos)
@@ -97,7 +98,7 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 		for (Language::ObjectMap::const_iterator it =
 			 comps.map->begin(); it != comps.map->end(); it++) {
 			Object* comp = it->second;
-			Language_COERCE_OR_THROW_PTR("languageInfo.compiler", comp, Map);
+			Language::CoerceOrThrowPtr("languageInfo.compiler", comp, Type::Map);
 			if (tryCompiler(comp->map->get("binary").asStringRaw()))
 				break;
 		}

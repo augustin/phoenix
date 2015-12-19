@@ -157,7 +157,7 @@ ASTNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, strin
 				ret = "";
 			}
 			Object result = ParseAndEvalExpression(PARSER_PARAMS);
-			Language_COERCE_OR_THROW("expression return type", result, String);
+			CoerceOrThrow("expression return type", result, Type::String);
 			realRet.variable.push_back(result.string);
 		} break;
 
@@ -259,7 +259,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 	// Try to find the function
 	if (variable) {
 		Object o = stack->get(funcRef);
-		Language_COERCE_OR_THROW("referenced variable", o, Function);
+		CoerceOrThrow("referenced variable", o, Type::Function);
 		func = *o.function;
 	} else {
 		auto funcIter = GlobalFunctions.find(funcRef[0]);
