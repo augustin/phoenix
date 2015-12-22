@@ -321,6 +321,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 				break;
 
 				case ')':
+					i--;
 				case ',':
 					treatAsTrueBoolean = true;
 					// fallthrough
