@@ -110,6 +110,23 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	} else
 		PrintUtil::checkFinished(compilerName + " ('" + compilerBinary + "')", 2);
 
+	// Grab standards modes
+	Object* stdsModes = info.map->get_ptr("standardsModes");
+	Language::CoerceOrThrowPtr("languageInfo.standardsModes", stdsModes, Type::Map);
+	for (Language::ObjectMap::const_iterator it =
+		 stdsModes->map->begin(); it != stdsModes->map->end(); it++) {
+		StandardsMode mode;
+		mode.status = 0;
+		Object* obj = it->second;
+		Language::CoerceOrThrowPtr("languageInfo.standardsModes[i]", obj, Type::Map);
+		mode.test = obj->map->get("test").asStringRaw();
+		Object* forComp = obj->map->get_ptr(compilerName);
+		Language::CoerceOrThrowPtr("languageInfo.standardsModes[i][comp]", forComp, Type::Map);
+		mode.normalFlag = forComp->map->get("normal").asStringRaw();
+		mode.strictFlag = forComp->map->get("strict").asStringRaw();
+		standardsModes.insert({it->first, mode});
+	}
+
 	// Check that the compiler works
 	PrintUtil::checking("if the " + langName + " compiler works");
 	FSUtil::mkdir("PhoenixFiles");

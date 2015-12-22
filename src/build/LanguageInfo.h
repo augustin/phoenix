@@ -4,6 +4,7 @@
  */
 #pragma once
 
+#include <cinttypes>
 #include <map>
 #include <string>
 #include <vector>
@@ -38,6 +39,15 @@ public:
 	std::string compilerOutputFlag;
 	std::string compilerDefinition;
 	std::string compilerInclude;
+
+	// Standards modes
+	struct StandardsMode {
+		std::string test;
+		std::string normalFlag;
+		std::string strictFlag;
+		int8_t status; // 0 is untested, -1 is doesn't work, 1 is OK
+	};
+	std::map<std::string, StandardsMode> standardsModes;
 
 	// From command-line flags & the like.
 	static std::map<std::string, std::string> sPreferredCompiler;
