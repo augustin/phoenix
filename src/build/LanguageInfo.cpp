@@ -9,7 +9,7 @@
 #include "language/Parser.h"
 #include "util/FSUtil.h"
 #include "util/PrintUtil.h"
-#include "util/ProcessUtil.h"
+#include "util/OSUtil.h"
 #include "util/StringUtil.h"
 
 using std::string;
@@ -59,8 +59,8 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 				Language::CoerceOrThrowPtr("languageInfo.compiler", comp, Type::Map);
 				Object detect = comp->map->get("detect");
 				Language::CoerceOrThrow("languageInfo.compiler.detect", detect, Type::Map);
-				ProcessUtil::ExecResult res =
-					ProcessUtil::exec(binary + " " + detect.map->get("arguments").asStringRaw());
+				OSUtil::ExecResult res =
+					OSUtil::exec(binary + " " + detect.map->get("arguments").asStringRaw());
 				if (res.exitcode != 0)
 					continue; // did not exit with 0 -- something wrong
 				Object contains = detect.map->get("contains");
@@ -115,7 +115,7 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	FSUtil::mkdir("PhoenixFiles");
 	string testFile = "PhoenixFiles/test" + langName + sourceExtensions[0];
 	FSUtil::putContents(testFile, info.map->get("test").asStringRaw());
-	ProcessUtil::ExecResult res = ProcessUtil::exec(compilerBinary +
+	OSUtil::ExecResult res = OSUtil::exec(compilerBinary +
 		" " + testFile + " " + compilerOutputFlag + testFile + OBJECT_FILE_EXT);
 	if (res.exitcode == 0)
 		PrintUtil::checkFinished("yes", 2);

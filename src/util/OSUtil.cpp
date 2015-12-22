@@ -2,7 +2,7 @@
  * (C) 2015 Augustin Cavalier
  * All rights reserved. Distributed under the terms of the MIT license.
  */
-#include "ProcessUtil.h"
+#include "OSUtil.h"
 
 #include <stdio.h>
 
@@ -13,7 +13,7 @@ using std::string;
 #define pclose _pclose
 #endif
 
-ProcessUtil::ExecResult ProcessUtil::exec(const string& command)
+OSUtil::ExecResult OSUtil::exec(const string& command)
 {
 	std::string cmd = command;
 	cmd.append(" 2>&1");

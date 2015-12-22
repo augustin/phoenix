@@ -6,7 +6,7 @@
 
 #include <string>
 
-class ProcessUtil
+class OSUtil
 {
 public:
 	struct ExecResult {
