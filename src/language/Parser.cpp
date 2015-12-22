@@ -248,7 +248,7 @@ Object ParseNumber(Stack* stack, const string& code, uint32_t& line, string::siz
 		}
 	}
 
-	int ret = strtol(number.c_str(), NULL, 10);
+	int ret = std::stoi(number, nullptr, 10);
 	return IntegerObject(ret);
 }
 

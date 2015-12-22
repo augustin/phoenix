@@ -34,7 +34,7 @@ GlobalLanguageObject::GlobalLanguageObject()
 				std::string("'minimum' must have at least 1 component"));
 		vector<int> parts;
 		for (const std::string& str : components)
-			parts.push_back(strtol(str.c_str(), NULL, 10));
+			parts.push_back(std::stoi(str, nullptr, 10));
 		while (parts.size() != 3)
 			parts.push_back(-1);
 		if (parts[0] > PHOENIX_VERSION_MAJOR ||
