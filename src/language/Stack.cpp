@@ -52,9 +52,8 @@ Object Stack::get(const vector<string> variable)
 	} else
 		ret = fStack[getPos(variable[0])].get_ptr(variable[0]);
 	for (vector<string>::size_type i = 1; i < variable.size(); i++) {
-		std::string what = string("referenced variable '")
-			.append(StringUtil::join(variable, ".")).append("'");
-		CoerceOrThrowPtr(what, ret, Type::Map);
+		CoerceOrThrowPtr(string("referenced variable '")
+			.append(variable[i - 1]).append("'"), ret, Type::Map);
 		ret = ret->map->get_ptr(variable[i]);
 	}
 
