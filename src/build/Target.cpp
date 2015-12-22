@@ -21,9 +21,8 @@ Target::Target(const ObjectMap& params)
 	std::vector<std::string> languages;
 	const Object obj = params.get("language");
 	if (obj.type() == Language::Type::List) {
-		for (const Object& o : *obj.list) {
+		for (const Object& o : *obj.list)
 			languages.push_back(o.asStringRaw());
-		}
 	} else
 		languages.push_back(obj.asStringRaw());
 

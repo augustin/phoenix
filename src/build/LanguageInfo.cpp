@@ -91,7 +91,7 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	if (compilerName.empty() && !compilerEnviron.empty()) {
 		const char* env = getenv(compilerEnviron.c_str());
 		if (env != nullptr)
-			tryCompiler(string(env));
+			tryCompiler(env);
 	}
 	if (compilerName.empty()) {
 		// Preferred & environ didn't work, try everything in succession instead
