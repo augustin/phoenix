@@ -89,8 +89,8 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 		tryCompiler(sPreferredCompiler[langName]);
 	}
 	if (compilerName.empty() && !compilerEnviron.empty()) {
-		const char* env = getenv(compilerEnviron.c_str());
-		if (env != nullptr)
+		string env = OSUtil::getEnv(compilerEnviron);
+		if (!env.empty())
 			tryCompiler(env);
 	}
 	if (compilerName.empty()) {

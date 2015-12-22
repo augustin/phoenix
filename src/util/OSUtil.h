@@ -14,4 +14,6 @@ public:
 		int exitcode;
 	};
 	static ExecResult exec(const std::string& command);
+
+	static std::string getEnv(const std::string& env);
 };

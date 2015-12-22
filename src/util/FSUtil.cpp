@@ -4,6 +4,7 @@
  */
 #include "FSUtil.h"
 
+#include "OSUtil.h"
 #include "StringUtil.h"
 
 #include <algorithm>
@@ -81,7 +82,7 @@ string FSUtil::which(const string& program)
 
 #ifdef _WIN32
 	auto permutePathExt = [](const string& path) {
-		vector<string> PathExts = StringUtil::split(getenv("PATHEXT"), ";");
+		vector<string> PathExts = StringUtil::split(OSUtil::getEnv("PATHEXT"), ";");
 		for (string ext : PathExts) {
 			string fullPath = path + ext;
 			if (exists(fullPath))
@@ -112,9 +113,9 @@ string FSUtil::which(const string& program)
 
 	vector<string> PATHs =
 #ifdef _WIN32
-		StringUtil::split(getenv("PATH"), ";");
+		StringUtil::split(OSUtil::getEnv("PATH"), ";");
 #else
-		StringUtil::split(getenv("PATH"), ":");
+		StringUtil::split(OSUtil::getEnv("PATH"), ":");
 #endif
 
 	if (!PATHs.size())
