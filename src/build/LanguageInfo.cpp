@@ -162,7 +162,6 @@ bool LanguageInfo::checkStandardsMode(std::string standardsMode)
 		standardsModes[standardsMode].status = 1;
 		return true;
 	} else {
-		PrintUtil::message(res.output);
 		PrintUtil::checkFinished("no", 0);
 		standardsModes[standardsMode].status = -1;
 		return false;
