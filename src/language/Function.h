@@ -16,21 +16,23 @@ namespace Language {
 	Language::Object VARIABLE = params.get(NAME); \
 	Language::CoerceOrThrow("parameter '" NAME "'", VARIABLE, TYPE)
 
+typedef std::function<Object(Object, ObjectMap&)> NativeStdFunction;
+
 class Function
 {
 public:
 	Function();
-	Function(std::function<Object(ObjectMap&)> nativeFunction);
+	Function(NativeStdFunction nativeFunction);
 
-	Object call(ObjectMap& args);
+	Object call(Object context, ObjectMap& args);
 
 private:
-	std::function<Object(ObjectMap&)> fNativeFunction;
+	NativeStdFunction fNativeFunction;
 	bool fIsNative;
 };
 
 // Convenience constructors
-inline Object FunctionObject(std::function<Object(ObjectMap&)> nativeFunction)
+inline Object FunctionObject(NativeStdFunction nativeFunction)
 {
 	Object ret(Type::Function);
 	ret.function = new Function(nativeFunction);

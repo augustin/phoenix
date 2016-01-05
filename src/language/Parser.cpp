@@ -351,7 +351,14 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 			IgnoreWhitespace(PARSER_PARAMS);
 		}
 	}
-	return func.call(arguments);
+
+	Object context;
+	if (funcRef.size() > 1) {
+		vector<string> parentRef = funcRef;
+		parentRef.pop_back();
+		context = stack->get(parentRef);
+	}
+	return func.call(context, arguments);
 }
 
 Object ParseList(Stack* stack, const string& code, uint32_t& line, string::size_type& i)

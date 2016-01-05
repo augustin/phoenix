@@ -14,17 +14,17 @@ Function::Function()
 	fIsNative(false)
 {
 }
-Function::Function(std::function<Object(ObjectMap&)> nativeFunction)
+Function::Function(NativeStdFunction nativeFunction)
 	:
 	fNativeFunction(nativeFunction),
 	fIsNative(true)
 {
 }
 
-Object Function::call(ObjectMap& args)
+Object Function::call(Object context, ObjectMap& args)
 {
 	if (fIsNative)
-		return fNativeFunction(args);
+		return fNativeFunction(context, args);
 	throw Exception(Exception::AccessViolation, "Attempted to call null function");
 }
 

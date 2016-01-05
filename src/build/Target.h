@@ -5,13 +5,15 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "language/Object.h"
 
-class Target : private Language::Object
-{
-public:
-	Target(const Language::ObjectMap& params);
-
-	static void addGlobalFunction();
+namespace Target {
+struct ExtraData {
+	std::vector<std::string> languages;
+	std::string standardsModeFlag;
 };
+
+void addGlobalFunction();
+}

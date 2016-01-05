@@ -81,6 +81,7 @@ public: // Data storage
 	Function* function;
 	std::vector<Object>* list;
 	ObjectMap* map;
+	void* extradata;
 
 private:
 	Type fObjectType;

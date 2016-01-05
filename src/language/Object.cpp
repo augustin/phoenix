@@ -47,6 +47,7 @@ Object::Object(const Type type)
 	function(nullptr),
 	list(nullptr),
 	map(nullptr),
+	extradata(nullptr),
 
 	fObjectType(type)
 {
