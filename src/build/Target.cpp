@@ -60,6 +60,20 @@ Object CreateTarget(const ObjectMap& params)
 		return Object();
 	}));
 
+	ret.map->set("addDefinitions", FunctionObject([](Object self, ObjectMap& m) -> Object {
+		ExtraData* extraData = static_cast<ExtraData*>(self.extradata);
+		// TODO: get rid of hardcoded languages[0]
+		LanguageInfo* info = LanguageInfo::getLanguageInfo(extraData->languages[0]);
+
+		for (ObjectMap::const_iterator it = m.begin(); it != m.end(); it++) {
+			std::string val = it->second->asStringRaw();
+			StringUtil::replaceAll(val, "\"", "\\\"");
+			extraData->definitionsFlags.append(" \"" + info->compilerDefinition +
+				it->first + "=" + val + "\"");
+		}
+		return Object();
+	}));
+
 	return ret;
 }
 

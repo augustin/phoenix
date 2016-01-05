@@ -13,6 +13,7 @@ namespace Target {
 struct ExtraData {
 	std::vector<std::string> languages;
 	std::string standardsModeFlag;
+	std::string definitionsFlags;
 };
 
 void addGlobalFunction();
