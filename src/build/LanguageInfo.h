@@ -49,6 +49,9 @@ public:
 	};
 	std::map<std::string, StandardsMode> standardsModes;
 
+	// Checks
+	bool checkStandardsMode(std::string standardsMode);
+
 	// From command-line flags & the like.
 	static std::map<std::string, std::string> sPreferredCompiler;
 private:

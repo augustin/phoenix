@@ -143,11 +143,36 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	}
 }
 
+bool LanguageInfo::checkStandardsMode(std::string standardsMode)
+{
+	StandardsMode mode = standardsModes[standardsMode];
+	if (mode.status > 0)
+		return true;
+	if (mode.status < 0)
+		return false;
+
+	PrintUtil::checking("if the standards mode '" + name + standardsMode + "' works");
+	string testFile = "PhoenixFiles/test" + name + standardsMode + sourceExtensions[0];
+	FSUtil::putContents(testFile, mode.test);
+	OSUtil::ExecResult res = OSUtil::exec(compilerBinary +
+		" " + testFile + " " + mode.normalFlag + " " + compilerOutputFlag +
+		testFile + OBJECT_FILE_EXT);
+	if (res.exitcode == 0) {
+		PrintUtil::checkFinished("yes", 2);
+		standardsModes[standardsMode].status = 1;
+		return true;
+	} else {
+		PrintUtil::message(res.output);
+		PrintUtil::checkFinished("no", 0);
+		standardsModes[standardsMode].status = -1;
+		return false;
+	}
+}
+
 LanguageInfo* LanguageInfo::getLanguageInfo(string langName)
 {
-	LanguageInfo* ret = sData[langName];
-	if (ret != nullptr)
-		return ret;
+	if (sData.count(langName) != 0)
+		return sData[langName];
 
 	// FIXME/TODO: this is bootstrap-only Phoenix, load hardcoded location
 	Language::Stack stack;
