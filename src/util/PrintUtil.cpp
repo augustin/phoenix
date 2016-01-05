@@ -15,6 +15,11 @@ void PrintUtil::error(const string& str)
 	std::cerr << "error: " << str << std::endl;
 }
 
+void PrintUtil::warning(const string& str)
+{
+	std::cerr << "warning: " << str << std::endl;
+}
+
 void PrintUtil::message(const string& str)
 {
 	std::cout << "message: " << str << std::endl;

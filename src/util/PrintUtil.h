@@ -10,6 +10,7 @@ class PrintUtil
 {
 public:
 	static void error(const std::string& str);
+	static void warning(const std::string& str);
 	static void message(const std::string& str);
 
 	static void checking(const std::string& str);
