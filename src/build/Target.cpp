@@ -6,11 +6,13 @@
 
 #include "language/Stack.h"
 #include "language/Function.h"
+#include "util/FSUtil.h"
 #include "util/PrintUtil.h"
 #include "util/StringUtil.h"
 
 #include "LanguageInfo.h"
 
+using std::vector;
 using Language::Exception;
 using Language::Function;
 using Language::FunctionObject;
@@ -83,9 +85,9 @@ Object CreateTarget(const ObjectMap& params)
 		NativeFunction_COERCE_OR_THROW("0", dirNameObj, Type::String);
 		std::string dirName = dirNameObj.asStringRaw();
 		bool recurse = params.get("recursive").boolean;
-
-		// TODO: implement
-		PrintUtil::error("UNIMPLEMENTED: addSourceDirectory");
+		extraData->sourceFiles =
+			FSUtil::searchForFiles(dirName, info->sourceExtensions, recurse);
+		return Object();
 	}));
 
 	return ret;

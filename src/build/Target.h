@@ -15,6 +15,7 @@ struct ExtraData {
 	std::vector<std::string> languages;
 	std::string standardsModeFlag;
 	std::string definitionsFlags;
+	std::vector<std::string> sourceFiles;
 };
 
 void addGlobalFunction();
