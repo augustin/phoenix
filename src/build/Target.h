@@ -11,6 +11,7 @@
 
 namespace Target {
 struct ExtraData {
+	std::string name;
 	std::vector<std::string> languages;
 	std::string standardsModeFlag;
 	std::string definitionsFlags;

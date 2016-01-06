@@ -27,6 +27,8 @@ Object CreateTarget(const ObjectMap& params)
 	ret.extradata = extraData;
 
 	NativeFunction_COERCE_OR_THROW("0", name, Type::String);
+	extraData->name = name.asStringRaw();
+
 	const Object obj = params.get("language");
 	if (obj.type() == Type::List) {
 		for (const Object& o : *obj.list)
