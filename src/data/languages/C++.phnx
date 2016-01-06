@@ -12,7 +12,7 @@ return Map(
 	compilers: Map(
 		"Clang": Map(
 			binary: "clang++",
-			detect: Map(arguments: "--version", contains: ["clang version"]),
+			detect: Map(arguments: "--version", contains: ["clang", "version"]),
 			compile: "-c ",
 			output: "-o ",
 			definition: "-D",
