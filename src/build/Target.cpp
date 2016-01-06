@@ -76,6 +76,18 @@ Object CreateTarget(const ObjectMap& params)
 		return Object();
 	}));
 
+	ret.map->set("addSourceDirectory", FunctionObject([](Object self, ObjectMap& params) -> Object {
+		ExtraData* extraData = static_cast<ExtraData*>(self.extradata);
+		// TODO: get rid of hardcoded languages[0]
+		LanguageInfo* info = LanguageInfo::getLanguageInfo(extraData->languages[0]);
+		NativeFunction_COERCE_OR_THROW("0", dirNameObj, Type::String);
+		std::string dirName = dirNameObj.asStringRaw();
+		bool recurse = params.get("recursive").boolean;
+
+		// TODO: implement
+		PrintUtil::error("UNIMPLEMENTED: addSourceDirectory");
+	}));
+
 	return ret;
 }
 
