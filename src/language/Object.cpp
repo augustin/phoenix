@@ -76,7 +76,7 @@ string Object::typeName() const
 	return typeName(fObjectType);
 }
 
-string Object::asString() const
+string Object::asStringPretty() const
 {
 	// Modify asStringRaw() below simultaneously with this one!
 	switch (fObjectType) {
@@ -98,7 +98,7 @@ string Object::asString() const
 }
 string Object::asStringRaw() const
 {
-	// Modify asString() above simultaneously with this one!
+	// Modify asStringPretty() above simultaneously with this one!
 	switch (fObjectType) {
 	case Type::Undefined:
 		return "<Undefined>";

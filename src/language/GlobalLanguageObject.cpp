@@ -53,7 +53,7 @@ GlobalLanguageObject::GlobalLanguageObject()
 		if (zero.type() == Type::String)
 			message += zero.string;
 		else
-			message += zero.asString();
+			message += zero.asStringPretty();
 		PrintUtil::message(message);
 		return Object();
 	})});

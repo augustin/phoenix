@@ -96,7 +96,7 @@ void Stack::print()
 		for (ObjectMap::const_iterator it = m.begin(); it != m.end(); it++) {
 			for (int i = 0; i < tabs; i++)
 				cout << "    ";
-			cout << it->first << ": " << it->second->asString() << std::endl;
+			cout << it->first << ": " << it->second->asStringPretty() << std::endl;
 		}
 		tabs++;
 	}

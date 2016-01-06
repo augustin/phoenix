@@ -60,7 +60,7 @@ public:
 	inline Type type() const { return fObjectType; }
 	static std::string typeName(Type type);
 	std::string typeName() const;
-	std::string asString() const;
+	std::string asStringPretty() const;
 	std::string asStringRaw() const;
 
 	// Operators
