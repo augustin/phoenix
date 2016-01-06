@@ -19,6 +19,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <cstring>
 #else /* _MSC_VER */
 #include <direct.h>
 #endif
