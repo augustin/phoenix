@@ -17,6 +17,9 @@ public:
 	static std::string getContents(const std::string& file);
 	static void putContents(const std::string& file, const std::string& contents);
 
+	static std::vector<std::string> searchForFiles(const std::string& dir,
+		const std::vector<std::string>& exts, bool recursive);
+
 	static std::string which(const std::string& program);
 
 	static std::string normalizePath(const std::string& path);

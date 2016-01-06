@@ -13,10 +13,12 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+
 #ifndef _MSC_VER
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <dirent.h>
 #else /* _MSC_VER */
 #include <direct.h>
 #endif
@@ -67,6 +69,44 @@ void FSUtil::putContents(const std::string& file, const std::string& contents)
 {
 	std::ofstream filestream(file);
 	filestream << contents;
+}
+
+inline void FSUtil_fileSearchHelper(vector<string>& ret, const string& dir,
+	const vector<string>& exts, bool recursive)
+{
+	DIR* dp = opendir(dir.c_str());
+	if (dp == nullptr) {
+		// Path does not exist or could not be read
+		return;
+	}
+
+	struct dirent* entry;
+	while ((entry = readdir(dp)) != nullptr) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+		std::string fullPath = FSUtil::combinePaths({dir, entry->d_name});
+		if (recursive && FSUtil::isDir(fullPath))
+			FSUtil_fileSearchHelper(ret, fullPath, exts, recursive);
+		else {
+			for (string ext : exts) {
+				if (StringUtil::endsWith(fullPath, ext)) {
+					ret.push_back(fullPath);
+					break;
+				}
+			}
+		}
+	}
+
+	closedir(dp);
+}
+
+vector<string> FSUtil::searchForFiles(const string& dir, const vector<string>& exts,
+	bool recursive)
+{
+	// TODO: report errors?
+	vector<string> ret;
+	FSUtil_fileSearchHelper(ret, dir, exts, recursive);
+	return ret;
 }
 
 string FSUtil::which(const string& program)
