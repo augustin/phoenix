@@ -9,6 +9,9 @@
 
 #include "language/Object.h"
 
+// Predefinitions
+class Generator;
+
 namespace Target {
 struct ExtraData {
 	std::string name;
@@ -17,6 +20,9 @@ struct ExtraData {
 	std::string definitionsFlags;
 	std::vector<std::string> sourceFiles;
 };
+extern std::vector<ExtraData*> targets;
+
+void generate(ExtraData* target, Generator* gen);
 
 void addGlobalFunction();
 }

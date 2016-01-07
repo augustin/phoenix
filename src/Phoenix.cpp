@@ -17,6 +17,7 @@
 
 #include "util/FSUtil.h"
 #include "util/StringUtil.h"
+#include "util/PrintUtil.h"
 
 using std::vector;
 using std::string;
@@ -90,7 +91,16 @@ int main(int argc, char* argv[])
 		Language::Run(stack, sourceDirectory);
 	} catch (Language::Exception e) {
 		e.print();
-		status = e.fType;
+		return e.fType;
 	}
-	return status;
+
+	string generatorName = Generators::defaultName();
+	std::cout << "generating build files for " << generatorName << "... ";
+	Generator* gen = Generators::create(generatorName);
+	for (Target::ExtraData* data : Target::targets)
+		Target::generate(data, gen);
+	gen->write();
+	std::cout << "done" << std::endl;
+
+	return 0;
 }

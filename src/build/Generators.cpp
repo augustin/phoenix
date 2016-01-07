@@ -4,9 +4,18 @@
  */
 #include "Generators.h"
 
+#include "generators/NinjaGenerator.h"
+
 using std::string;
 
 string Generators::defaultName()
 {
-	return "None";
+	return "Ninja";
+}
+
+Generator* Generators::create(string name)
+{
+	if (name == "Ninja")
+		return new NinjaGenerator;
+	return nullptr;
 }

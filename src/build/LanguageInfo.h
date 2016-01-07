@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "build/Generators.h"
 #include "language/Object.h"
 
 // TODO: per-compiler rules, maybe?
@@ -52,8 +53,13 @@ public:
 	// Checks
 	bool checkStandardsMode(std::string standardsMode);
 
+	// Generation
+	void generate(Generator* gen);
+
 	// From command-line flags & the like.
 	static std::map<std::string, std::string> sPreferredCompiler;
 private:
+	bool fGenerated;
+
 	static std::map<std::string, LanguageInfo*> sData;
 };

@@ -20,7 +20,8 @@ std::map<string, string> LanguageInfo::sPreferredCompiler;
 std::map<string, LanguageInfo*> LanguageInfo::sData;
 
 LanguageInfo::LanguageInfo(string langName, Object info)
-	: name(langName)
+	: name(langName),
+	  fGenerated(false)
 {
 	Language::CoerceOrThrow("language information", info, Type::Map);
 	Object type = info.map->get("type");
@@ -166,6 +167,25 @@ bool LanguageInfo::checkStandardsMode(std::string standardsMode)
 		standardsModes[standardsMode].status = -1;
 		return false;
 	}
+}
+
+void LanguageInfo::generate(Generator* gen)
+{
+	if (fGenerated)
+		return;
+
+	// FIXME: shouldn't be done here
+	gen->setProgramLinkRule(compilerBinary + " %INPUTFILE% " + compilerOutputFlag +
+		"%OUTPUTFILE% %TARGETFLAGS%");
+
+	string genName = name;
+	StringUtil::replaceAll(genName, "+", "P");
+	StringUtil::replaceAll(genName, "-", "D");
+	gen->addObjectRule("lang" + genName, name, sourceExtensions, compilerBinary,
+		OBJECT_FILE_EXT, compilerCompileFlag + "%INPUTFILE% " +
+		compilerOutputFlag + "%OUTPUTFILE% %TARGETFLAGS%");
+
+	fGenerated = true;
 }
 
 LanguageInfo* LanguageInfo::getLanguageInfo(string langName)

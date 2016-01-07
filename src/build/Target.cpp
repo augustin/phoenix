@@ -10,6 +10,7 @@
 #include "util/PrintUtil.h"
 #include "util/StringUtil.h"
 
+#include "Generators.h"
 #include "LanguageInfo.h"
 
 using std::vector;
@@ -21,12 +22,14 @@ using Language::ObjectMap;
 using Language::Type;
 
 namespace Target {
+std::vector<ExtraData*> targets;
 
 Object CreateTarget(const ObjectMap& params)
 {
 	Object ret = Language::MapObject(new ObjectMap);
 	ExtraData* extraData = new Target::ExtraData;
 	ret.extradata = extraData;
+	targets.push_back(extraData);
 
 	NativeFunction_COERCE_OR_THROW("0", name, Type::String);
 	extraData->name = name.asStringRaw();
@@ -54,13 +57,15 @@ Object CreateTarget(const ObjectMap& params)
 			modeName.erase(0, info->name.length());
 		if (info->standardsModes.count(modeName) == 0)
 			throw Exception(Exception::UserError,
-				std::string("standards mode '" + modeName + "' for language " + info->name + " does not exist!"));
+				std::string("standards mode '" + modeName + "' for language " +
+					 info->name + " does not exist!"));
 		if (info->checkStandardsMode(modeName)) {
 			extraData->standardsModeFlag =
 				strict ? info->standardsModes[modeName].strictFlag :
 						 info->standardsModes[modeName].normalFlag;
 		} else
-			PrintUtil::warning("standards mode '" + modeName + "' for language " + info->name + " unsupported");
+			PrintUtil::warning("standards mode '" + modeName + "' for language "
+				+ info->name + " unsupported!");
 		return Object();
 	}));
 
@@ -91,6 +96,13 @@ Object CreateTarget(const ObjectMap& params)
 	}));
 
 	return ret;
+}
+
+void generate(ExtraData* target, Generator* gen)
+{
+	for (std::string lang : target->languages)
+		LanguageInfo::getLanguageInfo(lang)->generate(gen);
+	gen->addTarget(target->name, target->sourceFiles);
 }
 
 void addGlobalFunction()

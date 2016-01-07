@@ -43,6 +43,7 @@ mkdir -p build-bootstrap
 PHOENIX_SRCS="
 	Phoenix.cpp
 	build/Generators.cpp
+	build/generators/NinjaGenerator.cpp
 	build/LanguageInfo.cpp
 	build/Target.cpp
 	language/Function.cpp
