@@ -61,7 +61,7 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 				Object detect = comp->map->get("detect");
 				Language::CoerceOrThrow("languageInfo.compiler.detect", detect, Type::Map);
 				OSUtil::ExecResult res =
-					OSUtil::exec(binary + " " + detect.map->get("arguments").asStringRaw());
+					OSUtil::exec(binary, detect.map->get("arguments").asStringRaw());
 				if (res.exitcode != 0)
 					continue; // did not exit with 0 -- something wrong
 				Object contains = detect.map->get("contains");
@@ -133,8 +133,8 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	FSUtil::mkdir("PhoenixFiles");
 	string testFile = "PhoenixFiles/test" + langName + sourceExtensions[0];
 	FSUtil::putContents(testFile, info.map->get("test").asStringRaw());
-	OSUtil::ExecResult res = OSUtil::exec(compilerBinary +
-		" " + testFile + " " + compilerOutputFlag + testFile + OBJECT_FILE_EXT);
+	OSUtil::ExecResult res = OSUtil::exec(compilerBinary,
+		testFile + " " + compilerOutputFlag + testFile + OBJECT_FILE_EXT);
 	if (res.exitcode == 0)
 		PrintUtil::checkFinished("yes", 2);
 	else {
@@ -155,9 +155,9 @@ bool LanguageInfo::checkStandardsMode(std::string standardsMode)
 	PrintUtil::checking("if the standards mode '" + name + standardsMode + "' works");
 	string testFile = "PhoenixFiles/test" + name + standardsMode + sourceExtensions[0];
 	FSUtil::putContents(testFile, mode.test);
-	OSUtil::ExecResult res = OSUtil::exec(compilerBinary +
-		" " + testFile + " " + mode.normalFlag + " " + compilerOutputFlag +
-		testFile + OBJECT_FILE_EXT);
+	OSUtil::ExecResult res = OSUtil::exec(compilerBinary,
+		testFile + " " + mode.normalFlag + " " + compilerOutputFlag + testFile +
+		OBJECT_FILE_EXT);
 	if (res.exitcode == 0) {
 		PrintUtil::checkFinished("yes", 2);
 		standardsModes[standardsMode].status = 1;

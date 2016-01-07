@@ -14,9 +14,9 @@ using std::string;
 #define pclose _pclose
 #endif
 
-OSUtil::ExecResult OSUtil::exec(const string& command)
+OSUtil::ExecResult OSUtil::exec(const string& program, const string& args)
 {
-	std::string cmd = command;
+	std::string cmd = program + " " + args;
 	cmd.append(" 2>&1");
 
 	ExecResult ret;
