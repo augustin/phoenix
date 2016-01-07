@@ -1,5 +1,5 @@
 /*
- * (C) 2015 Augustin Cavalier
+ * (C) 2015-2016 Augustin Cavalier
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include <iostream>
@@ -26,7 +26,7 @@ using std::cerr;
 void printUsage(string program)
 {
 	cerr << "Phoenix, version " PHOENIX_VERSION << ". ";
-	cerr << "(C) 2015 Augustin Cavalier." << std::endl << std::endl;
+	cerr << "(C) 2015-2016 Augustin Cavalier." << std::endl << std::endl;
 	cerr << "Usage: " << std::endl;
 	cerr << "\t" << program << " [options] <path/to/source> [<path/to/build/directory>]" << std::endl;
 	cerr << "\t" << program << " [options] <path/to/build/directory = .>" << std::endl;

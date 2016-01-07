@@ -1,5 +1,5 @@
 /*
- * (C) 2015 Augustin Cavalier
+ * (C) 2015-2016 Augustin Cavalier
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include "GlobalLanguageObject.h"
