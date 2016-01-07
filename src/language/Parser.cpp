@@ -285,7 +285,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 			while (j < code.length()) {
 				if (code[j] == ':')
 					return false;
-				if (code[j] == '(' || code[j] == ',' ||
+				if (code[j] == '(' || code[j] == ',' ||	code[j] == '[' ||
 					code[j] == '$' || code[j] == '{')
 					return true;
 				j++;
@@ -296,6 +296,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 		bool treatAsTrueBoolean = false;
 		if (paramNum == 0 && commaBeforeColon()) {
 			paramName = "0";
+			i--;
 		} else {
 			bool pastColon = false, pastEndOfParamName = false;
 			while (!pastColon && i < code.length()) {
