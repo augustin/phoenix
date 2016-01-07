@@ -10,6 +10,11 @@ addons:
 compiler:
   - gcc
   - clang
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc
+      # "gcc" on OS X is just Clang in fake-GCC mode
 
 before_install:
   - "if [ $TRAVIS_OS_NAME = 'osx' ]; then brew install ninja; fi"
