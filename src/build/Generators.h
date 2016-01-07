@@ -7,6 +7,11 @@
 #include <string>
 #include <vector>
 
+// GCC 4.6 doesn't support "override", so compensate for that
+#if __GNUC__ == 4 && __GNUC_MINOR__ < 7
+#  define override
+#endif
+
 class Generator
 {
 public:
