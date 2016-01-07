@@ -43,7 +43,7 @@ return Map(
 			"MSVC": Map(normal: "", strict: "")
 		),
 		"11": Map(
-			test: "int main(){\n#if __cplusplus != 201103L\n#error Not Cpp11\n#endif\nreturn 0;}",
+			test: "#include<vector>\nint main(){std::vector<int>v={1,2,3,4};for(int i:v)i++;return 0;}",
 			"GNU": Map(normal: "-std=gnu++0x", strict: "-std=c++0x"),
 			"Clang": Map(normal: "-std=gnu++0x", strict: "-std=c++0x"),
 			"MSVC": Map(normal: "", strict: "")
