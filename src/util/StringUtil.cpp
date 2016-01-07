@@ -36,10 +36,13 @@ vector<string> StringUtil::split(const string& str, const string& delimiter)
 	return ret;
 }
 
-string StringUtil::join(const vector<string>& array, const string& delimiter)
+string StringUtil::join(const vector<string>& array, const string& delimiter,
+	bool skipEmptyStrings)
 {
 	string ret = "";
 	for (vector<string>::size_type i = 0; i < array.size(); i++) {
+		if (skipEmptyStrings && array[i].empty())
+			continue;
 		if (i != 0)
 			ret += delimiter;
 		ret += array[i];
