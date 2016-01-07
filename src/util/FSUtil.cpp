@@ -21,7 +21,9 @@
 #include <dirent.h>
 #include <cstring>
 #else /* _MSC_VER */
+#define WIN32_LEAN_AND_MEAN
 #include <direct.h>
+#include <windows.h>
 #endif
 
 using std::string;
@@ -72,7 +74,8 @@ void FSUtil::putContents(const std::string& file, const std::string& contents)
 	filestream << contents;
 }
 
-inline void FSUtil_fileSearchHelper(vector<string>& ret, const string& dir,
+#ifndef _MSC_VER
+void FSUtil_fileSearchHelper(vector<string>& ret, const string& dir,
 	const vector<string>& exts, bool recursive)
 {
 	DIR* dp = opendir(dir.c_str());
@@ -100,6 +103,41 @@ inline void FSUtil_fileSearchHelper(vector<string>& ret, const string& dir,
 
 	closedir(dp);
 }
+#else /* _MSC_VER  */
+void FSUtil_fileSearchHelper(vector<string>& ret, const string& dir,
+	const vector<string>& exts, bool recursive)
+{
+	// Specify a file mask.
+	std::string path = dir + "\\*";
+
+	WIN32_FIND_DATAA file;
+	HANDLE findHndl = nullptr;
+	if ((findHndl = FindFirstFileA(path.c_str(), &file)) == INVALID_HANDLE_VALUE) {
+		// Path not found
+		return;
+	}
+
+	do {
+		if (strcmp(file.cFileName, ".") == 0 || strcmp(file.cFileName, "..") == 0)
+			continue;
+		// Build the path
+		path = dir + "\\" + file.cFileName;
+
+		if (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			FSUtil_fileSearchHelper(ret, path, exts, recursive);
+		} else {
+			for (string ext : exts) {
+				if (StringUtil::endsWith(path, ext)) {
+					ret.push_back(FSUtil::normalizePath(path));
+					break;
+				}
+			}
+		}
+	} while (FindNextFileA(findHndl, &file));
+
+	FindClose(findHndl);
+}
+#endif
 
 vector<string> FSUtil::searchForFiles(const string& dir, const vector<string>& exts,
 	bool recursive)
