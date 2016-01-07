@@ -207,9 +207,16 @@ ASTNode ParseString(Stack*, const string& code, uint32_t& line, string::size_typ
 			}
 		break;
 
+		case '\n':
+			line++;
+			ret += c;
+		break;
+
 		case '$':
 			needs_dereferencing = true;
-			// fall through
+			ret += c;
+		break;
+
 		default:
 			ret += c;
 		break;
