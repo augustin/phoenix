@@ -82,7 +82,6 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	int status = 0;
 	// Create the language stack on the heap, as it can get pretty large.
 	Language::Stack* stack = new Language::Stack();
 	stack->addSuperglobal("Phoenix", Language::GlobalLanguageObject());

@@ -100,7 +100,7 @@ Object ASTNode::toObject(Stack* stack)
 Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, string::size_type& i);
 
 // Returns whether or not it ignored whitespace
-bool IgnoreWhitespace(Stack* stack, const string& code, uint32_t& line, string::size_type& i,
+bool IgnoreWhitespace(Stack*, const string& code, uint32_t& line, string::size_type& i,
 	bool ignoreComments = true)
 {
 	const string::size_type oldi = i;
@@ -187,7 +187,7 @@ ASTNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, strin
 	return realRet;
 }
 
-ASTNode ParseString(Stack* stack, const string& code, uint32_t& line, string::size_type& i,
+ASTNode ParseString(Stack*, const string& code, uint32_t& line, string::size_type& i,
 	char endChar)
 {
 	string ret = "";
@@ -223,7 +223,7 @@ ASTNode ParseString(Stack* stack, const string& code, uint32_t& line, string::si
 	return ASTNode(ASTNode::Literal, StringObject(ret));
 }
 
-Object ParseNumber(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
+Object ParseNumber(Stack*, const string& code, uint32_t&, string::size_type& i)
 {
 	string number = "";
 	bool atEnd = false;
