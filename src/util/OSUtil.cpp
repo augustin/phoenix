@@ -16,7 +16,7 @@ using std::string;
 
 OSUtil::ExecResult OSUtil::exec(const string& program, const string& args)
 {
-	std::string cmd = program + " " + args;
+	string cmd = "\"" + program + "\"" + " " + args;
 	cmd.append(" 2>&1");
 
 	ExecResult ret;
