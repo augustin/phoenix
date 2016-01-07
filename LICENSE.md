@@ -1,4 +1,4 @@
-Phoenix is (C) 2015 Augustin Cavalier.
+Phoenix is (C) 2015-2016 Augustin Cavalier.
 
 The MIT License
 ------------------------------
