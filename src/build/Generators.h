@@ -29,7 +29,7 @@ public:
 	virtual void setProgramLinkRule(std::string rule) = 0;
 
 	virtual void addTarget(std::string outputBinaryName,
-		std::vector<std::string> inputFiles) = 0;
+		std::vector<std::string> inputFiles, std::string targetFlags) = 0;
 
 	virtual void write() = 0;
 };

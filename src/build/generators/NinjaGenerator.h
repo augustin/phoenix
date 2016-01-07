@@ -23,7 +23,7 @@ public:
 	virtual void setProgramLinkRule(std::string rule) override;
 
 	virtual void addTarget(std::string outputBinaryName,
-		std::vector<std::string> inputFiles) override;
+		std::vector<std::string> inputFiles, std::string targetFlags) override;
 
 	virtual void write() override;
 
