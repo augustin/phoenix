@@ -167,7 +167,7 @@ Object Object::op_eq(const Object& left, const Object& right)
 	throw Exception(Exception::InternalError, "unimplemented: complex type comparison");
 }
 
-bool coerceToBoolean(const Object& obj)
+bool Object_coerceToBoolean(const Object& obj)
 {
 	switch (obj.type()) {
 	case Type::Undefined:	return false;
@@ -175,6 +175,7 @@ bool coerceToBoolean(const Object& obj)
 	case Type::Integer:		return obj.integer != 0;
 	case Type::String:		return obj.string.length() != 0;
 	case Type::Function:	return true;
+	case Type::List:		return obj.list->size() != 0;
 	case Type::Map:			return obj.map->size() != 0;
 	default:
 		throw Exception(Exception::InternalError, "unexpected type for lowering");
@@ -184,11 +185,11 @@ Object Object::op_and(const Object& left, const Object& right)
 {
 	if (left.type() == Type::Undefined || right.type() == Type::Undefined)
 		return BooleanObject(false);
-	return BooleanObject(coerceToBoolean(left) && coerceToBoolean(right));
+	return BooleanObject(Object_coerceToBoolean(left) && Object_coerceToBoolean(right));
 }
 Object Object::op_or(const Object& left, const Object& right)
 {
-	return BooleanObject(coerceToBoolean(left) || coerceToBoolean(right));
+	return BooleanObject(Object_coerceToBoolean(left) || Object_coerceToBoolean(right));
 }
 
 }
