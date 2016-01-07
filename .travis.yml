@@ -11,10 +11,12 @@ compiler:
   - gcc
   - clang
 
+before_install:
+  - "if [ $TRAVIS_OS_NAME = 'osx' ]; then brew install ninja; fi"
 script:
   - ./tools/bootstrap.sh
   - ./phoenix_bootstrapped .
-  - ninja .
+  - ninja
 
 notifications:
   webhooks:
