@@ -3,6 +3,10 @@ language: cpp
 os:
   - linux
   - osx
+addons:
+  apt:
+    packages:
+    - ninja-build
 compiler:
   - gcc
   - clang
