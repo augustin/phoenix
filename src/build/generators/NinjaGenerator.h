@@ -17,13 +17,15 @@ public:
 
 	virtual std::string name() override;
 
-	virtual void addObjectRule(std::string ruleName, std::string descName,
-		std::vector<std::string> forExts, std::string program,
-		std::string outFileExt, std::string rule) override;
-	virtual void setProgramLinkRule(std::string rule) override;
+	virtual void addObjectRule(const std::string& ruleName,
+		const std::string& descName, const std::vector<std::string>& forExts,
+		const std::string& program, const std::string& outFileExt,
+		const std::string& rule);
+	virtual void setProgramLinkRule(const std::string& rule);
 
-	virtual void addTarget(std::string outputBinaryName,
-		std::vector<std::string> inputFiles, std::string targetFlags) override;
+	virtual void addTarget(const std::string& outputBinaryName,
+		const std::vector<std::string>& inputFiles,
+		const std::string& targetFlags);
 
 	virtual void write() override;
 

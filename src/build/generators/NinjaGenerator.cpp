@@ -20,8 +20,9 @@ string NinjaGenerator::name()
 	return "Ninja";
 }
 
-void NinjaGenerator::addObjectRule(string ruleName, string descName,
-	vector<string> forExts, string program, string outFileExt, string rule)
+void NinjaGenerator::addObjectRule(const string& ruleName, const string& descName,
+	const vector<string>& forExts, const string& program, const string& outFileExt,
+	const string& rule)
 {
 	string realRule = rule;
 	StringUtil::replaceAll(realRule, "%INPUTFILE%", "$in");
@@ -41,7 +42,7 @@ void NinjaGenerator::addObjectRule(string ruleName, string descName,
 		fRulesForExts.insert({ext, itm});
 }
 
-void NinjaGenerator::setProgramLinkRule(string rule)
+void NinjaGenerator::setProgramLinkRule(const string& rule)
 {
 	string realRule = rule;
 	StringUtil::replaceAll(realRule, "%INPUTFILE%", "$in");
@@ -52,8 +53,8 @@ void NinjaGenerator::setProgramLinkRule(string rule)
 		"  description = LINK $out");
 }
 
-void NinjaGenerator::addTarget(string outputBinaryName, vector<string> inputFiles,
-	string targetFlags)
+void NinjaGenerator::addTarget(const string& outputBinaryName,
+	const vector<string>& inputFiles, const string& targetFlags)
 {
 	vector<string> outfiles;
 	for (string file : inputFiles) {
