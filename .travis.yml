@@ -10,6 +10,7 @@ compiler:
 script:
   - ./tools/bootstrap.sh
   - ./phoenix_bootstrapped .
+  - ninja .
 
 notifications:
   webhooks:
