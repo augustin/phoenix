@@ -3,7 +3,14 @@ pull_requests:
   do_not_increment_build_number: true
 os:
   - MinGW
-  - Visual Studio 2013
+#  - Visual Studio 2013
 clone_depth: 10
 build_script:
-  - cmd: sh ./tools/bootstrap.sh
+  - cmd: g++ --version && sh ./tools/bootstrap.sh
+
+notifications:
+  - provider: Webhook
+    url: https://webhooks.gitter.im/e/b84525a8c935510a5d40
+    on_build_success: false
+    on_build_failure: true
+    on_build_status_changed: true
