@@ -67,6 +67,7 @@ string Object::typeName(Type type)
 	case Type::Integer:		return "Integer";
 	case Type::String:		return "String";
 	case Type::Function:	return "Function";
+	case Type::List:		return "List";
 	case Type::Map:			return "Map";
 	default:				return "Unknown";
 	}
@@ -90,6 +91,8 @@ string Object::asStringPretty() const
 		return std::string("<String:\"").append(string).append("\">");
 	case Type::Function:
 		return std::string("<Function>");
+	case Type::List:
+		return std::string("<List[...]>"); // TODO
 	case Type::Map:
 		return std::string("<Map[...]>"); // TODO
 	default:
@@ -110,6 +113,8 @@ string Object::asStringRaw() const
 		return string;
 	case Type::Function:
 		return std::string("<Function>");
+	case Type::List:
+		return std::string("<List[...]>"); // TODO
 	case Type::Map:
 		return std::string("<Map[...]>"); // TODO
 	default:
