@@ -16,6 +16,7 @@ public:
 
 	static std::string getContents(const std::string& file);
 	static void putContents(const std::string& file, const std::string& contents);
+	static void deleteFile(const std::string& file);
 
 	static std::vector<std::string> searchForFiles(const std::string& dir,
 		const std::vector<std::string>& exts, bool recursive);

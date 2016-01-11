@@ -74,6 +74,11 @@ void FSUtil::putContents(const std::string& file, const std::string& contents)
 	filestream << contents;
 }
 
+void FSUtil::deleteFile(const std::string& file)
+{
+	::remove(file.c_str());
+}
+
 #ifndef _MSC_VER
 void FSUtil_fileSearchHelper(vector<string>& ret, const string& dir,
 	const vector<string>& exts, bool recursive)
