@@ -83,6 +83,14 @@ Object CreateTarget(const ObjectMap& params)
 		return Object();
 	}));
 
+	ret.map->set("addSources", FunctionObject([](Object self, ObjectMap& params) -> Object {
+		ExtraData* extraData = static_cast<ExtraData*>(self.extradata);
+		NativeFunction_COERCE_OR_THROW("0", filesObj, Type::List);
+		for (Object o : *filesObj.list) {
+			extraData->sourceFiles.push_back(FSUtil::normalizePath(o.asStringRaw()));
+		}
+		return Object();
+	}));
 	ret.map->set("addSourceDirectory", FunctionObject([](Object self, ObjectMap& params) -> Object {
 		ExtraData* extraData = static_cast<ExtraData*>(self.extradata);
 		// TODO: get rid of hardcoded languages[0]
@@ -90,8 +98,10 @@ Object CreateTarget(const ObjectMap& params)
 		NativeFunction_COERCE_OR_THROW("0", dirNameObj, Type::String);
 		std::string dirName = dirNameObj.asStringRaw();
 		bool recurse = params.get("recursive").boolean;
-		extraData->sourceFiles =
+		vector<std::string> newFiles =
 			FSUtil::searchForFiles(dirName, info->sourceExtensions, recurse);
+		extraData->sourceFiles.insert(extraData->sourceFiles.end(), newFiles.begin(),
+			newFiles.end());
 		return Object();
 	}));
 
