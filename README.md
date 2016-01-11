@@ -11,5 +11,8 @@ $helloworld.addSourceDirectory(["src"]);
 ```
 
 ## Building Phoenix
-Phoenix requires a limited subset of C++11, but should still compile with GCC 4.6 or better.
-On all systems where there is a UNIX-compatible shell and a GCC or Clang-compatible compiler, run `./tools/bootstrap.sh` (optionally with the `CXX`, `LD`, `CXXFLAGS`, and/or `LINKFLAGS` environment variables set) to generate the `phoenix_bootstrapped` binary.
+Phoenix requires a limited subset of C++11, but should still compile with GCC 4.6 or better. Phoenix should build and run on all systems where this dependency is met, but it may require tweaking for OS-specific paths and locations.
+
+One-liner templates to compile Phoenix:
+ * Any UNIX shell: `g++ $(find src -name "*.cpp") -Isrc -o phoenix_bootstrapped -std=c++0x -O2`
+ * Windows GCC/PowerShell: `g++ $((Get-ChildItem src -Filter *.cpp -Recurse | % { $_.FullName } | Resolve-Path -Relative) -replace '\s+', ' ').split() -Isrc -o phoenix_bootstrapped -std=c++0x -O2`
