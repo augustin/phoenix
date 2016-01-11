@@ -23,6 +23,7 @@ script:
   - "g++ $(find src -name \"*.cpp\") -Isrc -o phoenix_bootstrapped -std=c++0x -O2"
   - ./phoenix_bootstrapped .
   - ninja
+  - build-utiltest/utiltest
 
 notifications:
   webhooks:

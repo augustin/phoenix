@@ -15,6 +15,15 @@ $phoenix.addIncludeDirectories(["src"]);
 #TODO# $phoenix.install(to: $$binDir, dependencies: 'autodetect');
 
 ######
+## tests
+######
+$utiltest = CreateTarget("utiltest", language: "C++");
+$utiltest.setStandardsMode("C++11", strict);
+$utiltest.addSourceDirectory("src/util");
+$utiltest.addSources(["tests/Tester.cpp", "tests/Util.cpp"]);
+$utiltest.addIncludeDirectories(["src"]);
+
+######
 ## language support files
 ######
 #TODO# $datafiles = CreateTarget(language: "static-files");
