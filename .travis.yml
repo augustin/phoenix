@@ -20,7 +20,7 @@ matrix:
 before_install:
   - "if [ $TRAVIS_OS_NAME = 'osx' ]; then brew install ninja; fi"
 script:
-  - ./tools/bootstrap.sh
+  - "g++ $(find src -name \"*.cpp\") -Isrc -o phoenix_bootstrapped -std=c++0x -O2"
   - ./phoenix_bootstrapped .
   - ninja
 
