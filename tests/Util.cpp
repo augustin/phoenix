@@ -10,12 +10,6 @@
 #include "util/StringUtil.h"
 #include "util/FSUtil.h"
 
-#ifdef _WIN32
-#  define TO_DEV_NULL " 2>nul >nul"
-#else
-#  define TO_DEV_NULL " 2>/dev/null >/dev/null"
-#endif
-
 int main(int argc, char* argv[])
 {
 	Tester t(true);
@@ -74,8 +68,7 @@ int main(int argc, char* argv[])
 	t.result(!FSUtil::isDir("this_file_does_not_exist.txt"), "isDir-4");
 
 	FSUtil::putContents("this_file_exists.txt", "These are the contents of this file.");
-	t.result(system("dir this_file_exists.txt " TO_DEV_NULL) == 0 &&
-		system("dir this_file_does_not_exist.txt " TO_DEV_NULL) != 0, "putContents-1");
+	t.result(FSUtil::isFile("this_file_exists.txt"), "putContents-1/isFile-4");
 	t.result(FSUtil::exists("this_file_exists.txt"), "putContents-2");
 
 	t.result(FSUtil::getContents("this_file_exists.txt") == "These are the contents of this file.",
