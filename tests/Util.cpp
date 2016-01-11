@@ -3,6 +3,8 @@
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
+#include <stdlib.h>
+
 #include "Tester.h"
 
 #include "util/StringUtil.h"
