@@ -63,7 +63,6 @@ void Tester::result(bool pass, const std::string& testName)
 int Tester::done()
 {
 	std::cout << "Finished: " << std::to_string(fTestsPassed) <<
-		" passed, " << std::to_string(fTestsFailed) << " failed." << std::endl <<
-		std::endl;
+		" passed, " << std::to_string(fTestsFailed) << " failed." << std::endl;
 	return fTestsFailed;
 }
