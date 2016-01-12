@@ -110,6 +110,8 @@ int main(int argc, char* argv[])
 
 	FSUtil::mkdir("this_directory_now_exists");
 	t.result(FSUtil::isDir("this_directory_now_exists"), "mkdir-1/isDir-5");
+	FSUtil::rmdir("this_directory_now_exists");
+	t.result(!FSUtil::isDir("this_directory_now_exists"), "rmdir-1/isDir-6");
 	t.endGroup();
 
 	return t.done();

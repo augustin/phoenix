@@ -293,3 +293,7 @@ void FSUtil::mkdir(const string& path)
 		);
 #endif
 }
+void FSUtil::rmdir(const string& path)
+{
+	::rmdir(path.c_str());
+}

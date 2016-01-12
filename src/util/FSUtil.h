@@ -28,4 +28,5 @@ public:
 	static std::string parentDirectory(const std::string& path);
 
 	static void mkdir(const std::string& dirname);
+	static void rmdir(const std::string& dirname);
 };
