@@ -42,8 +42,8 @@ bool FSUtil::exists(const string& path)
 
 bool FSUtil::isFile(const string& path)
 {
-	struct stat statbuf;
-	if (stat(path.c_str(), &statbuf) == -1)
+	struct ::stat statbuf;
+	if (::stat(path.c_str(), &statbuf) == -1)
 		return false;
 	if (statbuf.st_mode & S_IFREG)
 		return true;
@@ -52,8 +52,8 @@ bool FSUtil::isFile(const string& path)
 
 bool FSUtil::isDir(const string& path)
 {
-	struct stat statbuf;
-	if (stat(path.c_str(), &statbuf) == -1)
+	struct ::stat statbuf;
+	if (::stat(path.c_str(), &statbuf) == -1)
 		return false;
 	if (statbuf.st_mode & S_IFDIR)
 		return true;
@@ -83,14 +83,14 @@ void FSUtil::deleteFile(const std::string& file)
 void FSUtil_fileSearchHelper(vector<string>& ret, const string& dir,
 	const vector<string>& exts, bool recursive)
 {
-	DIR* dp = opendir(dir.c_str());
+	DIR* dp = ::opendir(dir.c_str());
 	if (dp == nullptr) {
 		// Path does not exist or could not be read
 		return;
 	}
 
-	struct dirent* entry;
-	while ((entry = readdir(dp)) != nullptr) {
+	struct ::dirent* entry;
+	while ((entry = ::readdir(dp)) != nullptr) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		std::string fullPath = FSUtil::combinePaths({dir, entry->d_name});
@@ -247,7 +247,7 @@ string FSUtil::normalizePath(const string& path)
 #ifdef _WIN32
 	// Check for Cygwin/MSYS-style path
 	if (ret[0] == '/' && ret[2] == '/') {
-		ret[0] = toupper(ret[1]);
+		ret[0] = ::toupper(ret[1]);
 		ret[1] = ':';
 	}
 #endif
