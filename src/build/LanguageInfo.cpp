@@ -139,6 +139,8 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	FSUtil::deleteFile(testFile);
 	bool outFileExisted = FSUtil::exists(testFile + BINARY_FILE_EXT);
 	FSUtil::deleteFile(testFile + BINARY_FILE_EXT);
+	if (compilerName == "MSVC") // Yay, special casing! >:[
+		FSUtil::deleteFile("test" + langName + OBJECT_FILE_EXT);
 	if (res.exitcode == 0 && outFileExisted) {
 		PrintUtil::checkFinished("yes", 2);
 	} else {
@@ -165,6 +167,8 @@ bool LanguageInfo::checkStandardsMode(std::string standardsMode)
 	FSUtil::deleteFile(testFile);
 	bool outFileExisted = FSUtil::exists(testFile + BINARY_FILE_EXT);
 	FSUtil::deleteFile(testFile + BINARY_FILE_EXT);
+	if (compilerName == "MSVC") // Yay, special casing! >:[
+		FSUtil::deleteFile("test" + name + standardsMode + OBJECT_FILE_EXT);
 	if (res.exitcode == 0 && outFileExisted) {
 		PrintUtil::checkFinished("yes", 2);
 		standardsModes[standardsMode].status = 1;
