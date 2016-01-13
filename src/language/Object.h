@@ -64,6 +64,8 @@ public:
 	std::string asStringPretty() const;
 	std::string asStringRaw() const;
 
+	inline Object operator[](const char* key);
+
 	// Operators
 	static Object op_div(const Object& left, const Object& right);
 	static Object op_mult(const Object& left, const Object& right);
@@ -157,6 +159,12 @@ public:
 
 	size_type size() const { return _inherited::size(); }
 };
+
+// Must be down here, as it needs ObjectMap's definition
+inline Object Object::operator[](const char* key)
+{
+	return map->get(key);
+}
 
 // Convenience constructors
 inline Object MapObject(ObjectMap* value)

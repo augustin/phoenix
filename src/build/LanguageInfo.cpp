@@ -23,31 +23,31 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	  fGenerated(false)
 {
 	Language::CoerceOrThrow("language information", info, Type::Map);
-	Object type = info.map->get("type");
+	Object type = info["type"];
 	Language::CoerceOrThrow("languageInfo.type", type, Type::String);
 	if (type.string != "CompiledToMachineCode")
 		throw Language::Exception(Language::Exception::Type::UserError,
 			"only 'CompiledToMachineCode' is supported at this time");
 
 	// File extensions
-	Object srcExts = info.map->get("sourceExtensions");
+	Object srcExts = info["sourceExtensions"];
 	Language::CoerceOrThrow("languageInfo.sourceExtensions", srcExts, Type::List);
 	for (const Object& obj : *srcExts.list)
 		sourceExtensions.push_back(obj.asStringRaw());
-	Object extraExts = info.map->get("extraExtensions");
+	Object extraExts = info["extraExtensions"];
 	if (extraExts.type() == Language::Type::List) {
 		for (const Object& obj : *extraExts.list)
 			extraExtensions.push_back(obj.asStringRaw());
 	}
 
-	preprocessor = info.map->get("preprocessor").boolean;
+	preprocessor = info["preprocessor"].boolean;
 
-	Object envir = info.map->get("compilerEnviron");
+	Object envir = info["compilerEnviron"];
 	if (envir.type() != Language::Type::Undefined)
 		compilerEnviron = envir.asStringRaw();
 
 	// Figure out what compiler we're using
-	Object comps = info.map->get("compilers");
+	Object comps = info["compilers"];
 	Language::CoerceOrThrow("languageInfo.compilers", comps, Type::Map);
 	auto tryCompiler = [&](const string& binary) -> bool {
 		string compilerBin = FSUtil::which(binary);
@@ -55,15 +55,16 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 			// Which compiler is this?
 			for (Language::ObjectMap::const_iterator it =
 				 comps.map->begin(); it != comps.map->end(); it++) {
-				Object* comp = it->second;
-				Language::CoerceOrThrowPtr("languageInfo.compiler", comp, Type::Map);
-				Object detect = comp->map->get("detect");
+				Object* compPtr = it->second;
+				Language::CoerceOrThrowPtr("languageInfo.compiler", compPtr, Type::Map);
+				Object comp = *compPtr;
+				Object detect = comp["detect"];
 				Language::CoerceOrThrow("languageInfo.compiler.detect", detect, Type::Map);
 				OSUtil::ExecResult res =
-					OSUtil::exec(binary, detect.map->get("arguments").asStringRaw());
+					OSUtil::exec(binary, detect["arguments"].asStringRaw());
 				if (res.exitcode != 0)
 					continue; // did not exit with 0 -- something wrong
-				Object contains = detect.map->get("contains");
+				Object contains = detect["contains"];
 				Language::CoerceOrThrow("languageInfo.compiler.detect.contains", contains, Type::List);
 				bool OK = true;
 				for (const Object& obj : *contains.list) {
@@ -73,12 +74,12 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 				if (OK) {
 					compilerName = it->first;
 					compilerBinary = compilerBin;
-					compilerDefaultFlags = comp->map->get("defaultFlags").asStringRaw();
-					compilerCompileFlag = comp->map->get("compile").asStringRaw();
-					compilerOutputFlag = comp->map->get("output").asStringRaw();
-					compilerLinkBinaryFlag = comp->map->get("linkBinary").asStringRaw();
-					compilerDefinition = comp->map->get("definition").asStringRaw();
-					compilerInclude = comp->map->get("include").asStringRaw();
+					compilerDefaultFlags = comp["defaultFlags"].asStringRaw();
+					compilerCompileFlag = comp["compile"].asStringRaw();
+					compilerOutputFlag = comp["output"].asStringRaw();
+					compilerLinkBinaryFlag = comp["linkBinary"].asStringRaw();
+					compilerDefinition = comp["definition"].asStringRaw();
+					compilerInclude = comp["include"].asStringRaw();
 					return true;
 				}
 			}
@@ -132,7 +133,7 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	// Check that the compiler works
 	PrintUtil::checking("if the " + langName + " compiler works");
 	OSUtil::ExecResult res =
-		checkIfCompiles("test" + langName, info.map->get("test").asStringRaw());
+		checkIfCompiles("test" + langName, info["test"].asStringRaw());
 	if (res.exitcode == 0) {
 		PrintUtil::checkFinished("yes", 2);
 	} else {
