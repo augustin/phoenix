@@ -277,7 +277,10 @@ string FSUtil::combinePaths(const vector<string>& paths)
 string FSUtil::parentDirectory(const string& path)
 {
 	string ret = normalizePath(path);
-	return ret.substr(0, ret.rfind("/", ret.length() - 1 /* in case it ends with a '/' */));
+	string::size_type pos = ret.rfind("/", ret.length() - 1 /* in case it ends with a '/' */);
+	if (pos == string::npos)
+		return "."; // No '/'s in the path; so it's just a single file.
+	return ret.substr(0, pos);
 }
 
 void FSUtil::mkdir(const string& path)
