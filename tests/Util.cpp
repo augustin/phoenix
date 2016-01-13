@@ -107,6 +107,8 @@ int main(int argc, char* argv[])
 		"parentDirectory-1");
 	t.result(FSUtil::parentDirectory("/test/1.3.4.2/blah/file.txt") == "/test/1.3.4.2/blah",
 		"parentDirectory-2");
+	t.result(FSUtil::parentDirectory("file.txt") == ".",
+		"parentDirectory-3");
 
 	FSUtil::mkdir("this_directory_now_exists");
 	t.result(FSUtil::isDir("this_directory_now_exists"), "mkdir-1/isDir-5");
