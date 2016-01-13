@@ -23,7 +23,9 @@ public:
 	void push();
 	void pop();
 
-	Object get(const std::vector<std::string> variable);
+	Object* get_ptr(const std::vector<std::string> variable);
+	inline Object get(const std::vector<std::string> variable) {
+		Object* o = get_ptr(variable); if (o == nullptr) return Object(); else return *o; }
 	inline Object get(const std::string variable0) {
 		std::vector<std::string> variable = {variable0};
 		return get(variable); }
@@ -31,11 +33,17 @@ public:
 
 	void addSuperglobal(std::string variableName, Object value);
 
+	inline void pushDir(const std::string& dir) { fDirectoryStack.push_back(dir); }
+	inline void popDir() { fDirectoryStack.pop_back(); }
+	inline std::string currentDir() { return fDirectoryStack[fDirectoryStack.size() - 1]; }
+
 	void print();
 
 private:
 	ObjectMap fSuperglobalScope;
 	std::vector<ObjectMap> fStack;
+
+	std::vector<std::string> fDirectoryStack;
 
 	std::vector<ObjectMap>::size_type getPos(std::string variable);
 };

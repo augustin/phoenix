@@ -19,6 +19,7 @@ using Language::Function;
 using Language::FunctionObject;
 using Language::Object;
 using Language::ObjectMap;
+using Language::Stack;
 using Language::Type;
 
 namespace Target {
@@ -47,9 +48,9 @@ Object CreateTarget(const ObjectMap& params)
 
 	extraData->otherFlags = LanguageInfo::getLanguageInfo(extraData->languages[0])->compilerDefaultFlags;
 
-	ret.map->set("setStandardsMode", FunctionObject([](Object self, ObjectMap& params) -> Object {
+	ret.map->set("setStandardsMode", FunctionObject([](Stack*, Object* self, ObjectMap& params) -> Object {
 		NativeFunction_COERCE_OR_THROW("0", modeNameObj, Type::String);
-		ExtraData* extraData = static_cast<ExtraData*>(self.extradata);
+		ExtraData* extraData = static_cast<ExtraData*>(self->extradata);
 
 		bool strict = params.get("strict").boolean;
 		std::string modeName = modeNameObj.asStringRaw();
@@ -71,8 +72,8 @@ Object CreateTarget(const ObjectMap& params)
 		return Object();
 	}));
 
-	ret.map->set("addDefinitions", FunctionObject([](Object self, ObjectMap& m) -> Object {
-		ExtraData* extraData = static_cast<ExtraData*>(self.extradata);
+	ret.map->set("addDefinitions", FunctionObject([](Stack*, Object* self, ObjectMap& m) -> Object {
+		ExtraData* extraData = static_cast<ExtraData*>(self->extradata);
 		// TODO: get rid of hardcoded languages[0]
 		LanguageInfo* info = LanguageInfo::getLanguageInfo(extraData->languages[0]);
 
@@ -85,20 +86,24 @@ Object CreateTarget(const ObjectMap& params)
 		return Object();
 	}));
 
-	ret.map->set("addSources", FunctionObject([](Object self, ObjectMap& params) -> Object {
-		ExtraData* extraData = static_cast<ExtraData*>(self.extradata);
+	ret.map->set("addSources", FunctionObject([](Stack* stack,
+			Object* self, ObjectMap& params) -> Object {
+		ExtraData* extraData = static_cast<ExtraData*>(self->extradata);
 		NativeFunction_COERCE_OR_THROW("0", filesObj, Type::List);
 		for (Object o : *filesObj.list) {
-			extraData->sourceFiles.push_back(FSUtil::normalizePath(o.asStringRaw()));
+			extraData->sourceFiles.push_back(FSUtil::combinePaths({
+				stack->currentDir(), o.asStringRaw()}));
 		}
 		return Object();
 	}));
-	ret.map->set("addSourceDirectory", FunctionObject([](Object self, ObjectMap& params) -> Object {
-		ExtraData* extraData = static_cast<ExtraData*>(self.extradata);
+	ret.map->set("addSourceDirectory", FunctionObject([](Stack* stack, Object* self,
+			ObjectMap& params) -> Object {
+		ExtraData* extraData = static_cast<ExtraData*>(self->extradata);
 		// TODO: get rid of hardcoded languages[0]
 		LanguageInfo* info = LanguageInfo::getLanguageInfo(extraData->languages[0]);
 		NativeFunction_COERCE_OR_THROW("0", dirNameObj, Type::String);
-		std::string dirName = dirNameObj.asStringRaw();
+		std::string dirName = FSUtil::combinePaths({stack->currentDir(),
+			dirNameObj.asStringRaw()});
 		bool recurse = params.get("recursive").boolean;
 		vector<std::string> newFiles =
 			FSUtil::searchForFiles(dirName, info->sourceExtensions, recurse);
@@ -107,15 +112,16 @@ Object CreateTarget(const ObjectMap& params)
 		return Object();
 	}));
 
-	ret.map->set("addIncludeDirectories", FunctionObject([](Object self, ObjectMap& params) -> Object {
-		ExtraData* extraData = static_cast<ExtraData*>(self.extradata);
+	ret.map->set("addIncludeDirectories", FunctionObject([](Stack* stack,
+			Object* self, ObjectMap& params) -> Object {
+		ExtraData* extraData = static_cast<ExtraData*>(self->extradata);
 		// TODO: get rid of hardcoded languages[0]
 		LanguageInfo* info = LanguageInfo::getLanguageInfo(extraData->languages[0]);
 		NativeFunction_COERCE_OR_THROW("0", dirsList, Type::List);
 
 		for (Object itm : *dirsList.list) {
 			extraData->includesFlags.append(" \"" + info->compilerInclude +
-				itm.asStringRaw() + "\"");
+				FSUtil::combinePaths({stack->currentDir(), itm.asStringRaw()}) + "\"");
 		}
 		return Object();
 	}));
@@ -134,7 +140,7 @@ void generate(ExtraData* target, Generator* gen)
 
 void addGlobalFunction()
 {
-	Language::GlobalFunctions.insert({"CreateTarget", Function([](Object, ObjectMap& params)
+	Language::GlobalFunctions.insert({"CreateTarget", Function([](Stack*, Object*, ObjectMap& params)
 		-> Language::Object {
 		return CreateTarget(params);
 	})});

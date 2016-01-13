@@ -21,10 +21,10 @@ Function::Function(NativeStdFunction nativeFunction)
 {
 }
 
-Object Function::call(Object context, ObjectMap& args)
+Object Function::call(Stack* stack, Object* context, ObjectMap& args)
 {
 	if (fIsNative)
-		return fNativeFunction(context, args);
+		return fNativeFunction(stack, context, args);
 	throw Exception(Exception::AccessViolation, "Attempted to call null function");
 }
 

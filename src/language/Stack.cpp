@@ -41,7 +41,7 @@ std::vector<ObjectMap>::size_type Stack::getPos(std::string variable)
 	return fStack.size() - 1;
 }
 
-Object Stack::get(const vector<string> variable)
+Object* Stack::get_ptr(const vector<string> variable)
 {
 	Object* ret = nullptr;
 	if (variable[0][0] == '$') {
@@ -57,9 +57,7 @@ Object Stack::get(const vector<string> variable)
 		ret = ret->map->get_ptr(variable[i]);
 	}
 
-	if (ret != nullptr)
-		return *ret;
-	return Object();
+	return ret;
 }
 
 void Stack::set(vector<string> variable, Object value)

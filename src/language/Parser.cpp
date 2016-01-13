@@ -360,13 +360,13 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 		}
 	}
 
-	Object context;
+	Object* context = nullptr;
 	if (funcRef.size() > 1) {
 		vector<string> parentRef = funcRef;
 		parentRef.pop_back();
-		context = stack->get(parentRef);
+		context = stack->get_ptr(parentRef);
 	}
-	return func.call(context, arguments);
+	return func.call(stack, context, arguments);
 }
 
 Object ParseList(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
@@ -663,6 +663,7 @@ Object Run(Stack* stack, string path)
 	if (filename.empty())
 		throw Exception(Exception::FileDoesNotExist, path);
 	string code = FSUtil::getContents(filename);
+	stack->pushDir(FSUtil::parentDirectory(filename));
 
 	uint32_t line = 1;
 	string::size_type i = 0;
@@ -674,14 +675,17 @@ Object Run(Stack* stack, string path)
 			IgnoreWhitespace(PARSER_PARAMS);
 		}
 	} catch (ReturnValue& e) {
+		stack->popDir();
 		return e.value;
 	} catch (Exception& e) {
+		stack->popDir();
 		if (e.fLine == 0) {
 			e.fFile = filename;
 			e.fLine = line;
 		}
 		throw e;
 	}
+	stack->popDir();
 	return Object(); // undefined
 }
 

@@ -11,12 +11,15 @@
 
 namespace Language {
 
+// Predefinitions
+class Stack;
+
 // Utilities for native function declarations
 #define NativeFunction_COERCE_OR_THROW(NAME, VARIABLE, TYPE) \
 	Language::Object VARIABLE = params.get(NAME); \
 	Language::CoerceOrThrow("parameter '" NAME "'", VARIABLE, TYPE)
 
-typedef std::function<Object(Object, ObjectMap&)> NativeStdFunction;
+typedef std::function<Object(Stack*, Object*, ObjectMap&)> NativeStdFunction;
 
 class Function
 {
@@ -24,7 +27,7 @@ public:
 	Function();
 	Function(NativeStdFunction nativeFunction);
 
-	Object call(Object context, ObjectMap& args);
+	Object call(Stack* stack, Object* context, ObjectMap& args);
 
 private:
 	NativeStdFunction fNativeFunction;
