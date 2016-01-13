@@ -7,7 +7,7 @@ Assuming the `src` directory contains the source code for a C++ "Hello, world!" 
 ```bash
 $$Phoenix.checkVersion(minimum: "0.0.1");
 $helloworld = CreateTarget("hello", language: "C++");
-$helloworld.addSourceDirectory(["src"]);
+$helloworld.addSourceDirectory("src");
 ```
 
 ## Building Phoenix
