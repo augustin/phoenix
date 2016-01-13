@@ -9,7 +9,6 @@
 #include "language/Parser.h"
 #include "util/FSUtil.h"
 #include "util/PrintUtil.h"
-#include "util/OSUtil.h"
 #include "util/StringUtil.h"
 
 using std::string;
@@ -132,16 +131,9 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 
 	// Check that the compiler works
 	PrintUtil::checking("if the " + langName + " compiler works");
-	string testFile = "PhoenixTemp/test" + langName + sourceExtensions[0];
-	FSUtil::putContents(testFile, info.map->get("test").asStringRaw());
-	OSUtil::ExecResult res = OSUtil::exec(compilerBinary,
-		testFile + " " + compilerLinkBinaryFlag + testFile + BINARY_FILE_EXT);
-	FSUtil::deleteFile(testFile);
-	bool outFileExisted = FSUtil::exists(testFile + BINARY_FILE_EXT);
-	FSUtil::deleteFile(testFile + BINARY_FILE_EXT);
-	if (compilerName == "MSVC") // Yay, special casing! >:[
-		FSUtil::deleteFile("test" + langName + OBJECT_FILE_EXT);
-	if (res.exitcode == 0 && outFileExisted) {
+	OSUtil::ExecResult res =
+		checkIfCompiles("test" + langName, info.map->get("test").asStringRaw());
+	if (res.exitcode == 0) {
 		PrintUtil::checkFinished("yes", 2);
 	} else {
 		PrintUtil::checkFinished("no", 0);
@@ -159,17 +151,9 @@ bool LanguageInfo::checkStandardsMode(std::string standardsMode)
 		return false;
 
 	PrintUtil::checking("if the standards mode '" + name + standardsMode + "' works");
-	string testFile = "PhoenixTemp/test" + name + standardsMode + sourceExtensions[0];
-	FSUtil::putContents(testFile, mode.test);
-	OSUtil::ExecResult res = OSUtil::exec(compilerBinary,
-		testFile + " " + mode.normalFlag + " " + compilerLinkBinaryFlag + testFile +
-		BINARY_FILE_EXT);
-	FSUtil::deleteFile(testFile);
-	bool outFileExisted = FSUtil::exists(testFile + BINARY_FILE_EXT);
-	FSUtil::deleteFile(testFile + BINARY_FILE_EXT);
-	if (compilerName == "MSVC") // Yay, special casing! >:[
-		FSUtil::deleteFile("test" + name + standardsMode + OBJECT_FILE_EXT);
-	if (res.exitcode == 0 && outFileExisted) {
+	OSUtil::ExecResult res =
+		checkIfCompiles("test" + name + standardsMode, mode.test);
+	if (res.exitcode == 0) {
 		PrintUtil::checkFinished("yes", 2);
 		standardsModes[standardsMode].status = 1;
 		return true;
@@ -197,6 +181,23 @@ void LanguageInfo::generate(Generator* gen)
 		compilerOutputFlag + "%OUTPUTFILE% %TARGETFLAGS%");
 
 	fGenerated = true;
+}
+
+OSUtil::ExecResult LanguageInfo::checkIfCompiles(const string& testName, const string& testContents)
+{
+	string testFileBase = "PhoenixTemp/" + testName;
+	FSUtil::putContents(testFileBase + sourceExtensions[0], testContents);
+	OSUtil::ExecResult res = OSUtil::exec(compilerBinary,
+		testFileBase + sourceExtensions[0] + " " + compilerLinkBinaryFlag + testFileBase +
+		BINARY_FILE_EXT);
+	FSUtil::deleteFile(testFileBase + sourceExtensions[0]);
+	bool outFileExisted = FSUtil::exists(testFileBase + BINARY_FILE_EXT);
+	FSUtil::deleteFile(testFileBase + BINARY_FILE_EXT);
+	if (compilerName == "MSVC") // Yay, special casing! >:[
+		FSUtil::deleteFile(testName + OBJECT_FILE_EXT);
+	if (res.exitcode == 0 && !outFileExisted)
+		res.exitcode = 1;
+	return res;
 }
 
 LanguageInfo* LanguageInfo::getLanguageInfo(string langName)

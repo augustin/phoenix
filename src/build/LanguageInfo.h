@@ -11,6 +11,7 @@
 
 #include "build/Generators.h"
 #include "language/Object.h"
+#include "util/OSUtil.h"
 
 // TODO: per-compiler rules, maybe?
 #ifdef _WIN32
@@ -18,7 +19,7 @@
 #define BINARY_FILE_EXT ".exe"
 #else
 #define OBJECT_FILE_EXT ".o"
-#define BINARY_FILE_EXT
+#define BINARY_FILE_EXT ""
 #endif
 
 class LanguageInfo
@@ -64,6 +65,9 @@ public:
 	static std::map<std::string, std::string> sPreferredCompiler;
 private:
 	bool fGenerated;
+
+	OSUtil::ExecResult checkIfCompiles(const std::string& testName,
+		const std::string& testContents);
 
 	static std::map<std::string, LanguageInfo*> sData;
 };
