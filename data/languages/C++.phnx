@@ -16,6 +16,7 @@ return Map(
 			defaultFlags: "",
 			compile: "-c ",
 			output: "-o ",
+			linkBinary: "-o ",
 			definition: "-D",
 			include: "-I"
 		),
@@ -25,6 +26,7 @@ return Map(
 			defaultFlags: "",
 			compile: "-c ",
 			output: "-o ",
+			linkBinary: "-o ",
 			definition: "-D",
 			include: "-I"
 		),
@@ -34,6 +36,7 @@ return Map(
 			defaultFlags: "/nologo /TP /GR /EHsc",
 			compile: "/c ",
 			output: "/Fo",
+			linkBinary: "/Fe",
 			definition: "/D",
 			include: "/I"
 		)
