@@ -36,6 +36,7 @@ public:
 	// Compiler info
 	std::string compilerName;
 	std::string compilerBinary;
+	std::string compilerDefaultFlags;
 	std::string compilerCompileFlag;
 	std::string compilerOutputFlag;
 	std::string compilerDefinition;

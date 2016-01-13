@@ -19,6 +19,7 @@ struct ExtraData {
 	std::string standardsModeFlag;
 	std::string definitionsFlags;
 	std::string includesFlags;
+	std::string otherFlags;
 	std::vector<std::string> sourceFiles;
 };
 extern std::vector<ExtraData*> targets;

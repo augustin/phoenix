@@ -13,6 +13,7 @@ return Map(
 		"Clang": Map(
 			binary: "clang++",
 			detect: Map(arguments: "--version", contains: ["clang", "version"]),
+			defaultFlags: "",
 			compile: "-c ",
 			output: "-o ",
 			definition: "-D",
@@ -21,6 +22,7 @@ return Map(
 		"GNU": Map(
 			binary: "g++",
 			detect: Map(arguments: "--version", contains: ["g++", "Free Software Foundation"]),
+			defaultFlags: "",
 			compile: "-c ",
 			output: "-o ",
 			definition: "-D",
@@ -29,6 +31,7 @@ return Map(
 		"MSVC": Map(
 			binary: "cl",
 			detect: Map(arguments: "", contains: ["Microsoft (R) C/C++ Optimizing Compiler"]),
+			defaultFlags: "/nologo /TP /GR /EHsc",
 			compile: "/c ",
 			output: "/Fo",
 			definition: "/D",

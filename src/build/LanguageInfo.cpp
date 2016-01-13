@@ -74,6 +74,7 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 				if (OK) {
 					compilerName = it->first;
 					compilerBinary = compilerBin;
+					compilerDefaultFlags = comp->map->get("defaultFlags").asStringRaw();
 					compilerCompileFlag = comp->map->get("compile").asStringRaw();
 					compilerOutputFlag = comp->map->get("output").asStringRaw();
 					compilerDefinition = comp->map->get("definition").asStringRaw();

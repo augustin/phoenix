@@ -45,6 +45,8 @@ Object CreateTarget(const ObjectMap& params)
 	for (std::string lang : extraData->languages)
 		LanguageInfo::getLanguageInfo(lang);
 
+	extraData->otherFlags = LanguageInfo::getLanguageInfo(extraData->languages[0])->compilerDefaultFlags;
+
 	ret.map->set("setStandardsMode", FunctionObject([](Object self, ObjectMap& params) -> Object {
 		NativeFunction_COERCE_OR_THROW("0", modeNameObj, Type::String);
 		ExtraData* extraData = static_cast<ExtraData*>(self.extradata);
@@ -126,8 +128,8 @@ void generate(ExtraData* target, Generator* gen)
 	for (std::string lang : target->languages)
 		LanguageInfo::getLanguageInfo(lang)->generate(gen);
 	gen->addTarget(target->name, target->sourceFiles,
-		StringUtil::join({target->includesFlags, target->definitionsFlags,
-			target->standardsModeFlag}, " "));
+		StringUtil::join({target->otherFlags, target->includesFlags,
+			target->definitionsFlags, target->standardsModeFlag}, " "));
 }
 
 void addGlobalFunction()
