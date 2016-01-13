@@ -130,14 +130,16 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 
 	// Check that the compiler works
 	PrintUtil::checking("if the " + langName + " compiler works");
-	FSUtil::mkdir("PhoenixFiles");
-	string testFile = "PhoenixFiles/test" + langName + sourceExtensions[0];
+	string testFile = "PhoenixTemp/test" + langName + sourceExtensions[0];
 	FSUtil::putContents(testFile, info.map->get("test").asStringRaw());
 	OSUtil::ExecResult res = OSUtil::exec(compilerBinary,
 		testFile + " " + compilerOutputFlag + testFile + OBJECT_FILE_EXT);
-	if (res.exitcode == 0)
+	FSUtil::deleteFile(testFile);
+	bool outFileExisted = FSUtil::exists(testFile + OBJECT_FILE_EXT);
+	FSUtil::deleteFile(testFile + OBJECT_FILE_EXT);
+	if (res.exitcode == 0 && outFileExisted) {
 		PrintUtil::checkFinished("yes", 2);
-	else {
+	} else {
 		PrintUtil::checkFinished("no", 0);
 		throw Language::Exception(Language::Exception::UserError,
 			string("complier for " + langName + " is broken: '" + res.output + "'"));
@@ -153,12 +155,15 @@ bool LanguageInfo::checkStandardsMode(std::string standardsMode)
 		return false;
 
 	PrintUtil::checking("if the standards mode '" + name + standardsMode + "' works");
-	string testFile = "PhoenixFiles/test" + name + standardsMode + sourceExtensions[0];
+	string testFile = "PhoenixTemp/test" + name + standardsMode + sourceExtensions[0];
 	FSUtil::putContents(testFile, mode.test);
 	OSUtil::ExecResult res = OSUtil::exec(compilerBinary,
 		testFile + " " + mode.normalFlag + " " + compilerOutputFlag + testFile +
 		OBJECT_FILE_EXT);
-	if (res.exitcode == 0) {
+	FSUtil::deleteFile(testFile);
+	bool outFileExisted = FSUtil::exists(testFile + OBJECT_FILE_EXT);
+	FSUtil::deleteFile(testFile + OBJECT_FILE_EXT);
+	if (res.exitcode == 0 && outFileExisted) {
 		PrintUtil::checkFinished("yes", 2);
 		standardsModes[standardsMode].status = 1;
 		return true;

@@ -82,6 +82,9 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	// Directory setup
+	FSUtil::mkdir("PhoenixTemp");
+
 	// Create the language stack on the heap, as it can get pretty large.
 	Language::Stack* stack = new Language::Stack();
 	stack->addSuperglobal("Phoenix", Language::GlobalLanguageObject());
@@ -100,6 +103,9 @@ int main(int argc, char* argv[])
 		Target::generate(data, gen);
 	gen->write();
 	std::cout << "done" << std::endl;
+
+	// Directory de-setup
+	FSUtil::rmdir("PhoenixTemp");
 
 	return 0;
 }
