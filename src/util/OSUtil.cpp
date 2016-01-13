@@ -10,8 +10,8 @@
 using std::string;
 
 #ifdef _MSC_VER
-#define popen _popen
-#define pclose _pclose
+#  define popen _popen
+#  define pclose _pclose
 #endif
 
 OSUtil::ExecResult OSUtil::exec(const string& program, const string& args)

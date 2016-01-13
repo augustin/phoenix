@@ -15,11 +15,11 @@
 
 // TODO: per-compiler rules, maybe?
 #ifdef _WIN32
-#define OBJECT_FILE_EXT ".obj"
-#define BINARY_FILE_EXT ".exe"
+#  define OBJECT_FILE_EXT ".obj"
+#  define BINARY_FILE_EXT ".exe"
 #else
-#define OBJECT_FILE_EXT ".o"
-#define BINARY_FILE_EXT ""
+#  define OBJECT_FILE_EXT ".o"
+#  define BINARY_FILE_EXT ""
 #endif
 
 class LanguageInfo
