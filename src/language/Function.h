@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include "ObjectMap.h"
+#include "Object.h"
 
 #include <functional>
 #include <string>

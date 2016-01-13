@@ -9,7 +9,7 @@
 #include "Phoenix.h"
 
 #include "Function.h"
-#include "ObjectMap.h"
+#include "Object.h"
 #include "Stack.h"
 
 #include "util/PrintUtil.h"

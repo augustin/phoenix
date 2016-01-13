@@ -7,7 +7,6 @@
 #include "util/FSUtil.h"
 #include "util/StringUtil.h"
 #include "Object.h"
-#include "ObjectMap.h"
 #include "Stack.h"
 
 #include <cassert>

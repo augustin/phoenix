@@ -2,7 +2,7 @@
  * (C) 2015-2016 Augustin Cavalier
  * All rights reserved. Distributed under the terms of the MIT license.
  */
-#include "ObjectMap.h"
+#include "Object.h"
 
 using std::map;
 using std::string;
