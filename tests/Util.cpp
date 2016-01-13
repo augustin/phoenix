@@ -102,6 +102,8 @@ int main(int argc, char* argv[])
 		"/whatever/whatever/dir2/dir9/apathto.txt", "combinePaths-1");
 	t.result(FSUtil::combinePaths({"/this/not", "really", "", "../..", "is/a//path.txt"}) ==
 		"/this/is/a/path.txt", "combinePaths-2");
+	t.result(FSUtil::combinePaths({"shortpath", "../../data/languages/"}) ==
+		"../data/languages", "combinePaths-3");
 
 	t.result(FSUtil::parentDirectory("/test/1.3.4.2/blah/") == "/test/1.3.4.2",
 		"parentDirectory-1");
