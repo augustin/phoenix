@@ -25,6 +25,7 @@ public:
 
 	static std::string normalizePath(const std::string& path);
 	static std::string combinePaths(const std::vector<std::string>& paths);
+	static std::string absolutePath(const std::string& path);
 	static std::string parentDirectory(const std::string& path);
 
 	static void mkdir(const std::string& dirname);

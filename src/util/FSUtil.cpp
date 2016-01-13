@@ -274,6 +274,21 @@ string FSUtil::combinePaths(const vector<string>& paths)
 	return normalizePath(ret);
 }
 
+string FSUtil::absolutePath(const string& path)
+{
+	string ret = normalizePath(path);
+	if (path[0] == '/'
+#ifdef _WIN32
+		|| (path.size() > 2 && path[1] == ':' && path[2] == '/')
+#endif
+		)
+		return ret;
+	char cwd[PATH_MAX];
+	if (getcwd(cwd, sizeof(cwd)) != NULL)
+		ret = FSUtil::combinePaths({cwd, path});
+	return ret;
+}
+
 string FSUtil::parentDirectory(const string& path)
 {
 	string ret = normalizePath(path);

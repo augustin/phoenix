@@ -66,6 +66,11 @@ void NinjaGenerator::addTarget(const string& outputBinaryName,
 			splitBySlash[splitBySlash.size() - 1] + rule.outFileExt;
 		outfiles.push_back(outFile);
 
+#ifdef _WIN32
+		// ":" is a special character, so escape it if this is an abs path
+		if (file.length() > 2 && file[1] == ':' && file[2] == '/')
+			file.insert(1, 1, '$');
+#endif
 		string line = "build " + outFile + ": " +
 			rule.ruleName + " " + file;
 		if (targetFlags.length())

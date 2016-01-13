@@ -91,8 +91,8 @@ Object CreateTarget(const ObjectMap& params)
 		ExtraData* extraData = static_cast<ExtraData*>(self->extradata);
 		NativeFunction_COERCE_OR_THROW("0", filesObj, Type::List);
 		for (Object o : *filesObj.list) {
-			extraData->sourceFiles.push_back(FSUtil::combinePaths({
-				stack->currentDir(), o.asStringRaw()}));
+			extraData->sourceFiles.push_back(FSUtil::absolutePath(FSUtil::combinePaths({
+				stack->currentDir(), o.asStringRaw()})));
 		}
 		return Object();
 	}));
@@ -107,6 +107,8 @@ Object CreateTarget(const ObjectMap& params)
 		bool recurse = params.get("recursive").boolean;
 		vector<std::string> newFiles =
 			FSUtil::searchForFiles(dirName, info->sourceExtensions, recurse);
+		for (vector<std::string>::size_type i = 0; i < newFiles.size(); i++)
+			newFiles[i] = FSUtil::absolutePath(newFiles[i]);
 		extraData->sourceFiles.insert(extraData->sourceFiles.end(), newFiles.begin(),
 			newFiles.end());
 		return Object();
