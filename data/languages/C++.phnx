@@ -30,7 +30,7 @@ return Map(
 			binary: "cl",
 			detect: Map(arguments: "", contains: ["Microsoft (R) C/C++ Optimizing Compiler"]),
 			compile: "/c ",
-			output: "/o ",
+			output: "/Fo",
 			definition: "/D",
 			include: "/I"
 		)
