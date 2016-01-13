@@ -152,7 +152,7 @@ bool LanguageInfo::checkStandardsMode(std::string standardsMode)
 
 	PrintUtil::checking("if the standards mode '" + name + standardsMode + "' works");
 	OSUtil::ExecResult res =
-		checkIfCompiles("test" + name + standardsMode, mode.test);
+		checkIfCompiles("test" + name + standardsMode, mode.test, mode.normalFlag);
 	if (res.exitcode == 0) {
 		PrintUtil::checkFinished("yes", 2);
 		standardsModes[standardsMode].status = 1;
@@ -183,18 +183,21 @@ void LanguageInfo::generate(Generator* gen)
 	fGenerated = true;
 }
 
-OSUtil::ExecResult LanguageInfo::checkIfCompiles(const string& testName, const string& testContents)
+OSUtil::ExecResult LanguageInfo::checkIfCompiles(const string& testName,
+	const string& testContents, const string& extraFlags)
 {
 	string testFileBase = "PhoenixTemp/" + testName;
 	FSUtil::putContents(testFileBase + sourceExtensions[0], testContents);
 	OSUtil::ExecResult res = OSUtil::exec(compilerBinary,
-		testFileBase + sourceExtensions[0] + " " + compilerLinkBinaryFlag + testFileBase +
-		BINARY_FILE_EXT);
+		extraFlags + " " + testFileBase + sourceExtensions[0] + " " +
+		compilerLinkBinaryFlag + testFileBase + BINARY_FILE_EXT);
 	FSUtil::deleteFile(testFileBase + sourceExtensions[0]);
 	bool outFileExisted = FSUtil::exists(testFileBase + BINARY_FILE_EXT);
 	FSUtil::deleteFile(testFileBase + BINARY_FILE_EXT);
+#ifdef _WIN32
 	if (compilerName == "MSVC") // Yay, special casing! >:[
 		FSUtil::deleteFile(testName + OBJECT_FILE_EXT);
+#endif
 	if (res.exitcode == 0 && !outFileExisted)
 		res.exitcode = 1;
 	return res;

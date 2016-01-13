@@ -67,7 +67,7 @@ private:
 	bool fGenerated;
 
 	OSUtil::ExecResult checkIfCompiles(const std::string& testName,
-		const std::string& testContents);
+		const std::string& testContents, const std::string& extraFlags = "");
 
 	static std::map<std::string, LanguageInfo*> sData;
 };
