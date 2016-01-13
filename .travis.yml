@@ -24,6 +24,9 @@ script:
   - ./phoenix_bootstrapped .
   - ninja
   - build-utiltest/utiltest
+  - mkdir build-self && cd build-self
+  - ../build-phoenix/phoenix ..
+  - ninja
 
 notifications:
   webhooks:
