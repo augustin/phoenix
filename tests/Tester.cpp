@@ -51,10 +51,10 @@ void Tester::result(bool pass, const std::string& testName)
 	}
 
 	if (pass) {
-		puts(COLOR_GREEN "PASS" COLOR_RESET);
+		printf(COLOR_GREEN "PASS" COLOR_RESET);
 		fTestsPassed++;
 	} else {
-		puts(COLOR_RED "FAIL" COLOR_RESET);
+		printf(COLOR_RED "FAIL" COLOR_RESET);
 		fTestsFailed++;
 	}
 	std::cout << ": " << testName << std::endl;
