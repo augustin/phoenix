@@ -153,21 +153,23 @@ vector<string> FSUtil::searchForFiles(const string& dir, const vector<string>& e
 	return ret;
 }
 
-string FSUtil::which(const string& program)
+string FSUtil::which(const string& prog)
 {
+	if (prog.empty())
+		return prog;
+
+	const string program = normalizePath(prog);
 	if (program[0] == '/'
 #ifdef _WIN32
-		|| (program[0] == '\\' || (program.length() > 2 && program[1] == ':' && program[2] == '\\'))
+		|| (program.length() > 2 && program[1] == ':' && program[2] == '/') // "C:/"
 #endif
 		)
 		return program; // already an absolute path
-	if (program.empty())
-		return program;
 
 #ifdef _WIN32
-	auto permutePathExt = [](const string& path) {
-		vector<string> PathExts = StringUtil::split(OSUtil::getEnv("PATHEXT"), ";");
-		for (string ext : PathExts) {
+	const vector<string> pathExts = StringUtil::split(OSUtil::getEnv("PATHEXT"), ";");
+	auto permutePathExt = [&](const string& path) {
+		for (string ext : pathExts) {
 			string fullPath = path + ext;
 			if (exists(fullPath))
 				return fullPath;
@@ -177,11 +179,7 @@ string FSUtil::which(const string& program)
 #endif
 
 	// The program's name contains a slash, ignore PATH
-	if (program.find('/') != string::npos
-#ifdef _WIN32
-		|| program.find('\\') != string::npos
-#endif
-		) {
+	if (program.find('/') != string::npos) {
 		string normd = normalizePath(program);
 		if (exists(normd)) {
 			// TODO: check if 'program' is executable
@@ -202,7 +200,7 @@ string FSUtil::which(const string& program)
 		StringUtil::split(OSUtil::getEnv("PATH"), ":");
 #endif
 
-	if (!PATHs.size())
+	if (PATHs.empty())
 		return "";
 	for (string path : PATHs) {
 		string fullPath =
@@ -230,13 +228,16 @@ string FSUtil::normalizePath(const string& path)
 	for (string i : orig) {
 		if (i == ".")
 			continue;
-		else if (i.empty() && normd.size() > 0) // preserve beginning '/'
+		else if (i.empty() && normd.size() > 0) // preserve the opening '/'
 			continue;
 		else if (i == ".." && normd.size() > 0 && normd[normd.size() - 1] != "..")
 			normd.pop_back();
 		else
 			normd.push_back(i);
 	}
+
+	// Now that we've normalized the vector containing the individual components,
+	// rebuild the actual path string.
 	ret = "";
 	for (vector<string>::size_type i = 0; i < normd.size(); i++) {
 		if (i != 0)
@@ -245,7 +246,8 @@ string FSUtil::normalizePath(const string& path)
 	}
 
 #ifdef _WIN32
-	// Check for Cygwin/MSYS-style path
+	// Turn Cygwin/MSYS-style paths (e.g. '/c/Windows/') into drive+path format
+	// (e.g. "C:/Windows/").
 	if (ret[0] == '/' && ret[2] == '/') {
 		ret[0] = ::toupper(ret[1]);
 		ret[1] = ':';
