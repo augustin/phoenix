@@ -20,7 +20,7 @@ $phoenix.addIncludeDirectories(["src"]);
 $utiltest = CreateTarget("utiltest", language: "C++");
 $utiltest.setStandardsMode("C++11", strict);
 $utiltest.addSourceDirectory("src/util");
-$utiltest.addSources(["tests/Tester.cpp", "tests/Util.cpp"]);
+$utiltest.addSources(["tests/Tester.cpp", "tests/UtilTest.cpp"]);
 $utiltest.addIncludeDirectories(["src"]);
 
 ######

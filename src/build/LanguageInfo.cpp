@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "language/Parser.h"
+#include "language/Interpreter.h"
 #include "util/FSUtil.h"
 #include "util/PrintUtil.h"
 #include "util/StringUtil.h"

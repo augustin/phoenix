@@ -12,7 +12,7 @@
 #include "build/Target.h"
 
 #include "language/GlobalLanguageObject.h"
-#include "language/Parser.h"
+#include "language/Interpreter.h"
 #include "language/Stack.h"
 
 #include "util/FSUtil.h"
