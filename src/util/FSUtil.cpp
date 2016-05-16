@@ -24,6 +24,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <direct.h>
 #include <windows.h>
+#define PATH_MAX MAX_PATH
 #endif
 
 using std::string;
