@@ -48,6 +48,14 @@ int main(int argc, char* argv[])
 			else
 				t.result((exceptionResult.what() == expect.substr(1, string::npos)), name);
 			continue;
+		} else if (expect[0] == 'B') {
+			if (result.type() != Script::Type::Boolean)
+				t.result(false, name + " (return type incorrect)");
+			else {
+				bool exp = (expect[1] == 't');
+				t.result((result.boolean == exp), name);
+			}
+			continue;
 		} else if (expect[0] == '"') {
 			if (result.type() != Script::Type::String)
 				t.result(false, name + " (return type incorrect)");

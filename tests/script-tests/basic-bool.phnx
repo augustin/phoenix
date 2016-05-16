@@ -1,0 +1,2 @@
+#EXPECT: Btrue
+return true;
