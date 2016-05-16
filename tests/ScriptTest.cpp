@@ -19,6 +19,12 @@ int main(int argc, char* argv[])
 		"..", "script-tests"}), {""}, false);
 	Tester t(true);
 
+	// Global function instatiation (copied from GlobalLanguageObject.cpp)
+	Script::GlobalFunctions.insert({"Map", Script::Function([](Script::Stack*,
+			Script::Object*, Script::ObjectMap& params) -> Script::Object {
+		return Script::MapObject(new Script::ObjectMap(params));
+	})});
+
 	const string opener = "#EXPECT: ";
 	const size_t openerLen = opener.length();
 	for (const string& i : files) {
@@ -48,28 +54,8 @@ int main(int argc, char* argv[])
 			else
 				t.result((exceptionResult.what() == expect.substr(1, string::npos)), name);
 			continue;
-		} else if (expect[0] == 'B') {
-			if (result.type() != Script::Type::Boolean)
-				t.result(false, name + " (return type incorrect)");
-			else {
-				bool exp = (expect[1] == 't');
-				t.result((result.boolean == exp), name);
-			}
-			continue;
-		} else if (expect[0] == '"') {
-			if (result.type() != Script::Type::String)
-				t.result(false, name + " (return type incorrect)");
-			else
-				t.result((result.string == expect.substr(1, string::npos)), name);
-			continue;
-		} else if (expect[0] == '0') {
-			if (result.type() != Script::Type::Integer)
-				t.result(false, name + " (return type incorrect)");
-			else
-				t.result((result.asStringRaw() == expect.substr(1, string::npos)), name);
-			continue;
 		} else
-			t.result(false, name + " (unexpected return type)");
+			t.result((result.asStringPretty() == expect), name);
 	}
 	return t.done();
 }

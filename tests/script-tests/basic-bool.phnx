@@ -1,2 +1,2 @@
-#EXPECT: Btrue
+#EXPECT: <Boolean:true>
 return true;

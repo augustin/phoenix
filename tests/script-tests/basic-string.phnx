@@ -1,2 +1,2 @@
-#EXPECT: "hai, world
+#EXPECT: <String:"hai, world">
 return "hai, world";

@@ -1,0 +1,2 @@
+#EXPECT: <Map:{other: <String:"JUNK">, thing: <Boolean:true>, world: <String:"hai">}>
+return Map(world : "hai", thing:true, other :"JUNK");

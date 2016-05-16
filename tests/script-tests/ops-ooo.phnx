@@ -1,2 +1,2 @@
-#EXPECT: 0132
+#EXPECT: <Integer:132>
 return 5*3*7+3*9;

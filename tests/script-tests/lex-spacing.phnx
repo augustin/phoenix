@@ -1,4 +1,4 @@
-#EXPECT: 08828
+#EXPECT: <Integer:8828>
 return 8    +
 
 2+3+5+7+9+
