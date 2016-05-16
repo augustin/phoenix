@@ -1,2 +1,2 @@
-#EXPECT: <Boolean:true>
-return [1, 4, 2, 6, "hello", false, "nine"];
+#EXPECT: <List:[<Integer:1>, <Integer:4>, <Integer:2>, <Boolean:true>, <Integer:6>, <String:"hello">, <Boolean:false>, <String:"nine">, <Undefined>]>
+return [1, 4, 2, true,6,"hello",   false,"nine",undefined];

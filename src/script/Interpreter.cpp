@@ -394,6 +394,28 @@ Object ParseList(Stack* stack, const string& code, uint32_t& line, string::size_
 			pastEndOfEntry = true;
 		break;
 
+		case 'u':
+			if (code.substr(i, 9) == "undefined")
+				ret->push_back(Object());
+			else
+				throw UNEXPECTED_TOKEN;
+			i += 8;
+		break;
+		case 't':
+			if (code.substr(i, 4) == "true")
+				ret->push_back(BooleanObject(true));
+			else
+				throw UNEXPECTED_TOKEN;
+			i += 3;
+		break;
+		case 'f':
+			if (code.substr(i, 5) == "false")
+				ret->push_back(BooleanObject(false));
+			else
+				throw UNEXPECTED_TOKEN;
+			i += 4;
+		break;
+
 		case ',':
 			pastEndOfEntry = false;
 		break;

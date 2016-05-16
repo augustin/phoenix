@@ -54,8 +54,13 @@ int main(int argc, char* argv[])
 			else
 				t.result((exceptionResult.what() == expect.substr(1, string::npos)), name);
 			continue;
-		} else
-			t.result((result.asStringPretty() == expect), name);
+		} else {
+			bool res = (result.asStringPretty() == expect);
+			if (res)
+				t.result(true, name);
+			else
+				t.result(false, name + "(got " + result.asStringPretty() + ", expected " + expect + ")");
+		}
 	}
 	return t.done();
 }
