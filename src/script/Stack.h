@@ -11,7 +11,7 @@
 #include "Function.h"
 #include "Object.h"
 
-namespace Language {
+namespace Script {
 
 extern std::map<std::string, Function> GlobalFunctions;
 

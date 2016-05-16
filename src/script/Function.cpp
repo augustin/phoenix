@@ -2,12 +2,12 @@
  * (C) 2015-2016 Augustin Cavalier
  * All rights reserved. Distributed under the terms of the MIT license.
  */
-#include "language/Function.h"
+#include "script/Function.h"
 
 using std::function;
 using std::string;
 
-namespace Language {
+namespace Script {
 
 Function::Function()
 	:

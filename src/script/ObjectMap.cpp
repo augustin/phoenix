@@ -7,7 +7,7 @@
 using std::map;
 using std::string;
 
-namespace Language {
+namespace Script {
 
 ObjectMap::ObjectMap()
 	:

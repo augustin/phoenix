@@ -10,7 +10,7 @@
 #include "Object.h"
 #include "Stack.h"
 
-namespace Language {
+namespace Script {
 
 // AST
 class ASTNode

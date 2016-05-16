@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "build/Generators.h"
-#include "language/Object.h"
+#include "script/Object.h"
 #include "util/OSUtil.h"
 
 // TODO: per-compiler rules, maybe?
@@ -25,7 +25,7 @@
 class LanguageInfo
 {
 public:
-	LanguageInfo(std::string langName, Language::Object info);
+	LanguageInfo(std::string langName, Script::Object info);
 
 	static LanguageInfo* getLanguageInfo(std::string langName);
 

@@ -4,8 +4,8 @@
  */
 #include "Target.h"
 
-#include "language/Stack.h"
-#include "language/Function.h"
+#include "script/Stack.h"
+#include "script/Function.h"
 #include "util/FSUtil.h"
 #include "util/PrintUtil.h"
 #include "util/StringUtil.h"
@@ -14,20 +14,20 @@
 #include "LanguageInfo.h"
 
 using std::vector;
-using Language::Exception;
-using Language::Function;
-using Language::FunctionObject;
-using Language::Object;
-using Language::ObjectMap;
-using Language::Stack;
-using Language::Type;
+using Script::Exception;
+using Script::Function;
+using Script::FunctionObject;
+using Script::Object;
+using Script::ObjectMap;
+using Script::Stack;
+using Script::Type;
 
 namespace Target {
 std::vector<ExtraData*> targets;
 
 Object CreateTarget(const ObjectMap& params)
 {
-	Object ret = Language::MapObject(new ObjectMap);
+	Object ret = Script::MapObject(new ObjectMap);
 	ExtraData* extraData = new Target::ExtraData;
 	ret.extradata = extraData;
 	targets.push_back(extraData);
@@ -142,8 +142,8 @@ void generate(ExtraData* target, Generator* gen)
 
 void addGlobalFunction()
 {
-	Language::GlobalFunctions.insert({"CreateTarget", Function([](Stack*, Object*, ObjectMap& params)
-		-> Language::Object {
+	Script::GlobalFunctions.insert({"CreateTarget", Function([](Stack*, Object*, ObjectMap& params)
+		-> Script::Object {
 		return CreateTarget(params);
 	})});
 }

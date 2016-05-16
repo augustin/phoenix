@@ -11,9 +11,9 @@
 #include "build/LanguageInfo.h"
 #include "build/Target.h"
 
-#include "language/GlobalLanguageObject.h"
-#include "language/Interpreter.h"
-#include "language/Stack.h"
+#include "script/GlobalLanguageObject.h"
+#include "script/Interpreter.h"
+#include "script/Stack.h"
 
 #include "util/FSUtil.h"
 #include "util/StringUtil.h"
@@ -86,12 +86,12 @@ int main(int argc, char* argv[])
 	FSUtil::mkdir("PhoenixTemp");
 
 	// Create the language stack on the heap, as it can get pretty large.
-	Language::Stack* stack = new Language::Stack();
-	stack->addSuperglobal("Phoenix", Language::GlobalLanguageObject());
+	Script::Stack* stack = new Script::Stack();
+	stack->addSuperglobal("Phoenix", Script::GlobalLanguageObject());
 	Target::addGlobalFunction();
 	try {
-		Language::Run(stack, sourceDirectory);
-	} catch (Language::Exception e) {
+		Script::Run(stack, sourceDirectory);
+	} catch (Script::Exception e) {
 		e.print();
 		return e.fType;
 	}

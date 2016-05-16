@@ -12,7 +12,7 @@ using std::cout;
 using std::string;
 using std::vector;
 
-namespace Language {
+namespace Script {
 
 std::map<std::string, Function> GlobalFunctions;
 

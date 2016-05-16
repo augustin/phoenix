@@ -6,14 +6,14 @@
 
 #include <string>
 
-#include "language/Interpreter.h"
+#include "script/Interpreter.h"
 #include "util/FSUtil.h"
 #include "util/PrintUtil.h"
 #include "util/StringUtil.h"
 
 using std::string;
-using Language::Object;
-using Language::Type;
+using Script::Object;
+using Script::Type;
 
 std::map<string, string> LanguageInfo::sPreferredCompiler;
 std::map<string, LanguageInfo*> LanguageInfo::sData;
@@ -22,20 +22,20 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	: name(langName),
 	  fGenerated(false)
 {
-	Language::CoerceOrThrow("language information", info, Type::Map);
+	Script::CoerceOrThrow("language information", info, Type::Map);
 	Object type = info["type"];
-	Language::CoerceOrThrow("languageInfo.type", type, Type::String);
+	Script::CoerceOrThrow("languageInfo.type", type, Type::String);
 	if (type.string != "CompiledToMachineCode")
-		throw Language::Exception(Language::Exception::Type::UserError,
+		throw Script::Exception(Script::Exception::Type::UserError,
 			"only 'CompiledToMachineCode' is supported at this time");
 
 	// File extensions
 	Object srcExts = info["sourceExtensions"];
-	Language::CoerceOrThrow("languageInfo.sourceExtensions", srcExts, Type::List);
+	Script::CoerceOrThrow("languageInfo.sourceExtensions", srcExts, Type::List);
 	for (const Object& obj : *srcExts.list)
 		sourceExtensions.push_back(obj.asStringRaw());
 	Object extraExts = info["extraExtensions"];
-	if (extraExts.type() == Language::Type::List) {
+	if (extraExts.type() == Script::Type::List) {
 		for (const Object& obj : *extraExts.list)
 			extraExtensions.push_back(obj.asStringRaw());
 	}
@@ -43,29 +43,29 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	preprocessor = info["preprocessor"].boolean;
 
 	Object envir = info["compilerEnviron"];
-	if (envir.type() != Language::Type::Undefined)
+	if (envir.type() != Script::Type::Undefined)
 		compilerEnviron = envir.asStringRaw();
 
 	// Figure out what compiler we're using
 	Object comps = info["compilers"];
-	Language::CoerceOrThrow("languageInfo.compilers", comps, Type::Map);
+	Script::CoerceOrThrow("languageInfo.compilers", comps, Type::Map);
 	auto tryCompiler = [&](const string& binary) -> bool {
 		string compilerBin = FSUtil::which(binary);
 		if (FSUtil::exists(compilerBin)) {
 			// Which compiler is this?
-			for (Language::ObjectMap::const_iterator it =
+			for (Script::ObjectMap::const_iterator it =
 				 comps.map->begin(); it != comps.map->end(); it++) {
 				Object* compPtr = it->second;
-				Language::CoerceOrThrowPtr("languageInfo.compiler", compPtr, Type::Map);
+				Script::CoerceOrThrowPtr("languageInfo.compiler", compPtr, Type::Map);
 				Object comp = *compPtr;
 				Object detect = comp["detect"];
-				Language::CoerceOrThrow("languageInfo.compiler.detect", detect, Type::Map);
+				Script::CoerceOrThrow("languageInfo.compiler.detect", detect, Type::Map);
 				OSUtil::ExecResult res =
 					OSUtil::exec(binary, detect["arguments"].asStringRaw());
 				if (res.exitcode != 0)
 					continue; // did not exit with 0 -- something wrong
 				Object contains = detect["contains"];
-				Language::CoerceOrThrow("languageInfo.compiler.detect.contains", contains, Type::List);
+				Script::CoerceOrThrow("languageInfo.compiler.detect.contains", contains, Type::List);
 				bool OK = true;
 				for (const Object& obj : *contains.list) {
 					if (OK && res.output.find(obj.asStringRaw()) == string::npos)
@@ -98,33 +98,33 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	}
 	if (compilerName.empty()) {
 		// Preferred & environ didn't work, try everything in succession instead
-		for (Language::ObjectMap::const_iterator it =
+		for (Script::ObjectMap::const_iterator it =
 			 comps.map->begin(); it != comps.map->end(); it++) {
 			Object* comp = it->second;
-			Language::CoerceOrThrowPtr("languageInfo.compiler", comp, Type::Map);
+			Script::CoerceOrThrowPtr("languageInfo.compiler", comp, Type::Map);
 			if (tryCompiler(comp->map->get("binary").asStringRaw()))
 				break;
 		}
 	}
 	if (compilerName.empty()) {
 		PrintUtil::checkFinished("none found", 0);
-		throw Language::Exception(Language::Exception::UserError,
+		throw Script::Exception(Script::Exception::UserError,
 			string("cannot find a compiler for " + langName));
 	} else
 		PrintUtil::checkFinished(compilerName + " ('" + compilerBinary + "')", 2);
 
 	// Grab standards modes
 	Object* stdsModes = info.map->get_ptr("standardsModes");
-	Language::CoerceOrThrowPtr("languageInfo.standardsModes", stdsModes, Type::Map);
-	for (Language::ObjectMap::const_iterator it =
+	Script::CoerceOrThrowPtr("languageInfo.standardsModes", stdsModes, Type::Map);
+	for (Script::ObjectMap::const_iterator it =
 		 stdsModes->map->begin(); it != stdsModes->map->end(); it++) {
 		StandardsMode mode;
 		mode.status = 0;
 		Object* obj = it->second;
-		Language::CoerceOrThrowPtr("languageInfo.standardsModes[i]", obj, Type::Map);
+		Script::CoerceOrThrowPtr("languageInfo.standardsModes[i]", obj, Type::Map);
 		mode.test = obj->map->get("test").asStringRaw();
 		Object* forComp = obj->map->get_ptr(compilerName);
-		Language::CoerceOrThrowPtr("languageInfo.standardsModes[i][comp]", forComp, Type::Map);
+		Script::CoerceOrThrowPtr("languageInfo.standardsModes[i][comp]", forComp, Type::Map);
 		mode.normalFlag = forComp->map->get("normal").asStringRaw();
 		mode.strictFlag = forComp->map->get("strict").asStringRaw();
 		standardsModes.insert({it->first, mode});
@@ -138,7 +138,7 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 		PrintUtil::checkFinished("yes", 2);
 	} else {
 		PrintUtil::checkFinished("no", 0);
-		throw Language::Exception(Language::Exception::UserError,
+		throw Script::Exception(Script::Exception::UserError,
 			string("complier for " + langName + " is broken: '" + res.output + "'"));
 	}
 }
@@ -210,8 +210,8 @@ LanguageInfo* LanguageInfo::getLanguageInfo(string langName)
 		return sData[langName];
 
 	// FIXME/TODO: this is bootstrap-only Phoenix, load hardcoded location
-	Language::Stack stack;
-	Object info = Language::Run(&stack,
+	Script::Stack stack;
+	Object info = Script::Run(&stack,
 		FSUtil::combinePaths({FSUtil::parentDirectory(__FILE__),
 			"../../data/languages/" + langName + ".phnx"}));
 	LanguageInfo* langInfo = new LanguageInfo(langName, info);

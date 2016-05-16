@@ -6,7 +6,7 @@
 
 #include "Object.h"
 
-namespace Language {
+namespace Script {
 
 class GlobalLanguageObject : public Object
 {

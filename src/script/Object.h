@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace Language {
+namespace Script {
 
 // Predefinitions
 class Function;

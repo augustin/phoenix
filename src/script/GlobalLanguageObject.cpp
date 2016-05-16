@@ -17,7 +17,7 @@
 
 using std::vector;
 
-namespace Language {
+namespace Script {
 
 GlobalLanguageObject::GlobalLanguageObject()
 	:

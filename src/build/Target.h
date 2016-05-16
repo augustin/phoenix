@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "language/Object.h"
+#include "script/Object.h"
 
 // Predefinitions
 class Generator;

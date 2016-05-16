@@ -9,15 +9,15 @@
 #include <functional>
 #include <string>
 
-namespace Language {
+namespace Script {
 
 // Predefinitions
 class Stack;
 
 // Utilities for native function declarations
 #define NativeFunction_COERCE_OR_THROW(NAME, VARIABLE, TYPE) \
-	Language::Object VARIABLE = params.get(NAME); \
-	Language::CoerceOrThrow("parameter '" NAME "'", VARIABLE, TYPE)
+	Script::Object VARIABLE = params.get(NAME); \
+	Script::CoerceOrThrow("parameter '" NAME "'", VARIABLE, TYPE)
 
 typedef std::function<Object(Stack*, Object*, ObjectMap&)> NativeStdFunction;
 

@@ -10,7 +10,7 @@
 
 using std::string;
 
-namespace Language {
+namespace Script {
 
 void Exception::print()
 {

@@ -15,7 +15,7 @@
 using std::string;
 using std::vector;
 
-namespace Language {
+namespace Script {
 
 // AST
 Object ASTNode::toObject(Stack* stack)
