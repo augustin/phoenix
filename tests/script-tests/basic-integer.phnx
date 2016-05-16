@@ -1,0 +1,2 @@
+#EXPECT: 0286
+return 286;

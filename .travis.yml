@@ -24,6 +24,7 @@ script:
   - ./phoenix_bootstrapped .
   - ninja
   - build-utiltest/utiltest
+  - build-scripttest/scripttest
   - mkdir build-self && cd build-self
   - ../build-phoenix/phoenix ..
   - ninja

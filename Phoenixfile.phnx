@@ -23,6 +23,13 @@ $utiltest.addSourceDirectory("src/util");
 $utiltest.addSources(["tests/Tester.cpp", "tests/UtilTest.cpp"]);
 $utiltest.addIncludeDirectories(["src"]);
 
+$scripttest = CreateTarget("scripttest", language: "C++");
+$scripttest.setStandardsMode("C++11", strict);
+$scripttest.addSourceDirectory("src/util");
+$scripttest.addSourceDirectory("src/script");
+$scripttest.addSources(["tests/Tester.cpp", "tests/ScriptTest.cpp"]);
+$scripttest.addIncludeDirectories(["src"]);
+
 ######
 ## language support files
 ######

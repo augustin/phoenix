@@ -1,0 +1,2 @@
+#EXPECT: Eattempted to call function 'non_exist' which does not exist
+non_exist("this function doesn't exist so it'll throw!");
