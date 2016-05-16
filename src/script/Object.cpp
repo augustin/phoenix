@@ -180,8 +180,7 @@ Object Object::op_eq(const Object& left, const Object& right)
 
 	else if (left.type() == Type::Undefined && right.type() == Type::Undefined)
 		return BooleanObject(true);
-	else if ((left.type() == Type::Undefined && right.type() != Type::Undefined) ||
-			 (left.type() != Type::Undefined && right.type() == Type::Undefined))
+	else if ((left.type() == Type::Undefined) ^ (right.type() == Type::Undefined))
 		return BooleanObject(false);
 	throw Exception(Exception::InternalError, "unimplemented: complex type comparison");
 }
