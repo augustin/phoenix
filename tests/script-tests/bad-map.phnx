@@ -1,0 +1,2 @@
+#EXPECT: E'false' is an illegal parameter name
+return Map("BLEH, BLEH, BLEH", false: true);

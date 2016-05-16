@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 			if (res)
 				t.result(true, name);
 			else
-				t.result(false, name + "(got " + result.asStringPretty() + ", expected " + expect + ")");
+				t.result(false, name + " (got " + result.asStringPretty() + ", expected " + expect + ")");
 		}
 	}
 	return t.done();
