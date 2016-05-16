@@ -1,0 +1,4 @@
+#EXPECT: <String:"25Hello, world!">
+$thing = 25;
+$otherthing = "Hello, world!";
+return $thing + $otherthing;
