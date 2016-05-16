@@ -90,10 +90,20 @@ string Object::asStringPretty() const
 		return std::string("<String:\"").append(string).append("\">");
 	case Type::Function:
 		return std::string("<Function>");
-	case Type::List:
-		return std::string("<List[...]>"); // TODO
-	case Type::Map:
-		return std::string("<Map[...]>"); // TODO
+	case Type::List: {
+		std::string ret("<List:[");
+		for (std::vector<Object>::size_type i = 0; i < list->size(); i++)
+			ret.append(list->at(i).asStringPretty()).append(", ");
+		ret.erase(ret.length() - 2);
+		return ret.append("]>");
+	}
+	case Type::Map: {
+		std::string ret("<Map:{");
+		for (ObjectMap::const_iterator it = map->begin(); it != map->end(); it++)
+			ret.append(it->first).append(": ").append(it->second->asStringPretty()).append(", ");
+		ret.erase(ret.length() - 2);
+		return ret.append("}>");
+	}
 	default:
 		return "<UNKNOWN>";
 	}
@@ -112,10 +122,20 @@ string Object::asStringRaw() const
 		return string;
 	case Type::Function:
 		return std::string("<Function>");
-	case Type::List:
-		return std::string("<List[...]>"); // TODO
-	case Type::Map:
-		return std::string("<Map[...]>"); // TODO
+	case Type::List: {
+		std::string ret("[");
+		for (std::vector<Object>::size_type i = 0; i < list->size(); i++)
+			ret.append(list->at(i).asStringRaw()).append(", ");
+		ret.erase(ret.length() - 2);
+		return ret.append("]");
+	}
+	case Type::Map: {
+		std::string ret("{");
+		for (ObjectMap::const_iterator it = map->begin(); it != map->end(); it++)
+			ret.append(it->first).append(": ").append(it->second->asStringRaw()).append(", ");
+		ret.erase(ret.length() - 2);
+		return ret.append("}");
+	}
 	default:
 		return "<UNKNOWN>";
 	}
