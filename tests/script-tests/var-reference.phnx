@@ -1,0 +1,8 @@
+#EXPECT: <String:"This_Thing">
+$var6="This_Thing";
+
+$v = "var";
+$i = 10/2;
+$i++;
+
+return $[$v+$i];

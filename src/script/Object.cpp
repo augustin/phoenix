@@ -92,8 +92,8 @@ string Object::asStringPretty() const
 		return std::string("<Function>");
 	case Type::List: {
 		std::string ret("<List:[");
-		for (std::vector<Object>::size_type i = 0; i < list->size(); i++)
-			ret.append(list->at(i).asStringPretty()).append(", ");
+		for (ObjectList::size_type i = 0; i < list->size(); i++)
+			ret.append((*list)[i].asStringPretty()).append(", ");
 		ret.erase(ret.length() - 2);
 		return ret.append("]>");
 	}
@@ -124,8 +124,8 @@ string Object::asStringRaw() const
 		return std::string("<Function>");
 	case Type::List: {
 		std::string ret("[");
-		for (std::vector<Object>::size_type i = 0; i < list->size(); i++)
-			ret.append(list->at(i).asStringRaw()).append(", ");
+		for (ObjectList::size_type i = 0; i < list->size(); i++)
+			ret.append((*list)[i].asStringRaw()).append(", ");
 		ret.erase(ret.length() - 2);
 		return ret.append("]");
 	}

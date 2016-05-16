@@ -1,0 +1,5 @@
+#EXPECT: <String:"hat">
+$map = Map(bleh :6, meh:5, lol: Map(cat: ["hat", "rat"], dog: "doge"));
+
+$thing = $map.lol.cat.0;
+return $thing;

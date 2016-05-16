@@ -32,12 +32,12 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	// File extensions
 	Object srcExts = info["sourceExtensions"];
 	Script::CoerceOrThrow("languageInfo.sourceExtensions", srcExts, Type::List);
-	for (const Object& obj : *srcExts.list)
-		sourceExtensions.push_back(obj.asStringRaw());
+	for (const Object* obj : *srcExts.list)
+		sourceExtensions.push_back(obj->asStringRaw());
 	Object extraExts = info["extraExtensions"];
 	if (extraExts.type() == Script::Type::List) {
-		for (const Object& obj : *extraExts.list)
-			extraExtensions.push_back(obj.asStringRaw());
+		for (const Object* obj : *extraExts.list)
+			extraExtensions.push_back(obj->asStringRaw());
 	}
 
 	preprocessor = info["preprocessor"].boolean;
@@ -67,8 +67,8 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 				Object contains = detect["contains"];
 				Script::CoerceOrThrow("languageInfo.compiler.detect.contains", contains, Type::List);
 				bool OK = true;
-				for (const Object& obj : *contains.list) {
-					if (OK && res.output.find(obj.asStringRaw()) == string::npos)
+				for (const Object* obj : *contains.list) {
+					if (OK && res.output.find(obj->asStringRaw()) == string::npos)
 						OK = false;
 				}
 				if (OK) {

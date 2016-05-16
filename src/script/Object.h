@@ -14,6 +14,7 @@ namespace Script {
 // Predefinitions
 class Function;
 class ObjectMap;
+class ObjectList;
 
 class Exception : public std::exception
 {
@@ -82,7 +83,7 @@ public: // Data storage
 	int integer;
 	std::string string;
 	Function* function;
-	std::vector<Object>* list;
+	ObjectList* list;
 	ObjectMap* map;
 	void* extradata;
 
@@ -134,7 +135,7 @@ inline Object StringObject(const std::string& value)
 	ret.string = std::string(value);
 	return ret;
 }
-inline Object ListObject(std::vector<Object>* value)
+inline Object ListObject(ObjectList* value)
 {
 	Object ret(Type::List);
 	ret.list = value;
@@ -156,6 +157,26 @@ public:
 	Object get(std::string key) const;
 	Object* get_ptr(std::string key);
 	void set(std::string key, Object value);
+
+	size_type size() const { return _inherited::size(); }
+};
+
+class ObjectList : private std::vector<Object*>
+{
+	typedef std::vector<Object*> _inherited;
+public:
+	ObjectList() {}
+	~ObjectList() {}
+
+	typedef _inherited::const_iterator const_iterator;
+	typedef _inherited::size_type size_type;
+	const_iterator begin() const { return _inherited::begin(); }
+	const_iterator end() const { return _inherited::end(); }
+
+	void push_back(const Object& obj) { Object* o = new Object; *o = obj; _inherited::push_back(o); }
+
+	Object operator[](_inherited::size_type i) { return *get_ptr(i); }
+	Object* get_ptr(_inherited::size_type i) { return _inherited::at(i); }
 
 	size_type size() const { return _inherited::size(); }
 };

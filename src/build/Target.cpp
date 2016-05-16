@@ -37,8 +37,8 @@ Object CreateTarget(const ObjectMap& params)
 
 	const Object obj = params.get("language");
 	if (obj.type() == Type::List) {
-		for (const Object& o : *obj.list)
-			extraData->languages.push_back(o.asStringRaw());
+		for (const Object* o : *obj.list)
+			extraData->languages.push_back(o->asStringRaw());
 	} else
 		extraData->languages.push_back(obj.asStringRaw());
 
@@ -90,9 +90,9 @@ Object CreateTarget(const ObjectMap& params)
 			Object* self, ObjectMap& params) -> Object {
 		ExtraData* extraData = static_cast<ExtraData*>(self->extradata);
 		NativeFunction_COERCE_OR_THROW("0", filesObj, Type::List);
-		for (Object o : *filesObj.list) {
+		for (const Object* o : *filesObj.list) {
 			extraData->sourceFiles.push_back(FSUtil::absolutePath(FSUtil::combinePaths({
-				stack->currentDir(), o.asStringRaw()})));
+				stack->currentDir(), o->asStringRaw()})));
 		}
 		return Object();
 	}));
@@ -121,9 +121,9 @@ Object CreateTarget(const ObjectMap& params)
 		LanguageInfo* info = LanguageInfo::getLanguageInfo(extraData->languages[0]);
 		NativeFunction_COERCE_OR_THROW("0", dirsList, Type::List);
 
-		for (Object itm : *dirsList.list) {
+		for (const Object* itm : *dirsList.list) {
 			extraData->includesFlags.append(" \"" + info->compilerInclude +
-				FSUtil::combinePaths({stack->currentDir(), itm.asStringRaw()}) + "\"");
+				FSUtil::combinePaths({stack->currentDir(), itm->asStringRaw()}) + "\"");
 		}
 		return Object();
 	}));

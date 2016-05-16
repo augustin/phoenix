@@ -52,9 +52,13 @@ Object* Stack::get_ptr(const vector<string> variable)
 	} else
 		ret = fStack[getPos(variable[0])].get_ptr(variable[0]);
 	for (vector<string>::size_type i = 1; i < variable.size(); i++) {
-		CoerceOrThrowPtr(string("referenced variable '")
-			.append(variable[i - 1]).append("'"), ret, Type::Map);
-		ret = ret->map->get_ptr(variable[i]);
+		if (ret->type() == Type::Map)
+			ret = ret->map->get_ptr(variable[i]);
+		else if (ret->type() == Type::List)
+			ret = ret->list->get_ptr(std::stoi(variable[i], nullptr, 10));
+		else
+			throw Exception(Exception::TypeError, "'" + variable[i - 1] + "' should be either 'List' or 'Map' "
+				"but is neither");
 	}
 
 	return ret;
