@@ -156,8 +156,7 @@ ASTNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, strin
 				ret = "";
 			}
 			Object result = ParseAndEvalExpression(PARSER_PARAMS);
-			CoerceOrThrow("expression return type", result, Type::String);
-			realRet.variable.push_back(result.string);
+			realRet.variable.push_back(result.asStringRaw());
 		} break;
 
 		case '.':
@@ -418,6 +417,9 @@ Object ParseList(Stack* stack, const string& code, uint32_t& line, string::size_
 			else
 				throw UNEXPECTED_TOKEN;
 			i += 4;
+		break;
+		case '[':
+			ret->push_back(ParseList(PARSER_PARAMS));
 		break;
 
 		case ',':

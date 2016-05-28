@@ -1,0 +1,5 @@
+#EXPECT: <String:"testy">
+$list = ["hat","rat",['testy','blah'],'nat'];
+
+$thing = $['list'][2][0];
+return $thing;
