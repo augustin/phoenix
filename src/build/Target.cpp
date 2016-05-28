@@ -135,6 +135,9 @@ void generate(ExtraData* target, Generator* gen)
 {
 	for (std::string lang : target->languages)
 		LanguageInfo::getLanguageInfo(lang)->generate(gen);
+	if (target->sourceFiles.size() == 0) {
+		throw Exception(Exception::TypeError, "no source files for target '" + target->name + "'");
+	}
 	gen->addTarget(target->name, target->sourceFiles,
 		StringUtil::join({target->otherFlags, target->includesFlags,
 			target->definitionsFlags, target->standardsModeFlag}, " "));

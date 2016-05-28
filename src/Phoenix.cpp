@@ -91,18 +91,18 @@ int main(int argc, char* argv[])
 	Target::addGlobalFunction();
 	try {
 		Script::Run(stack, sourceDirectory);
+
+		string generatorName = Generators::defaultName();
+		std::cout << "generating build files for " << generatorName << "... ";
+		Generator* gen = Generators::create(generatorName);
+		for (Target::ExtraData* data : Target::targets)
+			Target::generate(data, gen);
+		gen->write();
+		std::cout << "done" << std::endl;
 	} catch (Script::Exception e) {
 		e.print();
 		return e.fType;
 	}
-
-	string generatorName = Generators::defaultName();
-	std::cout << "generating build files for " << generatorName << "... ";
-	Generator* gen = Generators::create(generatorName);
-	for (Target::ExtraData* data : Target::targets)
-		Target::generate(data, gen);
-	gen->write();
-	std::cout << "done" << std::endl;
 
 	// Directory de-setup
 	FSUtil::rmdir("PhoenixTemp");
