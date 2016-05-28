@@ -31,7 +31,11 @@ Object AstNode::toObject(Stack* stack)
 			char c = string[i];
 			switch (c) {
 			case '$':
-				// FIXME/TODO: there's probably a way to implement eval() using this
+				if (string[i + 1] != '{') {
+					str += c;
+					continue;
+				}
+				// There's probably a way to implement eval() using this,
 				// but this is a build system, so screw it
 				try {
 					str += EvalVariableName(stack, string, line, i).toObject(stack).asStringRaw();

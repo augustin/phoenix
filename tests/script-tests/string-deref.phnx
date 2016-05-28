@@ -1,0 +1,5 @@
+#EXPECT: <String:"$h  - wurld.">
+
+$h="Hallo";
+$w = "wurld";
+return "$h  - ${w}.";
