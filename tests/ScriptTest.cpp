@@ -49,9 +49,10 @@ int main(int argc, char* argv[])
 		}
 
 		if (threwException) {
-			if (expect[0] != 'E')
-				t.result(false, name + " (unexpected exception: " + exceptionResult.what() + ")");
-			else
+			if (expect[0] != 'E') {
+				t.result(false, name + " (unexpected exception)");
+				exceptionResult.print();
+			} else
 				t.result((exceptionResult.what() == expect.substr(1, string::npos)), name);
 			continue;
 		} else {

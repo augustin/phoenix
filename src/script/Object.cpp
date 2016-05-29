@@ -24,6 +24,7 @@ void Exception::print()
 	case SyntaxError:
 	case TypeError:
 	case AccessViolation:
+	case InternalError:
 		// 'fWhat' is the error string
 		error += fWhat;
 	break;
@@ -141,6 +142,21 @@ string Object::asStringRaw() const
 	}
 }
 
+bool Object::coerceToBoolean() const
+{
+	switch (fObjectType) {
+	case Type::Undefined:	return false;
+	case Type::Boolean:		return boolean;
+	case Type::Integer:		return integer != 0;
+	case Type::String:		return string.length() != 0;
+	case Type::Function:	return true;
+	case Type::List:		return list->size() != 0;
+	case Type::Map:			return map->size() != 0;
+	default:
+		throw Exception(Exception::InternalError, "unexpected type for lowering");
+	}
+}
+
 Object Object::op_div(const Object& left, const Object& right)
 {
 	CoerceOrThrow("left-hand side of '/'", left, Type::Integer);
@@ -187,32 +203,19 @@ Object Object::op_eq(const Object& left, const Object& right)
 		return BooleanObject(true);
 	else if ((left.type() == Type::Undefined) ^ (right.type() == Type::Undefined))
 		return BooleanObject(false);
-	throw Exception(Exception::InternalError, "unimplemented: complex type comparison");
+	else // Compare as strings
+		return BooleanObject(left.asStringRaw() == right.asStringRaw());
 }
 
-bool Object_coerceToBoolean(const Object& obj)
-{
-	switch (obj.type()) {
-	case Type::Undefined:	return false;
-	case Type::Boolean:		return obj.boolean;
-	case Type::Integer:		return obj.integer != 0;
-	case Type::String:		return obj.string.length() != 0;
-	case Type::Function:	return true;
-	case Type::List:		return obj.list->size() != 0;
-	case Type::Map:			return obj.map->size() != 0;
-	default:
-		throw Exception(Exception::InternalError, "unexpected type for lowering");
-	}
-}
 Object Object::op_and(const Object& left, const Object& right)
 {
 	if (left.type() == Type::Undefined || right.type() == Type::Undefined)
 		return BooleanObject(false);
-	return BooleanObject(Object_coerceToBoolean(left) && Object_coerceToBoolean(right));
+	return BooleanObject(left.coerceToBoolean() && right.coerceToBoolean());
 }
 Object Object::op_or(const Object& left, const Object& right)
 {
-	return BooleanObject(Object_coerceToBoolean(left) || Object_coerceToBoolean(right));
+	return BooleanObject(left.coerceToBoolean() || right.coerceToBoolean());
 }
 
 }

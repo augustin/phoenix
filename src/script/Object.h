@@ -67,6 +67,8 @@ public:
 
 	inline Object operator[](const char* key);
 
+	// Helpers
+	bool coerceToBoolean() const;
 	// Operators
 	static Object op_div(const Object& left, const Object& right);
 	static Object op_mult(const Object& left, const Object& right);

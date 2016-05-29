@@ -1,0 +1,11 @@
+#EXPECT: <String:"Wow, good decision.">
+
+if (false) {
+	return "We shouldn't be here!";
+}
+if (true) {
+	if (0 == 0) {
+		return "Wow, good decision.";
+	}
+	return "All is not well.";
+}

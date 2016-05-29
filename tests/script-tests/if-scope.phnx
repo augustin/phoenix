@@ -1,0 +1,11 @@
+#EXPECT: <Map:{blah: <String:"whatever, really">, what: <Undefined>}>
+
+$blah = "whatever";
+if ($blah) {
+	$what = ", really";
+	$blah += $what;
+}
+if ($blah == false) {
+	$blah += "012";
+}
+return Map(what: $what, blah: $blah);

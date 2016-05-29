@@ -350,7 +350,8 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 			throw UNEXPECTED_EOF;
 
 		// TODO: any other keywords?
-		if (paramName == "false" || paramName == "true" || paramName == "undefined")
+		if (paramName == "false" || paramName == "true" || paramName == "undefined"
+			|| paramName == "return" || paramName == "if")
 			throw Exception(Exception::SyntaxError, "'" + paramName + "' is an illegal parameter name");
 
 		if (!treatAsTrueBoolean)
@@ -457,6 +458,46 @@ public:
 	Object value;
 };
 
+string::size_type LocateEndOfScope(Stack*, const string& code, uint32_t&, const string::size_type& i)
+{
+	string::size_type ret = i;
+	if (code[i] != '{')
+		throw UNEXPECTED_TOKEN_EXPECTED("{");
+	ret++;
+	std::string scope = "{";
+	while (scope.size()) {
+		ret++;
+		char c = code[ret];
+		switch (c) {
+		case '(':
+		case '[':
+		case '{':
+			scope += c;
+			break;
+
+		case ')':
+			if (scope[scope.size() - 1] != '(')
+				throw UNEXPECTED_TOKEN;
+			scope.resize(scope.size() - 1);
+			break;
+		case ']':
+			if (scope[scope.size() - 1] != '[')
+				throw UNEXPECTED_TOKEN;
+			scope.resize(scope.size() - 1);
+			break;
+		case '}':
+			if (scope[scope.size() - 1] != '{')
+				throw UNEXPECTED_TOKEN;
+			scope.resize(scope.size() - 1);
+			break;
+
+		default:
+			break;
+		}
+	}
+	return ret;
+}
+
 Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
 {
 	// Parse
@@ -532,6 +573,34 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				if (expression.size() != 0)
 					throw Exception(Exception::SyntaxError, string("incorrectly placed 'return'"));
 				isReturn = true;
+			} else if (thing == "if") {
+				if (expression.size() != 0)
+					throw Exception(Exception::SyntaxError, "incorrectly placed 'if'");
+				i++;
+				IgnoreWhitespace(PARSER_PARAMS);
+				if (code[i] != '(')
+					throw UNEXPECTED_TOKEN_EXPECTED("(");
+				bool exec = ParseAndEvalExpression(PARSER_PARAMS).coerceToBoolean();
+				i++;
+				IgnoreWhitespace(PARSER_PARAMS);
+				string::size_type j = LocateEndOfScope(PARSER_PARAMS);
+				if (exec) {
+					i++;
+					stack->push();
+					while (i < j) {
+						ParseAndEvalExpression(PARSER_PARAMS);
+						i++;
+						IgnoreWhitespace(PARSER_PARAMS);
+					}
+					stack->pop();
+				} else {
+					// Skip the block;
+					while (i < j) {
+						if (code[i] == '\n')
+							line++;
+						i++;
+					}
+				}
 			} else { // assume function call
 				i++;
 				expression.push_back(AstNode(AstNode::Literal, ParseCallAndEval(PARSER_PARAMS, {thing})));

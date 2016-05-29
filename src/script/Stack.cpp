@@ -33,12 +33,12 @@ void Stack::pop()
 
 std::vector<ObjectMap>::size_type Stack::getPos(std::string variable)
 {
-	std::vector<ObjectMap>::size_type size = fStack.size() - 1;
-	for (std::vector<ObjectMap>::size_type i = 0; i <= size; i++) {
-		if (fStack[size - i].get_ptr(variable) != nullptr)
-			return i;
+	std::vector<ObjectMap>::size_type last = fStack.size() - 1;
+	for (std::vector<ObjectMap>::size_type i = 0; i <= last; i++) {
+		if (fStack[last - i].get_ptr(variable) != nullptr)
+			return last - i;
 	}
-	return fStack.size() - 1;
+	return last;
 }
 
 Object* Stack::get_ptr(const vector<string> variable)
