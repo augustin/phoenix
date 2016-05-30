@@ -15,8 +15,6 @@ class NinjaGenerator : public Generator
 public:
 	NinjaGenerator();
 
-	virtual std::string name() override;
-
 	virtual void setBuildScriptFiles(std::string program,
 		const std::vector<std::string> files) override;
 

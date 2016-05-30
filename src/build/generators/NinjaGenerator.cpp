@@ -15,11 +15,6 @@ NinjaGenerator::NinjaGenerator()
 {
 }
 
-string NinjaGenerator::name()
-{
-	return "Ninja";
-}
-
 string NinjaGenerator::escapeString(const string& str)
 {
 	string ret = str;
