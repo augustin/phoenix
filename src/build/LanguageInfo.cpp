@@ -75,6 +75,7 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 					compilerDefaultFlags = comp["defaultFlags"].asStringRaw();
 					compilerCompileFlag = comp["compile"].asStringRaw();
 					compilerOutputFlag = comp["output"].asStringRaw();
+					compilerOutputExtension = comp["outputExtension"].asStringRaw();
 					compilerLinkBinaryFlag = comp["linkBinary"].asStringRaw();
 					compilerDefinition = comp["definition"].asStringRaw();
 					compilerInclude = comp["include"].asStringRaw();
@@ -176,7 +177,7 @@ void LanguageInfo::generate(Generator* gen)
 	StringUtil::replaceAll(genName, "+", "P");
 	StringUtil::replaceAll(genName, "-", "D");
 	gen->addObjectRule("lang" + genName, name, sourceExtensions, compilerBinary,
-		OBJECT_FILE_EXT, compilerCompileFlag + "%INPUTFILE% " +
+		compilerOutputExtension, compilerCompileFlag + "%INPUTFILE% " +
 		compilerOutputFlag + "%OUTPUTFILE% %TARGETFLAGS%");
 
 	fGenerated = true;
@@ -189,13 +190,13 @@ OSUtil::ExecResult LanguageInfo::checkIfCompiles(const string& testName,
 	FSUtil::putContents(testFileBase + sourceExtensions[0], testContents);
 	OSUtil::ExecResult res = OSUtil::exec(compilerBinary,
 		extraFlags + " " + testFileBase + sourceExtensions[0] + " " +
-		compilerLinkBinaryFlag + testFileBase + BINARY_FILE_EXT);
+		compilerLinkBinaryFlag + testFileBase + APPLICATION_FILE_EXT);
 	FSUtil::deleteFile(testFileBase + sourceExtensions[0]);
-	bool outFileExisted = FSUtil::exists(testFileBase + BINARY_FILE_EXT);
-	FSUtil::deleteFile(testFileBase + BINARY_FILE_EXT);
+	bool outFileExisted = FSUtil::exists(testFileBase + APPLICATION_FILE_EXT);
+	FSUtil::deleteFile(testFileBase + APPLICATION_FILE_EXT);
 #ifdef _WIN32
-	if (compilerName == "MSVC") // Yay, special casing! >:[
-		FSUtil::deleteFile(testName + OBJECT_FILE_EXT);
+	if (compilerName == "MSVC") // MSVC leaves behind the .obj file, so delete it.
+		FSUtil::deleteFile(testName + ".obj");
 #endif
 	if (res.exitcode == 0 && !outFileExisted)
 		res.exitcode = 1;

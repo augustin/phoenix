@@ -13,13 +13,10 @@
 #include "script/Object.h"
 #include "util/OSUtil.h"
 
-// TODO: per-compiler rules, maybe?
 #ifdef _WIN32
-#  define OBJECT_FILE_EXT ".obj"
-#  define BINARY_FILE_EXT ".exe"
+#  define APPLICATION_FILE_EXT ".exe"
 #else
-#  define OBJECT_FILE_EXT ".o"
-#  define BINARY_FILE_EXT ""
+#  define APPLICATION_FILE_EXT ""
 #endif
 
 class LanguageInfo
@@ -41,6 +38,7 @@ public:
 	std::string compilerDefaultFlags;
 	std::string compilerCompileFlag;
 	std::string compilerOutputFlag;
+	std::string compilerOutputExtension;
 	std::string compilerLinkBinaryFlag;
 	std::string compilerDefinition;
 	std::string compilerInclude;
