@@ -42,7 +42,7 @@ void NinjaGenerator::setBuildScriptFiles(string program, const vector<string> fi
 	fBuildLines.push_back(phony);
 }
 
-void NinjaGenerator::addObjectRule(const string& ruleName, const string& descName,
+void NinjaGenerator::addRegularRule(const string& ruleName, const string& descName,
 	const vector<string>& forExts, const string& program, const string& outFileExt,
 	const string& rule)
 {

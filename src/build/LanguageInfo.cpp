@@ -178,7 +178,7 @@ void LanguageInfo::generate(Generator* gen)
 	string genName = name;
 	StringUtil::replaceAll(genName, "+", "P");
 	StringUtil::replaceAll(genName, "-", "D");
-	gen->addObjectRule("lang" + genName, name, sourceExtensions, compilerBinary,
+	gen->addRegularRule("lang" + genName, name, sourceExtensions, compilerBinary,
 		compilerOutputExtension, compilerCompileFlag + "%INPUTFILE% " +
 		compilerOutputFlag + "%OUTPUTFILE% %TARGETFLAGS%");
 

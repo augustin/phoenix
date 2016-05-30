@@ -25,7 +25,7 @@ public:
 	 * 	 - `%OUTPUTFILE%`: The output file name.
 	 *   - `%TARGETFLAGS%`: The place to insert per-target flags.
 	 */
-	virtual void addObjectRule(const std::string& ruleName,
+	virtual void addRegularRule(const std::string& ruleName,
 		const std::string& descName, const std::vector<std::string>& forExts,
 		const std::string& program, const std::string& outFileExt,
 		const std::string& rule) = 0;
