@@ -40,8 +40,6 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 			extraExtensions.push_back(obj->asStringRaw());
 	}
 
-	preprocessor = info["preprocessor"].boolean;
-
 	Object envir = info["compilerEnviron"];
 	if (envir.type() != Script::Type::Undefined)
 		compilerEnviron = envir.asStringRaw();

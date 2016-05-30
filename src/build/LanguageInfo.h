@@ -33,7 +33,6 @@ public:
 	std::string name;
 	std::vector<std::string> sourceExtensions;
 	std::vector<std::string> extraExtensions;
-	bool preprocessor;
 	std::string compilerEnviron;
 
 	// Compiler info

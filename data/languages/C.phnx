@@ -7,7 +7,6 @@ return Map(
 	sourceExtensions: [".c"],
 	extraExtensions: [".h"],
 	compilerEnviron: "CC",
-	preprocessor: true,
 	test: "int main(){\n#ifdef __cplusplus\n#error Cpp not C\n#endif\nreturn 0;}",
 	compilers: Map(
 		"Clang": Map(
