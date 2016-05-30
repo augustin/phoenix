@@ -17,7 +17,7 @@ ObjectMap::ObjectMap()
 ObjectMap::~ObjectMap()
 {
 	for (_inherited::const_iterator it = begin(); it != end(); it++) {
-		//delete it->second; //FIXME
+		//delete it->second; // FIXME
 	}
 }
 

@@ -148,7 +148,6 @@ void FSUtil_fileSearchHelper(vector<string>& ret, const string& dir,
 vector<string> FSUtil::searchForFiles(const string& dir, const vector<string>& exts,
 	bool recursive)
 {
-	// TODO: report errors?
 	vector<string> ret;
 	FSUtil_fileSearchHelper(ret, dir, exts, recursive);
 	return ret;
@@ -303,7 +302,6 @@ string FSUtil::parentDirectory(const string& path)
 
 void FSUtil::mkdir(const string& path)
 {
-	// TODO: error handling?
 #ifdef _MSC_VER
 	::_mkdir(path.c_str());
 #else

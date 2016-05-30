@@ -29,7 +29,7 @@ void printUsage(string program)
 	cerr << "(C) 2015-2016 Augustin Cavalier." << std::endl << std::endl;
 	cerr << "Usage: " << std::endl;
 	cerr << "\t" << program << " [options] <path/to/source> [<path/to/build/directory = .>]" << std::endl;
-	//cerr << "\t" << program << " [options] <path/to/build/directory = .>" << std::endl;
+	//cerr << "\t" << program << " [options] <path/to/build/directory = .>" << std::endl; // TODO
 }
 
 int main(int argc, char* argv[])

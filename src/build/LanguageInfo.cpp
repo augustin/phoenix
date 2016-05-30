@@ -209,7 +209,7 @@ LanguageInfo* LanguageInfo::getLanguageInfo(string langName)
 	if (sData.count(langName) != 0)
 		return sData[langName];
 
-	// FIXME/TODO: this is bootstrap-only Phoenix, load hardcoded location
+	// FIXME: this is bootstrap-only Phoenix, load hardcoded location
 	Script::Stack stack;
 	Object info = Script::Run(&stack,
 		FSUtil::combinePaths({FSUtil::parentDirectory(__FILE__),

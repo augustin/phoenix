@@ -349,10 +349,10 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 		if (i >= code.length())
 			throw UNEXPECTED_EOF;
 
-		// TODO: any other keywords?
-		if (paramName == "false" || paramName == "true" || paramName == "undefined"
-			|| paramName == "return" || paramName == "if")
+		if (paramName == "false" || paramName == "true" || paramName == "undefined" ||
+			paramName == "return" || paramName == "if") {
 			throw Exception(Exception::SyntaxError, "'" + paramName + "' is an illegal parameter name");
+		}
 
 		if (!treatAsTrueBoolean)
 			arguments.set(paramName, ParseAndEvalExpression(PARSER_PARAMS));
