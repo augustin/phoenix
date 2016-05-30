@@ -17,6 +17,9 @@ public:
 
 	virtual std::string name() override;
 
+	virtual void setBuildScriptFiles(std::string program,
+		const std::vector<std::string> files) override;
+
 	virtual void addObjectRule(const std::string& ruleName,
 		const std::string& descName, const std::vector<std::string>& forExts,
 		const std::string& program, const std::string& outFileExt,
@@ -31,6 +34,8 @@ public:
 	virtual void write() override;
 
 private:
+	std::string escapeString(const std::string& str);
+
 	typedef struct {
 		std::string ruleName;
 		std::string outFileExt;

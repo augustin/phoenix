@@ -764,6 +764,7 @@ Object Run(Stack* stack, string path)
 		throw Exception(Exception::FileDoesNotExist, path);
 	string code = FSUtil::getContents(filename);
 	stack->pushDir(FSUtil::parentDirectory(filename));
+	stack->appendInputFile(filename);
 
 	uint32_t line = 1;
 	string::size_type i = 0;

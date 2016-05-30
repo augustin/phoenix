@@ -122,7 +122,7 @@ Object CreateTarget(const ObjectMap& params)
 		NativeFunction_COERCE_OR_THROW("0", dirsList, Type::List);
 
 		for (const Object* itm : *dirsList.list) {
-			extraData->includesFlags.append(" \"" + info->compilerInclude +
+			extraData->includesFlags.append(" " + info->compilerInclude + "\"" +
 				FSUtil::combinePaths({stack->currentDir(), itm->asStringRaw()}) + "\"");
 		}
 		return Object();

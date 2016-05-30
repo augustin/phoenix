@@ -37,13 +37,17 @@ public:
 	inline void popDir() { fDirectoryStack.pop_back(); }
 	inline std::string currentDir() { return fDirectoryStack[fDirectoryStack.size() - 1]; }
 
+	inline void appendInputFile(const std::string& path) { fInputFiles.push_back(path); }
+	inline std::vector<std::string> inputFiles() { return fInputFiles; }
+
 	void print();
 
 private:
 	ObjectMap fSuperglobalScope;
 	std::vector<ObjectMap> fStack;
-
 	std::vector<std::string> fDirectoryStack;
+
+	std::vector<std::string> fInputFiles;
 
 	std::vector<ObjectMap>::size_type getPos(std::string variable);
 };

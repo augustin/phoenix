@@ -15,6 +15,8 @@ using std::string;
 using Script::Object;
 using Script::Type;
 
+// Statics
+Script::Stack* LanguageInfo::sStack;
 std::map<string, string> LanguageInfo::sPreferredCompiler;
 std::map<string, LanguageInfo*> LanguageInfo::sData;
 
@@ -209,8 +211,7 @@ LanguageInfo* LanguageInfo::getLanguageInfo(string langName)
 		return sData[langName];
 
 	// FIXME: this is bootstrap-only Phoenix, load hardcoded location
-	Script::Stack stack;
-	Object info = Script::Run(&stack,
+	Object info = Script::Run(sStack,
 		FSUtil::combinePaths({FSUtil::parentDirectory(__FILE__),
 			"../../data/languages/" + langName + ".phnx"}));
 	LanguageInfo* langInfo = new LanguageInfo(langName, info);

@@ -11,6 +11,7 @@
 
 #include "build/Generators.h"
 #include "script/Object.h"
+#include "script/Stack.h"
 #include "util/OSUtil.h"
 
 #ifdef _WIN32
@@ -22,8 +23,10 @@
 class LanguageInfo
 {
 public:
-	LanguageInfo(std::string langName, Script::Object info);
+	// From command-line flags & the like.
+	static std::map<std::string, std::string> sPreferredCompiler;
 
+	static Script::Stack* sStack;
 	static LanguageInfo* getLanguageInfo(std::string langName);
 
 	// Basic info
@@ -58,9 +61,9 @@ public:
 	// Generation
 	void generate(Generator* gen);
 
-	// From command-line flags & the like.
-	static std::map<std::string, std::string> sPreferredCompiler;
 private:
+	LanguageInfo(std::string langName, Script::Object info);
+
 	bool fGenerated;
 
 	OSUtil::ExecResult checkIfCompiles(const std::string& testName,

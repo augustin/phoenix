@@ -93,16 +93,18 @@ int main(int argc, char* argv[])
 	// Directory setup
 	FSUtil::mkdir("PhoenixTemp");
 
-	// Create the language stack on the heap, as it can get pretty large.
 	Script::Stack* stack = new Script::Stack();
 	stack->addSuperglobal("Phoenix", Script::GlobalLanguageObject());
 	Target::addGlobalFunction();
+	LanguageInfo::sStack = stack;
+
 	try {
 		Script::Run(stack, sourceDirectory);
 
 		string generatorName = Generators::defaultName();
 		std::cout << "generating build files for " << generatorName << "... ";
 		Generator* gen = Generators::create(generatorName);
+		gen->setBuildScriptFiles(StringUtil::join(arguments, " "), stack->inputFiles());
 		for (Target::ExtraData* data : Target::targets)
 			Target::generate(data, gen);
 		gen->write();
