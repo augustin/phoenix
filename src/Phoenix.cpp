@@ -28,8 +28,8 @@ void printUsage(string program)
 	cerr << "Phoenix, version " PHOENIX_VERSION << ". ";
 	cerr << "(C) 2015-2016 Augustin Cavalier." << std::endl << std::endl;
 	cerr << "Usage: " << std::endl;
-	cerr << "\t" << program << " [options] <path/to/source> [<path/to/build/directory>]" << std::endl;
-	cerr << "\t" << program << " [options] <path/to/build/directory = .>" << std::endl;
+	cerr << "\t" << program << " [options] <path/to/source> [<path/to/build/directory = .>]" << std::endl;
+	//cerr << "\t" << program << " [options] <path/to/build/directory = .>" << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -51,8 +51,17 @@ int main(int argc, char* argv[])
 		if (arg == "--help") {
 			printUsage(arguments[0]);
 			cerr << "Options: " << std::endl;
-			cerr << "\t-G<generator>\t\tBuild system generator to use (default: '" <<
-				Generators::defaultName() << "')." << std::endl;
+
+			cerr << "\t-G<generator>\t\tBuild system generator to use; possibilities:" << std::endl;
+			string defGen = Generators::defaultName();
+			vector<string> list = Generators::list();
+			for (string genName : list) {
+				cerr << "\t\t" << genName;
+				if (genName == defGen)
+					cerr << " (default)";
+				cerr << std::endl;
+			}
+
 			// cerr << "\t-X<target>\tCross-compile to <target>." << std::endl; // TODO
 			cerr << "\t-C:<lang>:<compiler>\tPreferred compiler for <lang> to use." <<
 				std::endl;
@@ -103,8 +112,9 @@ int main(int argc, char* argv[])
 		return e.fType;
 	}
 
-	// Directory de-setup
+	// Deinitialization
 	FSUtil::rmdir("PhoenixTemp");
+	delete stack;
 
 	return 0;
 }

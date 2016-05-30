@@ -146,7 +146,7 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 bool LanguageInfo::checkStandardsMode(std::string standardsMode)
 {
 	StandardsMode mode = standardsModes[standardsMode];
-	if (mode.status > 0)
+	if (mode.status > 0) // If the mode was already checked, it'll have a nonzero status
 		return true;
 	if (mode.status < 0)
 		return false;

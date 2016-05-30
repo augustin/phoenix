@@ -13,6 +13,11 @@ string Generators::defaultName()
 	return "Ninja";
 }
 
+std::vector<std::string> Generators::list()
+{
+	return {"Ninja"};
+}
+
 Generator* Generators::create(string name)
 {
 	if (name == "Ninja")

@@ -33,6 +33,7 @@ public:
 		const std::vector<std::string>& inputFiles,
 		const std::string& targetFlags) = 0;
 
+	virtual std::vector<std::string> outputFiles() = 0;
 	virtual void write() = 0;
 };
 
@@ -40,5 +41,6 @@ class Generators
 {
 public:
 	static std::string defaultName();
+	static std::vector<std::string> list();
 	static Generator* create(std::string name);
 };

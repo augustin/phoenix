@@ -81,6 +81,10 @@ void NinjaGenerator::addTarget(const string& outputBinaryName,
 		"link " + StringUtil::join(outfiles, " ") + "\n");
 }
 
+vector<string> NinjaGenerator::outputFiles()
+{
+	return {"build.ninja"};
+}
 void NinjaGenerator::write()
 {
 	FSUtil::putContents("build.ninja",

@@ -27,6 +27,7 @@ public:
 		const std::vector<std::string>& inputFiles,
 		const std::string& targetFlags);
 
+	virtual std::vector<std::string> outputFiles() override;
 	virtual void write() override;
 
 private:
