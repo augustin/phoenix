@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 			cerr << "\t-G<generator>\t\tBuild system generator to use (default: '" <<
 				Generators::defaultName() << "')." << std::endl;
 			// cerr << "\t-X<target>\tCross-compile to <target>." << std::endl; // TODO
-			cerr << "\t-C:<lang>:<compiler>\tPreferred ompiler for <lang> to use." <<
+			cerr << "\t-C:<lang>:<compiler>\tPreferred compiler for <lang> to use." <<
 				std::endl;
 			return 1;
 		} else if (StringUtil::startsWith(arg, "-C:")) {
@@ -64,9 +64,8 @@ int main(int argc, char* argv[])
 				return 1;
 			}
 			LanguageInfo::sPreferredCompiler.insert({item[1], item[2]});
-		} else if (arg.find(".") != string::npos || arg.find("/") != string::npos ||
-				   arg.find("\\") != string::npos) {
-			// Looks like a path.
+		} else if (sourceDirectory.empty() || buildDirectory == ".") {
+			// Assume it's a path.
 			if (sourceDirectory.length() > 0)
 				buildDirectory = arg;
 			else
