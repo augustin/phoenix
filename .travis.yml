@@ -15,19 +15,17 @@ matrix:
   exclude:
     - os: osx
       compiler: gcc
-      # "gcc" on OS X is just Clang in fake-GCC mode
+      # "gcc" on OS X is just Clang in pseudo-GCC mode
 
 before_install:
   - "if [ $TRAVIS_OS_NAME = 'osx' ]; then brew install ninja; fi"
 script:
   - "g++ $(find src -name \"*.cpp\") -Isrc -o phoenix_bootstrapped -std=c++0x -O2"
-  - ./phoenix_bootstrapped .
+  - mkdir build-self && build-self
+  - ../phoenix_bootstrapped .
   - ninja
   - build-utiltest/utiltest
   - build-scripttest/scripttest
-  - mkdir build-self && cd build-self
-  - ../build-phoenix/phoenix ..
-  - ninja
 
 notifications:
   webhooks:
