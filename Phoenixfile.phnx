@@ -9,7 +9,7 @@ $$Phoenix.checkVersion(minimum: "0.0.1");
 ######
 $phoenix = CreateTarget("phoenix", language: "C++");
 $phoenix.setStandardsMode("C++11", strict);
-$phoenix.addDefinitions(DATA_DIR: '"/usr/bin/data"');#TODO# $$dataDir);
+#$phoenix.addDefinitions(DATA_DIR: '"/usr/bin/data"');#TODO# $$dataDir);
 $phoenix.addSourceDirectory("src", recursive);
 $phoenix.addIncludeDirectories(["src"]);
 #TODO# $phoenix.install(to: $$binDir, dependencies: 'autodetect');
