@@ -21,7 +21,7 @@ before_install:
   - "if [ $TRAVIS_OS_NAME = 'osx' ]; then brew install ninja; fi"
 script:
   - "g++ $(find src -name \"*.cpp\") -Isrc -o phoenix_bootstrapped -std=c++0x -O2"
-  - mkdir build-self && build-self
+  - mkdir build-self && cd build-self
   - ../phoenix_bootstrapped .
   - ninja
   - build-utiltest/utiltest
