@@ -13,6 +13,7 @@ public:
 	static bool exists(const std::string& path);
 	static bool isFile(const std::string& path);
 	static bool isDir(const std::string& path);
+	static bool isExec(const std::string& path);
 
 	static std::string getContents(const std::string& file);
 	static void putContents(const std::string& file, const std::string& contents);

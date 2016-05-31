@@ -10,7 +10,7 @@
 #include "util/StringUtil.h"
 #include "util/FSUtil.h"
 
-int main(int argc, char* argv[])
+int main(int, char* argv[])
 {
 	Tester t(true);
 
@@ -66,6 +66,10 @@ int main(int argc, char* argv[])
 	t.result(FSUtil::isDir("/"), "isDir-2");
 	t.result(!FSUtil::isDir(argv[0]), "isDir-3");
 	t.result(!FSUtil::isDir("this_file_does_not_exist.txt"), "isDir-4");
+
+	t.result(FSUtil::isExec(argv[0]), "isExec-1");
+	t.result(!FSUtil::isExec("this_file_does_not_exist.txt"), "isExec-2");
+	t.result(!FSUtil::isExec("."), "isExec-3");
 
 	FSUtil::putContents("this_file_exists.txt", "These are the contents of this file.");
 	t.result(FSUtil::isFile("this_file_exists.txt"), "putContents-1/isFile-4");

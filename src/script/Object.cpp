@@ -71,6 +71,7 @@ string Object::typeName(Type type)
 	case Type::List:		return "List";
 	case Type::Map:			return "Map";
 	}
+	return "UNKNOWN";
 }
 string Object::typeName() const
 {
@@ -106,6 +107,7 @@ string Object::asStringPretty() const
 		return ret.append("}>");
 	}
 	}
+	return "UNKNOWN";
 }
 string Object::asStringRaw() const
 {
@@ -136,6 +138,7 @@ string Object::asStringRaw() const
 		return ret.append("}");
 	}
 	}
+	return "UNKNOWN";
 }
 
 bool Object::coerceToBoolean() const
@@ -149,6 +152,7 @@ bool Object::coerceToBoolean() const
 	case Type::List:		return list->size() != 0;
 	case Type::Map:			return map->size() != 0;
 	}
+	return false;
 }
 
 Object Object::op_div(const Object& left, const Object& right)

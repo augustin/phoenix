@@ -61,6 +61,19 @@ bool FSUtil::isDir(const string& path)
 	return false;
 }
 
+bool FSUtil::isExec(const string& path)
+{
+#ifndef _WIN32
+	struct ::stat statbuf;
+	if (::stat(path.c_str(), &statbuf) == 0) {
+		return ((statbuf.st_mode & S_IFREG) && (statbuf.st_mode & 0111));
+	}
+	return false;
+#else
+	return !path.empty() && isFile(path); // Because who knows, anyway.
+#endif
+}
+
 std::string FSUtil::getContents(const string& file)
 {
 	std::ifstream filestream(file);
@@ -167,7 +180,9 @@ string FSUtil::which(const string& prog)
 		return program; // already an absolute path
 
 #ifdef _WIN32
-	const vector<string> pathExts = StringUtil::split(OSUtil::getEnv("PATHEXT"), ";");
+	string pathext = OSUtil::getEnv("PATHEXT");
+	std::transform(pathext.begin(), pathext.end(), pathext.begin(), ::tolower);
+	const vector<string> pathExts = StringUtil::split(pathext, ";");
 	auto permutePathExt = [&](const string& path) {
 		for (string ext : pathExts) {
 			string fullPath = path + ext;
@@ -181,7 +196,7 @@ string FSUtil::which(const string& prog)
 	// The program's name contains a slash, ignore PATH
 	if (program.find('/') != string::npos) {
 		string normd = normalizePath(program);
-		if (exists(normd)) {
+		if (isExec(normd)) {
 			// TODO: check if 'program' is executable
 			// TODO: return absolute path
 			return normd;
@@ -208,7 +223,7 @@ string FSUtil::which(const string& prog)
 #else
 			combinePaths({path, program});
 #endif
-		if (exists(fullPath))
+		if (isExec(fullPath))
 			return fullPath;
 	}
 	return "";
