@@ -12,6 +12,10 @@ using std::string;
 
 namespace Script {
 
+Exception::~Exception() noexcept
+{
+}
+
 void Exception::print()
 {
 	string error;
@@ -27,9 +31,6 @@ void Exception::print()
 	case InternalError:
 		// 'fWhat' is the error string
 		error += fWhat;
-	break;
-	default:
-		error += "unknown error " + std::to_string(fType) + ": \"" + fWhat + "\"";
 	break;
 	}
 	if (!fFile.empty() && fLine > 0) {
@@ -69,7 +70,6 @@ string Object::typeName(Type type)
 	case Type::Function:	return "Function";
 	case Type::List:		return "List";
 	case Type::Map:			return "Map";
-	default:				return "Unknown";
 	}
 }
 string Object::typeName() const
@@ -105,8 +105,6 @@ string Object::asStringPretty() const
 		ret.erase(ret.length() - 2);
 		return ret.append("}>");
 	}
-	default:
-		return "<UNKNOWN>";
 	}
 }
 string Object::asStringRaw() const
@@ -137,8 +135,6 @@ string Object::asStringRaw() const
 		ret.erase(ret.length() - 2);
 		return ret.append("}");
 	}
-	default:
-		return "<UNKNOWN>";
 	}
 }
 
@@ -152,8 +148,6 @@ bool Object::coerceToBoolean() const
 	case Type::Function:	return true;
 	case Type::List:		return list->size() != 0;
 	case Type::Map:			return map->size() != 0;
-	default:
-		throw Exception(Exception::InternalError, "unexpected type for lowering");
 	}
 }
 

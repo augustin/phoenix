@@ -14,6 +14,7 @@ class NinjaGenerator : public Generator
 {
 public:
 	NinjaGenerator();
+	virtual ~NinjaGenerator();
 
 	virtual void setBuildScriptFiles(std::string program,
 		const std::vector<std::string> files) override;
@@ -21,12 +22,12 @@ public:
 	virtual void addRegularRule(const std::string& ruleName,
 		const std::string& descName, const std::vector<std::string>& forExts,
 		const std::string& program, const std::string& outFileExt,
-		const std::string& rule);
-	virtual void setProgramLinkRule(const std::string& rule);
+		const std::string& rule) override;
+	virtual void setProgramLinkRule(const std::string& rule) override;
 
 	virtual void addTarget(const std::string& outputBinaryName,
 		const std::vector<std::string>& inputFiles,
-		const std::string& targetFlags);
+		const std::string& targetFlags) override;
 
 	virtual std::vector<std::string> outputFiles() override;
 	virtual void write() override;

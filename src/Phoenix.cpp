@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 	}
 
 	string buildDirectory = ".", sourceDirectory = "";
-	for (int i = 1; i < argc; i++) {
+	for (vector<string>::size_type i = 1; i < argc; i++) {
 		string arg = arguments[i];
 		if (arg == "--help") {
 			printUsage(arguments[0]);

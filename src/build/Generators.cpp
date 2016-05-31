@@ -8,6 +8,10 @@
 
 using std::string;
 
+Generator::~Generator()
+{
+}
+
 string Generators::defaultName()
 {
 	return "Ninja";

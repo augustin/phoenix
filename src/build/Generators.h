@@ -15,6 +15,8 @@
 class Generator
 {
 public:
+	virtual ~Generator();
+
 	// Generates the rule to regenerate the files when someone modifies a script
 	virtual void setBuildScriptFiles(std::string program,
 		const std::vector<std::string> files) = 0;

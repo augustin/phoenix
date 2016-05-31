@@ -190,7 +190,6 @@ string FSUtil::which(const string& prog)
 		else
 			return permutePathExt(normalizePath(program));
 #endif
-		return "";
 	}
 
 	vector<string> PATHs =

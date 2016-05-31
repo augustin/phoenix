@@ -30,8 +30,8 @@ public:
 	};
 	Exception(Type type, std::string what, std::string file = "", uint32_t line = 0)
 		: fType(type), fWhat(what), fFile(file), fLine(line) {}
-	virtual ~Exception() throw() {}
-	virtual const char* what() const throw() { return fWhat.c_str(); }
+	virtual ~Exception() noexcept;
+	virtual const char* what() const noexcept { return fWhat.c_str(); }
 
 	void print();
 
@@ -82,7 +82,7 @@ public:
 
 public: // Data storage
 	bool boolean;
-	int integer;
+	int32_t integer;
 	std::string string;
 	Function* function;
 	ObjectList* list;

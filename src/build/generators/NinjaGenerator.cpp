@@ -14,6 +14,9 @@ using std::vector;
 NinjaGenerator::NinjaGenerator()
 {
 }
+NinjaGenerator::~NinjaGenerator()
+{
+}
 
 string NinjaGenerator::escapeString(const string& str)
 {

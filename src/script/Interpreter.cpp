@@ -51,13 +51,12 @@ Object AstNode::toObject(Stack* stack)
 			case '\n':
 				line++;
 				str += c;
-				break;
 			break;
 
 			case '\\':
 				i++;
 				c = string[i];
-				// fall through
+			// fall through
 			default:
 				str += c;
 			break;
@@ -115,7 +114,7 @@ bool IgnoreWhitespace(Stack*, const string& code, uint32_t& line, string::size_t
 			// Ignore all following characters until next newline
 			while (code[i] != '\n' && i < code.length())
 				i++;
-			// fall through
+		// fall through
 		case '\n':
 			line++;
 		break;
@@ -174,14 +173,13 @@ AstNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, strin
 		} break;
 
 		case '}':
-			i++;
-			// fall through
+			i++; // Cancels out the i-- below.
+		// fall through
 		default:
 			i--;
 			if (ret.size() > 0)
 				realRet.variable.push_back(ret);
 			return realRet;
-		break;
 		}
 		i++;
 	}
@@ -247,7 +245,6 @@ Object ParseNumber(Stack*, const string& code, uint32_t&, string::size_type& i)
 		break;
 		case '.':
 			throw Exception(Exception::TypeError, string("floating-point unsupported"));
-		break;
 
 		default:
 			// End of number.
@@ -332,6 +329,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 
 				case ')':
 					i--;
+					// fallthrough
 				case ',':
 					treatAsTrueBoolean = true;
 					// fallthrough
@@ -341,7 +339,6 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 
 				default:
 					throw UNEXPECTED_TOKEN;
-				break;
 				}
 				i++;
 			}
@@ -438,7 +435,6 @@ Object ParseList(Stack* stack, const string& code, uint32_t& line, string::size_
 
 		default:
 			throw UNEXPECTED_TOKEN;
-		break;
 		}
 		i++;
 	}
@@ -452,11 +448,12 @@ class ReturnValue : public std::exception
 {
 public:
 	ReturnValue(Object val) { value = val; }
-	virtual ~ReturnValue() throw() {}
-	virtual const char* what() const throw() { return "ReturnValue"; }
+	virtual ~ReturnValue() noexcept;
+	virtual const char* what() const noexcept { return "ReturnValue"; }
 
 	Object value;
 };
+ReturnValue::~ReturnValue() noexcept {}
 
 string::size_type LocateEndOfScope(Stack*, const string& code, uint32_t&, const string::size_type& i)
 {
@@ -636,7 +633,6 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 
 		default:
 			throw UNEXPECTED_TOKEN;
-		break;
 		}
 		if (!atEOE) {
 			i++;
