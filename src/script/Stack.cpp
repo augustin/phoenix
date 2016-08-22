@@ -54,9 +54,20 @@ Object* Stack::get_ptr(const vector<string> variable)
 	for (vector<string>::size_type i = 1; i < variable.size(); i++) {
 		if (ret->type() == Type::Map)
 			ret = ret->map->get_ptr(variable[i]);
-		else if (ret->type() == Type::List)
-			ret = ret->list->get_ptr(std::stoi(variable[i], nullptr, 10));
-		else
+		else if (ret->type() == Type::List) {
+			if (variable[i] == "length") {
+				Object* newRet = new Object(Type::Integer);
+				newRet->integer = ret->list->size();
+				ret = newRet;
+			} else {
+				try {
+					ret = ret->list->get_ptr(std::stoi(variable[i], nullptr, 10));
+				} catch (...) {
+					throw Exception(Exception::SyntaxError,
+						string("expected integer, got '").append(variable[i]).append("'"));
+				}
+			}
+		} else
 			throw Exception(Exception::TypeError, "'" + variable[i - 1] + "' should be either 'List' or 'Map' "
 				"but is neither");
 	}

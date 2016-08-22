@@ -33,8 +33,12 @@ GlobalLanguageObject::GlobalLanguageObject()
 			throw Exception(Exception::TypeError,
 				std::string("'minimum' must have at least 1 component"));
 		vector<int> parts;
-		for (const std::string& str : components)
-			parts.push_back(std::stoi(str, nullptr, 10));
+		try {
+			for (const std::string& str : components)
+				parts.push_back(std::stoi(str, nullptr, 10));
+		} catch (...) {
+			throw Exception(Exception::SyntaxError, "expected an integer in call to checkVersion");
+		}
 		while (parts.size() != 3)
 			parts.push_back(-1);
 		if (parts[0] > PHOENIX_VERSION_MAJOR ||
@@ -42,7 +46,7 @@ GlobalLanguageObject::GlobalLanguageObject()
 			parts[2] > PHOENIX_VERSION_PATCH)
 			throw Exception(Exception::UserError,
 				std::string("minimum version of Phoenix required is ").append(minimum.string)
-				 .append(" and this is " PHOENIX_VERSION));
+				 .append(" and this is Phoenix " PHOENIX_VERSION));
 		return Object();
 	}));
 

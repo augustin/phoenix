@@ -1,0 +1,4 @@
+#EXPECT: <Integer:3>
+$blah = [1, 2, 3];
+
+return $blah.length;

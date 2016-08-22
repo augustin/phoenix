@@ -1,0 +1,5 @@
+#EXPECT: Eexpected integer, got 'zero'
+$list = ["hat","rat"];
+
+$list.zero;
+return $list;
