@@ -196,11 +196,8 @@ string FSUtil::which(const string& prog)
 	// The program's name contains a slash, ignore PATH
 	if (program.find('/') != string::npos) {
 		string normd = normalizePath(program);
-		if (isExec(normd)) {
-			// TODO: check if 'program' is executable
-			// TODO: return absolute path
+		if (isExec(normd))
 			return normd;
-		}
 #ifdef _WIN32
 		else
 			return permutePathExt(normalizePath(program));
