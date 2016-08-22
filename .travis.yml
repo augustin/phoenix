@@ -7,6 +7,10 @@ addons:
   apt:
     packages:
     - ninja-build
+matrix:
+  include:
+    - dist: precise
+    - dist: trusty
 compiler:
   - gcc
   - clang
@@ -20,7 +24,7 @@ matrix:
 before_install:
   - "if [ $TRAVIS_OS_NAME = 'osx' ]; then brew install ninja; fi"
 script:
-  - "$(CXX) $(find src -name \"*.cpp\") -Isrc -o phoenix_bootstrapped -std=c++0x -O2"
+  - "$CXX $(find src -name \"*.cpp\") -Isrc -o phoenix_bootstrapped -std=c++0x -O2"
   - ./phoenix_bootstrapped .
   - ninja
   - ./utiltest
