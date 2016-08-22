@@ -65,7 +65,7 @@ public:
 	std::string asStringPretty() const;
 	std::string asStringRaw() const;
 
-	inline Object operator[](const char* key);
+	inline Object operator[](const char* key) const;
 
 	// Helpers
 	bool coerceToBoolean() const;
@@ -184,7 +184,7 @@ public:
 };
 
 // Must be down here, as it needs ObjectMap's definition
-inline Object Object::operator[](const char* key)
+inline Object Object::operator[](const char* key) const
 {
 	return map->get(key);
 }
