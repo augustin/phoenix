@@ -43,4 +43,5 @@ private:
 
 	std::vector<std::string> fRulesLines;
 	std::vector<std::string> fBuildLines;
+	std::vector<std::string> fTargets;
 };

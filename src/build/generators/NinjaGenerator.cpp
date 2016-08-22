@@ -101,8 +101,10 @@ void NinjaGenerator::addTarget(const string& outputBinaryName,
 			line += "\n  targetflags = $" + targetflagsvar;
 		fBuildLines.push_back(line);
 	}
-	fBuildLines.push_back("build build-" + outputBinaryName + "/" + outputBinaryName + ": " +
+	std::string targetFile = /* TODO: runtimeOutputDirectory */ outputBinaryName;
+	fBuildLines.push_back("build " + targetFile + ": " +
 		"link " + StringUtil::join(outfiles, " ") + "\n");
+	fTargets.push_back(targetFile);
 }
 
 vector<string> NinjaGenerator::outputFiles()
@@ -127,5 +129,9 @@ void NinjaGenerator::write()
 
 		// Actual build stuff
 		StringUtil::join(fRulesLines, "\n") + "\n" +
-		StringUtil::join(fBuildLines, "\n") + "\n");
+		StringUtil::join(fBuildLines, "\n") + "\n" +
+
+		// "all" target & target defaults
+		"build all: phony " + StringUtil::join(fTargets, " ") + "\n" +
+		"default all\n");
 }
