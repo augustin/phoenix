@@ -138,7 +138,7 @@ void generate(ExtraData* target, Generator* gen)
 	if (target->sourceFiles.size() == 0) {
 		throw Exception(Exception::TypeError, "no source files for target '" + target->name + "'");
 	}
-	gen->addTarget(target->name, target->sourceFiles,
+	gen->addTarget(target->name + APPLICATION_FILE_EXT, target->sourceFiles,
 		StringUtil::join({target->otherFlags, target->includesFlags,
 			target->definitionsFlags, target->standardsModeFlag}, " "));
 }
