@@ -499,6 +499,52 @@ string::size_type LocateEndOfScope(Stack*, const string& code, uint32_t&, const 
 	return ret;
 }
 
+Object ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* stack,
+	const string& code, uint32_t& line, string::size_type& i)
+{
+	if (expression.size() != 0)
+		throw Exception(Exception::SyntaxError, string("incorrectly placed '").append(thing).append("'"));
+	i++;
+	IgnoreWhitespace(PARSER_PARAMS);
+	if (code[i] != '(')
+		throw UNEXPECTED_TOKEN_EXPECTED("(");
+
+	auto CBH_Inner = [&]() -> bool {
+		bool exec = ParseAndEvalExpression(PARSER_PARAMS).coerceToBoolean();
+		i++;
+		IgnoreWhitespace(PARSER_PARAMS);
+		string::size_type j = LocateEndOfScope(PARSER_PARAMS);
+		if (exec) {
+			i++;
+			stack->push();
+			while (i < j) {
+				ParseAndEvalExpression(PARSER_PARAMS);
+				i++;
+				IgnoreWhitespace(PARSER_PARAMS);
+			}
+			stack->pop();
+		} else {
+			// Skip the block;
+			while (i < j) {
+				if (code[i] == '\n')
+					line++;
+				i++;
+			}
+		}
+		return exec;
+	};
+
+	if (thing == "while") {
+		uint32_t old_line = line;
+		string::size_type old_i = i;
+		while (CBH_Inner()) {
+			line = old_line;
+			i = old_i;
+		}
+	} else if (thing == "if")
+		CBH_Inner();
+}
+
 Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
 {
 	// Parse
@@ -574,34 +620,8 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				if (expression.size() != 0)
 					throw Exception(Exception::SyntaxError, string("incorrectly placed 'return'"));
 				isReturn = true;
-			} else if (thing == "if") {
-				if (expression.size() != 0)
-					throw Exception(Exception::SyntaxError, "incorrectly placed 'if'");
-				i++;
-				IgnoreWhitespace(PARSER_PARAMS);
-				if (code[i] != '(')
-					throw UNEXPECTED_TOKEN_EXPECTED("(");
-				bool exec = ParseAndEvalExpression(PARSER_PARAMS).coerceToBoolean();
-				i++;
-				IgnoreWhitespace(PARSER_PARAMS);
-				string::size_type j = LocateEndOfScope(PARSER_PARAMS);
-				if (exec) {
-					i++;
-					stack->push();
-					while (i < j) {
-						ParseAndEvalExpression(PARSER_PARAMS);
-						i++;
-						IgnoreWhitespace(PARSER_PARAMS);
-					}
-					stack->pop();
-				} else {
-					// Skip the block;
-					while (i < j) {
-						if (code[i] == '\n')
-							line++;
-						i++;
-					}
-				}
+			} else if (thing == "if" || thing == "while") {
+				ConditionalBranchHandler(expression, thing, PARSER_PARAMS);
 			} else { // assume function call
 				i++;
 				expression.push_back(AstNode(AstNode::Literal, ParseCallAndEval(PARSER_PARAMS, {thing})));
