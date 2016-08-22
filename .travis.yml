@@ -20,13 +20,13 @@ matrix:
 before_install:
   - "if [ $TRAVIS_OS_NAME = 'osx' ]; then brew install ninja; fi"
 script:
-  - "g++ $(find src -name \"*.cpp\") -Isrc -o phoenix_bootstrapped -std=c++0x -O2"
+  - "$(CXX) $(find src -name \"*.cpp\") -Isrc -o phoenix_bootstrapped -std=c++0x -O2"
   - ./phoenix_bootstrapped .
   - ninja
-  - build-utiltest/utiltest
-  - build-scripttest/scripttest
+  - ./utiltest
+  - ./scripttest
   - mkdir build-self && cd build-self
-  - ../build-phoenix/phoenix ..
+  - ../phoenix ..
   - ninja
 
 notifications:
