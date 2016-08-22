@@ -451,7 +451,7 @@ Object ParseList(Stack* stack, const string& code, uint32_t& line, string::size_
 class ReturnValue : public std::exception
 {
 public:
-	ReturnValue(Object val) { value = val; }
+	ReturnValue(Object val) : value(val) {}
 	virtual ~ReturnValue() noexcept;
 	virtual const char* what() const noexcept { return "ReturnValue"; }
 

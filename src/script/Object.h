@@ -58,6 +58,9 @@ class Object
 public:
 	Object(const Type type = Type::Undefined);
 	~Object();
+	// Copy constructors
+	Object(const Object& other);
+	Object& operator=(const Object& other);
 
 	inline Type type() const { return fObjectType; }
 	static std::string typeName(Type type);
@@ -169,7 +172,7 @@ public:
 	const_iterator begin() const { return _inherited::begin(); }
 	const_iterator end() const { return _inherited::end(); }
 
-	void push_back(const Object& obj) { Object* o = new Object; *o = obj; _inherited::push_back(o); }
+	void push_back(const Object& obj) { Object* o = new Object(obj); _inherited::push_back(o); }
 
 	Object operator[](_inherited::size_type i) { return *get_ptr(i); }
 	Object* get_ptr(_inherited::size_type i) { return _inherited::at(i); }

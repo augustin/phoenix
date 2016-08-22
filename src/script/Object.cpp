@@ -53,11 +53,40 @@ Object::Object(const Type type)
 	fObjectType(type)
 {
 }
+Object::Object(const Object& other)
+	: Object(other.fObjectType)
+{
+	boolean = other.boolean;
+	integer = other.integer;
+	string = other.string;
+	if (other.function) function = new Function(*other.function);
+	else if (other.list) list = new ObjectList(*other.list);
+	else if (other.map) map = new ObjectMap(*other.map);
+	extradata = other.extradata; // Yep, this never gets deleted.
+}
+Object& Object::operator=(const Object& other)
+{
+	delete function;
+	delete list;
+	delete map;
+
+	fObjectType = other.fObjectType;
+	boolean = other.boolean;
+	integer = other.integer;
+	string = other.string;
+	if (other.function) function = new Function(*other.function);
+	else if (other.list) list = new ObjectList(*other.list);
+	else if (other.map) map = new ObjectMap(*other.map);
+	extradata = other.extradata; // Yep, this never gets deleted.
+
+	return *this;
+}
+
 Object::~Object()
 {
-	//delete function; // FIXME: LEAK LEAK LEAK LEAK!
-	//delete list;
-	//delete map;
+	delete function;
+	delete list;
+	delete map;
 }
 
 string Object::typeName(Type type)

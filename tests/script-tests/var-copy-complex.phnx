@@ -1,0 +1,5 @@
+#EXPECT: <List:[<List:[<Integer:1>, <Integer:2>, <Integer:3>]>, <List:[<Integer:1>, <Integer:2>, <Integer:3>, <Integer:4>]>]>
+$a = [1, 2, 3];
+$b = $a;
+$b += 4;
+return [$a, $b];
