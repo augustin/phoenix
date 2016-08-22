@@ -3,14 +3,13 @@ language: cpp
 os:
   - linux
   - osx
+dist:
+  - precise
+  - trusty
 addons:
   apt:
     packages:
     - ninja-build
-matrix:
-  include:
-    - dist: precise
-    - dist: trusty
 compiler:
   - gcc
   - clang
