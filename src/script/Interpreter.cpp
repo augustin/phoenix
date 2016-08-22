@@ -499,7 +499,7 @@ string::size_type LocateEndOfScope(Stack*, const string& code, uint32_t&, const 
 	return ret;
 }
 
-Object ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* stack,
+void ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* stack,
 	const string& code, uint32_t& line, string::size_type& i)
 {
 	if (expression.size() != 0)
