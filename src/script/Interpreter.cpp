@@ -424,6 +424,10 @@ Object ParseList(Stack* stack, const string& code, uint32_t& line, string::size_
 			ret->push_back(ParseList(PARSER_PARAMS));
 		break;
 
+		case '$':
+			ret->push_back(EvalVariableName(PARSER_PARAMS).toObject(stack));
+		break;
+
 		case ',':
 			pastEndOfEntry = false;
 		break;

@@ -1,0 +1,10 @@
+#EXPECT: <List:[<String:"blah.">, <String:"halb.">, <String:"blah.halb">, <String:"halb.blah">]>
+$a = "blah.";
+$b = "halb.";
+$c = [$a, $b];
+$a += "halb";
+$b += "blah";
+$c += $a;
+$c += $b;
+
+return $c;

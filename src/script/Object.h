@@ -137,12 +137,6 @@ inline Object StringObject(const std::string& value)
 	ret.string = std::string(value);
 	return ret;
 }
-inline Object ListObject(ObjectList* value)
-{
-	Object ret(Type::List);
-	ret.list = value;
-	return ret;
-}
 
 // ObjectMap (defined here, implemented in ObjectMap.cpp)
 class ObjectMap : private std::map<std::string, Object*>
@@ -182,6 +176,21 @@ public:
 
 	size_type size() const { return _inherited::size(); }
 };
+
+// Must be down here, as it needs ListObject's definition
+inline Object ListObject(ObjectList* value)
+{
+	Object ret(Type::List);
+	ret.list = value;
+	return ret;
+}
+inline Object ListObject(const ObjectList value)
+{
+	Object ret(Type::List);
+	ret.list = new ObjectList;
+	*ret.list = value;
+	return ret;
+}
 
 // Must be down here, as it needs ObjectMap's definition
 inline Object Object::operator[](const char* key) const

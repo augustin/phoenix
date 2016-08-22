@@ -185,6 +185,11 @@ Object Object::op_add(const Object& left, const Object& right)
 		return StringObject(std::to_string(left.integer) + right.string);
 	else if (left.type() == Type::String && right.type() == Type::Integer)
 		return StringObject(left.string + std::to_string(right.integer));
+	else if (left.type() == Type::List) {
+		Object o = ListObject(*left.list);
+		o.list->push_back(right);
+		return o;
+	}
 	throw Exception(Exception::TypeError, "unexpected operand types for add operation (left type '"
 		+ left.typeName() + "', right type '" + right.typeName() + "')");
 }
