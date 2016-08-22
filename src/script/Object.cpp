@@ -54,7 +54,12 @@ Object::Object(const Type type)
 {
 }
 Object::Object(const Object& other)
-	: Object(other.fObjectType)
+	:
+	function(nullptr),
+	list(nullptr),
+	map(nullptr),
+	extradata(nullptr),
+	fObjectType(other.fObjectType)
 {
 	boolean = other.boolean;
 	integer = other.integer;
