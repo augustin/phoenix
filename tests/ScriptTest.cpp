@@ -52,8 +52,12 @@ int main(int argc, char* argv[])
 			if (expect[0] != 'E') {
 				t.result(false, name + " (unexpected exception)");
 				exceptionResult.print();
-			} else
-				t.result((exceptionResult.what() == expect.substr(1, string::npos)), name);
+			} else {
+				bool result = (exceptionResult.what() == expect.substr(1, string::npos));
+				t.result(result, name +
+					(result ? "" : " (expected '" + expect.substr(1, string::npos) + "', got '" +
+						exceptionResult.what() + "')"));
+			}
 			continue;
 		} else {
 			bool res = (result.asStringPretty() == expect);
