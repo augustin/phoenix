@@ -1,2 +1,2 @@
-#EXPECT: Eunexpected token 'f'
+#EXPECT: Eattempted to call function 'falge' which does not exist
 return [1, 4, 2, falge, undefined, NINEF];

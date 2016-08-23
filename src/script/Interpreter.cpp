@@ -158,6 +158,7 @@ AstNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, strin
 				realRet.variable.push_back(ret);
 				ret = "";
 			}
+			i++;
 			Object result = ParseAndEvalExpression(PARSER_PARAMS);
 			realRet.variable.push_back(result.asStringRaw());
 		} break;
@@ -277,7 +278,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 	}
 
 	// Parse & build argument map
-	assert(i != '(');
+	assert(code[i] == '(');
 	i++;
 	ObjectMap arguments;
 	bool atEOC = false;
@@ -375,70 +376,22 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 
 Object ParseList(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
 {
-	assert(i != '[');
+	assert(code[i] == '[');
 	i++;
 
 	ObjectList* ret = new ObjectList;
-	bool pastEndOfEntry = false, atEndOfList = false;
+	bool atEndOfList = false;
 	while (!atEndOfList && i < code.length()) {
-		IgnoreWhitespace(PARSER_PARAMS);
-		char c = code[i];
-		switch (c) {
-		case '\'':
-		case '"':
-			if (pastEndOfEntry)
-				throw UNEXPECTED_TOKEN_EXPECTED(",' or ']");
-			ret->push_back(ParseString(PARSER_PARAMS, c).toObject(stack));
-			pastEndOfEntry = true;
-		break;
-
-		case NUMERIC_CASES:
-			if (pastEndOfEntry)
-				throw UNEXPECTED_TOKEN_EXPECTED(",' or ']");
-			ret->push_back(ParseNumber(PARSER_PARAMS));
-			pastEndOfEntry = true;
-		break;
-
-		case 'u':
-			if (code.substr(i, 9) == "undefined")
-				ret->push_back(Object());
-			else
-				throw UNEXPECTED_TOKEN;
-			i += 8;
-		break;
-		case 't':
-			if (code.substr(i, 4) == "true")
-				ret->push_back(BooleanObject(true));
-			else
-				throw UNEXPECTED_TOKEN;
-			i += 3;
-		break;
-		case 'f':
-			if (code.substr(i, 5) == "false")
-				ret->push_back(BooleanObject(false));
-			else
-				throw UNEXPECTED_TOKEN;
-			i += 4;
-		break;
-		case '[':
-			ret->push_back(ParseList(PARSER_PARAMS));
-		break;
-
-		case '$':
-			ret->push_back(EvalVariableName(PARSER_PARAMS).toObject(stack));
-		break;
-
-		case ',':
-			pastEndOfEntry = false;
-		break;
-
+		ret->push_back(ParseAndEvalExpression(PARSER_PARAMS));
+		switch (code[i]) {
 		case ']':
 			atEndOfList = true;
 			i--;
-		break;
+			break;
 
+		case ',':
 		default:
-			throw UNEXPECTED_TOKEN;
+			break;
 		}
 		i++;
 	}
@@ -566,8 +519,6 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				expression.push_back(AstNode(AstNode::Literal, ParseAndEvalExpression(PARSER_PARAMS)));
 		break;
 		case '[':
-			if (i == start)
-				break;
 			// Assume list
 			expression.push_back(AstNode(AstNode::Literal, ParseList(PARSER_PARAMS)));
 		break;
