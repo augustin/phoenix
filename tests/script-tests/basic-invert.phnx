@@ -1,0 +1,5 @@
+#EXPECT: <Boolean:true>
+
+$a = false;
+
+return !$a;

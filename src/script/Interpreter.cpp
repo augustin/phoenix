@@ -644,10 +644,6 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				break;
 				}
 			}
-			if (expression.size() == 0 ||
-				expression[expression.size() - 1].type == AstNode::Operator) {
-				throw Exception(Exception::SyntaxError, string("incorrectly placed operator"));
-			}
 			if (oper == "++" || oper == "--") {
 				expression.push_back(AstNode(AstNode::Operator, string(&oper[0], 1).append("=")));
 				expression.push_back(AstNode(AstNode::Literal, IntegerObject(1)));
@@ -722,7 +718,20 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* token */ 	       +,
 							   /* "TOKEN="? */     true)
 	}
-	// Pass 3: ==, !=, <, >
+	// Pass 3: !, !! (no macro, they only affect right-hand side)
+	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+		GET_OPERATOR_OR_CONTINUE;
+		if (oper == "!") {
+			Object result = BooleanObject(!(expression[j + 1].toObject(stack).coerceToBoolean()));
+			expression[j] = AstNode(AstNode::Literal, result);
+			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
+		} else if (oper == "!!") {
+			Object result = BooleanObject(expression[j + 1].toObject(stack).coerceToBoolean());
+			expression[j] = AstNode(AstNode::Literal, result);
+			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
+		}
+	}
+	// Pass 4: ==, !=, <, >
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "==")
@@ -742,7 +751,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* token */ 	       >,
 							   /* "TOKEN="? */     false)
 	}
-	// Pass 4: =
+	// Pass 5: =
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "=") {
@@ -757,7 +766,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			expression.erase(expression.begin() + j + 1, expression.begin() + j + 3);
 		}
 	}
-	// Pass 5: &&, ||
+	// Pass 6: &&, ||
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "&&")
@@ -769,7 +778,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* token */ 	       ||,
 							   /* "TOKEN="? */     false)
 	}
-	// Pass 6: throw if there are remaining operators
+	// Pass 7: throw if there are remaining operators
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		throw UNKNOWN_OPERATOR;

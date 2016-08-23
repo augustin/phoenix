@@ -1,0 +1,6 @@
+#EXPECT: <Boolean:true>
+
+$a = undefined;
+$b = "blah";
+
+return !$a && !!$b;
