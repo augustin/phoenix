@@ -82,6 +82,8 @@ public:
 		{ Object o = op_eq(left, right); o.boolean = !o.boolean; return o; }
 	static Object op_and(const Object& left, const Object& right);
 	static Object op_or(const Object& left, const Object& right);
+	static Object op_lt(const Object& left, const Object& right);
+	static Object op_gt(const Object& left, const Object& right);
 
 public: // Data storage
 	bool boolean;

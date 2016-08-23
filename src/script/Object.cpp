@@ -254,5 +254,19 @@ Object Object::op_or(const Object& left, const Object& right)
 {
 	return BooleanObject(left.coerceToBoolean() || right.coerceToBoolean());
 }
+Object Object::op_lt(const Object& left, const Object& right)
+{
+	if (left.type() == Type::Integer && right.type() == Type::Integer)
+		return BooleanObject(left.integer < right.integer);
+	throw Exception(Exception::TypeError, "unexpected operand types for less-than operation (left type '"
+		+ left.typeName() + "', right type '" + right.typeName() + "')");
+}
+Object Object::op_gt(const Object& left, const Object& right)
+{
+	if (left.type() == Type::Integer && right.type() == Type::Integer)
+		return BooleanObject(left.integer > right.integer);
+	throw Exception(Exception::TypeError, "unexpected operand types for greater-than operation (left type '"
+		+ left.typeName() + "', right type '" + right.typeName() + "')");
+}
 
 }

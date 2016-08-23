@@ -1,0 +1,7 @@
+#EXPECT: <Boolean:true>
+
+$a = 5;
+$b = 10;
+
+return $a < $b && $b > $a && ($b == 10) && ($a == 5);
+

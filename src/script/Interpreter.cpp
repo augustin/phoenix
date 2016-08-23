@@ -87,7 +87,7 @@ Object AstNode::toObject(Stack* stack)
 	ALPHABET_CASES: case NUMERIC_CASES
 #define OPERS_CASES \
 	'=': case '!': case '&': case '|': case '+': case '-': case '*': case '/': \
-	case '%'
+	case '%': case '<': case '>'
 #define WHITESPACE_CASES \
 	' ': case '#': case '\t': case '\n': case '\r'
 
@@ -722,7 +722,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* token */ 	       +,
 							   /* "TOKEN="? */     true)
 	}
-	// Pass 3: ==, !=
+	// Pass 3: ==, !=, <, >
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "==")
@@ -732,6 +732,14 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		else if (oper == "!=")
 			IMPLEMENT_OPERATOR(/* operator name */ neq,
 							   /* token */ 	       !=,
+							   /* "TOKEN="? */     false)
+		else if (oper == "<")
+			IMPLEMENT_OPERATOR(/* operator name */ lt,
+							   /* token */ 	       <,
+							   /* "TOKEN="? */     false)
+		else if (oper == ">")
+			IMPLEMENT_OPERATOR(/* operator name */ gt,
+							   /* token */ 	       >,
 							   /* "TOKEN="? */     false)
 	}
 	// Pass 4: =
