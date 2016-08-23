@@ -1,0 +1,10 @@
+#EXPECT: <Boolean:true>
+
+$a = 1;
+$b = 2;
+$c = 3;
+$d = 4;
+$e = 2;
+$f = 3;
+
+return $a <= $b && $b >= $a && $c >= $a && $b >= $e;

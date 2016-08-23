@@ -682,7 +682,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
 		}
 	}
-	// Pass 4: ==, !=, <, >
+	// Pass 4: ==, !=, <, >, <=, >=
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "==")
@@ -700,6 +700,14 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		else if (oper == ">")
 			IMPLEMENT_OPERATOR(/* operator name */ gt,
 							   /* token */ 	       >,
+							   /* "TOKEN="? */     false)
+		else if (oper == "<=")
+			IMPLEMENT_OPERATOR(/* operator name */ lteq,
+							   /* token */ 	       <=,
+							   /* "TOKEN="? */     false)
+		else if (oper == ">=")
+			IMPLEMENT_OPERATOR(/* operator name */ gteq,
+							   /* token */ 	       >=,
 							   /* "TOKEN="? */     false)
 	}
 	// Pass 5: =

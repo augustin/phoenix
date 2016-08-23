@@ -268,5 +268,19 @@ Object Object::op_gt(const Object& left, const Object& right)
 	throw Exception(Exception::TypeError, "unexpected operand types for greater-than operation (left type '"
 		+ left.typeName() + "', right type '" + right.typeName() + "')");
 }
+Object Object::op_lteq(const Object& left, const Object& right)
+{
+	if (left.type() == Type::Integer && right.type() == Type::Integer)
+		return BooleanObject(left.integer <= right.integer);
+	throw Exception(Exception::TypeError, "unexpected operand types for less-than-or-equals operation"
+		"(left type '" + left.typeName() + "', right type '" + right.typeName() + "')");
+}
+Object Object::op_gteq(const Object& left, const Object& right)
+{
+	if (left.type() == Type::Integer && right.type() == Type::Integer)
+		return BooleanObject(left.integer >= right.integer);
+	throw Exception(Exception::TypeError, "unexpected operand types for greater-than-or-equals operation"
+		"(left type '" + left.typeName() + "', right type '" + right.typeName() + "')");
+}
 
 }

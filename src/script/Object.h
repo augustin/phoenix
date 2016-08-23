@@ -84,6 +84,8 @@ public:
 	static Object op_or(const Object& left, const Object& right);
 	static Object op_lt(const Object& left, const Object& right);
 	static Object op_gt(const Object& left, const Object& right);
+	static Object op_lteq(const Object& left, const Object& right);
+	static Object op_gteq(const Object& left, const Object& right);
 
 public: // Data storage
 	bool boolean;
