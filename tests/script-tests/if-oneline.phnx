@@ -1,0 +1,17 @@
+#EXPECT: <String:"blahonline22more_stuffs">
+
+$thing = '';
+if (false)
+	return false;
+if (true)
+	$thing += "blah";
+if($thing)$thing+="online";if (22) {
+	$thing += "22";
+}
+if (26 != 24)
+	if ($thing)
+		$thing += "more_stuffs";
+if (25 != 25)
+	if ($thing)
+		$thing += "evenmoar";
+return $thing;

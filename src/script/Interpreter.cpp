@@ -414,11 +414,13 @@ ReturnValue::~ReturnValue() noexcept {}
 
 string::size_type LocateEndOfScope(Stack*, const string& code, uint32_t&, const string::size_type& i)
 {
+	std::string scope;
+	if (code[i] == '{')
+		scope = "{";
+	else
+		scope = "_"; // Must be a one-liner
 	string::size_type ret = i;
-	if (code[i] != '{')
-		throw UNEXPECTED_TOKEN_EXPECTED("{");
 	ret++;
-	std::string scope = "{";
 	while (scope.size()) {
 		ret++;
 		char c = code[ret];
@@ -445,6 +447,11 @@ string::size_type LocateEndOfScope(Stack*, const string& code, uint32_t&, const 
 			scope.resize(scope.size() - 1);
 			break;
 
+		case ';':
+			if (scope == "_")
+				scope.resize(scope.size() - 1);
+			break;
+
 		default:
 			break;
 		}
@@ -468,13 +475,17 @@ void ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* s
 		IgnoreWhitespace(PARSER_PARAMS);
 		string::size_type j = LocateEndOfScope(PARSER_PARAMS);
 		if (exec) {
-			i++;
+			bool oneliner = code[i] != '{';
+			if (!oneliner)
+				i++;
 			stack->push();
 			while (i < j) {
 				ParseAndEvalExpression(PARSER_PARAMS);
 				i++;
 				IgnoreWhitespace(PARSER_PARAMS);
 			}
+			if (oneliner)
+				i--;
 			stack->pop();
 		} else {
 			// Skip the block;
