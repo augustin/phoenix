@@ -62,8 +62,8 @@ GlobalLanguageObject::GlobalLanguageObject(Stack* stack)
 		return Object();
 	})});
 	stack->GlobalFunctions.insert({"fatal", Function([](Stack*, Object*, ObjectMap& params) -> Object {
-		NativeFunction_COERCE_OR_THROW("0", zero, Type::String);
-		throw Exception(Exception::UserError, std::string(zero.string));
+		Script::Object zero = params.get("0");
+		throw Exception(Exception::UserError, zero.asStringRaw());
 	})});
 	stack->GlobalFunctions.insert({"Map", Function([](Stack*, Object*, ObjectMap& params) -> Object {
 		return MapObject(new ObjectMap(params));
