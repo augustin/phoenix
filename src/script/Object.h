@@ -111,7 +111,7 @@ inline void CoerceOrThrowPtr(const std::string& what, const Object* variable, Ty
 	if (variable == nullptr) {
 		throw Exception(Exception::TypeError,
 			std::string(what).append(" should be of type '").append(Object::typeName(type))
-				.append("' but is of type 'Undefined'"));
+				.append("' but is of type 'undefined'"));
 	}
 	if (variable->type() != type) {
 		throw Exception(Exception::TypeError,
@@ -165,7 +165,7 @@ class ObjectList : private std::vector<Object*>
 	typedef std::vector<Object*> _inherited;
 public:
 	ObjectList() {}
-	~ObjectList() {}
+	~ObjectList() { /* for (Object* obj : *this) delete obj; // FIXME */ }
 
 	typedef _inherited::const_iterator const_iterator;
 	typedef _inherited::size_type size_type;
