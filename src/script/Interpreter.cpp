@@ -269,8 +269,8 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 		CoerceOrThrow("referenced variable", o, Type::Function);
 		func = *o.function;
 	} else {
-		auto funcIter = GlobalFunctions.find(funcRef[0]);
-		if (funcIter == GlobalFunctions.end()) {
+		auto funcIter = stack->GlobalFunctions.find(funcRef[0]);
+		if (funcIter == stack->GlobalFunctions.end()) {
 			throw Exception(Exception::SyntaxError, string("attempted to call function '")
 				.append(funcRef[0]).append("' which does not exist"));
 		}
@@ -293,7 +293,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 				if (code[j] == ':')
 					return false;
 				if (code[j] == '(' || code[j] == ',' ||	code[j] == '[' ||
-					code[j] == '$' || code[j] == '{')
+					code[j] == '$' || code[j] == '{' || code[j] == ')')
 					return true;
 				j++;
 			}

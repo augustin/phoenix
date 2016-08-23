@@ -11,6 +11,7 @@
 
 // Predefinitions
 class Generator;
+namespace Script { class Stack; }
 
 namespace Target {
 struct ExtraData {
@@ -26,5 +27,5 @@ extern std::vector<ExtraData*> targets;
 
 void generate(ExtraData* target, Generator* gen);
 
-void addGlobalFunction();
+void addGlobalFunction(Script::Stack* stack);
 }

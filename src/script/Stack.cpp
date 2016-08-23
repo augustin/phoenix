@@ -14,8 +14,6 @@ using std::vector;
 
 namespace Script {
 
-std::map<std::string, Function> GlobalFunctions;
-
 Stack::Stack()
 {
 	push();

@@ -6,6 +6,7 @@
 #include "Tester.h"
 
 #include "script/Interpreter.h"
+#include "script/GlobalLanguageObject.h"
 
 #include "util/FSUtil.h"
 #include "util/StringUtil.h"
@@ -18,12 +19,6 @@ int main(int argc, char* argv[])
 	vector<string> files = FSUtil::searchForFiles(FSUtil::combinePaths({__FILE__,
 		"..", "script-tests"}), {""}, false);
 	Tester t(true);
-
-	// Global function instatiation (copied from GlobalLanguageObject.cpp)
-	Script::GlobalFunctions.insert({"Map", Script::Function([](Script::Stack*,
-			Script::Object*, Script::ObjectMap& params) -> Script::Object {
-		return Script::MapObject(new Script::ObjectMap(params));
-	})});
 
 	const string opener = "#EXPECT: ";
 	const size_t openerLen = opener.length();
@@ -38,6 +33,7 @@ int main(int argc, char* argv[])
 		string expect = test.substr(openerLen, test.find_first_of("\n") - openerLen);
 
 		Script::Stack stack;
+		stack.addSuperglobal("Phoenix", Script::GlobalLanguageObject(&stack));
 		Script::Object result;
 		bool threwException = false;
 		Script::Exception exceptionResult(Script::Exception::InternalError, "");

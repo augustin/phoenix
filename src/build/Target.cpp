@@ -143,9 +143,9 @@ void generate(ExtraData* target, Generator* gen)
 			target->definitionsFlags, target->standardsModeFlag}, " "));
 }
 
-void addGlobalFunction()
+void addGlobalFunction(Script::Stack* stack)
 {
-	Script::GlobalFunctions.insert({"CreateTarget", Function([](Stack*, Object*, ObjectMap& params)
+	stack->GlobalFunctions.insert({"CreateTarget", Function([](Stack*, Object*, ObjectMap& params)
 		-> Script::Object {
 		return CreateTarget(params);
 	})});

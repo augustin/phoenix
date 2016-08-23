@@ -19,7 +19,7 @@ using std::vector;
 
 namespace Script {
 
-GlobalLanguageObject::GlobalLanguageObject()
+GlobalLanguageObject::GlobalLanguageObject(Stack* stack)
 	:
 	Object(Type::Map)
 {
@@ -51,7 +51,7 @@ GlobalLanguageObject::GlobalLanguageObject()
 	}));
 
 	// Also instantiate the GlobalFunctions object
-	GlobalFunctions.insert({"print", Function([](Stack*, Object*, ObjectMap& params) -> Object {
+	stack->GlobalFunctions.insert({"print", Function([](Stack*, Object*, ObjectMap& params) -> Object {
 		Object zero = params.get("0");
 		std::string message;
 		if (zero.type() == Type::String)
@@ -61,11 +61,11 @@ GlobalLanguageObject::GlobalLanguageObject()
 		PrintUtil::message(message);
 		return Object();
 	})});
-	GlobalFunctions.insert({"fatal", Function([](Stack*, Object*, ObjectMap& params) -> Object {
+	stack->GlobalFunctions.insert({"fatal", Function([](Stack*, Object*, ObjectMap& params) -> Object {
 		NativeFunction_COERCE_OR_THROW("0", zero, Type::String);
 		throw Exception(Exception::UserError, std::string(zero.string));
 	})});
-	GlobalFunctions.insert({"Map", Function([](Stack*, Object*, ObjectMap& params) -> Object {
+	stack->GlobalFunctions.insert({"Map", Function([](Stack*, Object*, ObjectMap& params) -> Object {
 		return MapObject(new ObjectMap(params));
 	})});
 }

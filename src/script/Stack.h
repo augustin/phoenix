@@ -13,8 +13,6 @@
 
 namespace Script {
 
-extern std::map<std::string, Function> GlobalFunctions;
-
 class Stack
 {
 public:
@@ -22,6 +20,8 @@ public:
 
 	void push();
 	void pop();
+
+	std::map<std::string, Function> GlobalFunctions;
 
 	Object* get_ptr(const std::vector<std::string> variable);
 	inline Object get(const std::vector<std::string> variable) {

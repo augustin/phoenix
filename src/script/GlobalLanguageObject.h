@@ -8,10 +8,13 @@
 
 namespace Script {
 
+// Predefinitions
+class Stack;
+
 class GlobalLanguageObject : public Object
 {
 public:
-	GlobalLanguageObject();
+	GlobalLanguageObject(Stack* stack);
 };
 
 }

@@ -1,0 +1,2 @@
+#EXPECT: Ethis is the fatal message
+fatal("this is the fatal message");

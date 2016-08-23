@@ -94,8 +94,8 @@ int main(int argc, char* argv[])
 	FSUtil::mkdir("PhoenixTemp");
 
 	Script::Stack* stack = new Script::Stack();
-	stack->addSuperglobal("Phoenix", Script::GlobalLanguageObject());
-	Target::addGlobalFunction();
+	stack->addSuperglobal("Phoenix", Script::GlobalLanguageObject(stack));
+	Target::addGlobalFunction(stack);
 	LanguageInfo::sStack = stack;
 
 	try {
