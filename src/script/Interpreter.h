@@ -41,6 +41,8 @@ public:
 };
 
 AstNode EvalVariableName(Stack* stack, const std::string& code, uint32_t& line, std::string::size_type& i);
+Object EvalString(Stack* stack, const std::string& code, std::string fromPath, const uint32_t fromLine = 1,
+	bool popDirs = false);
 Object Run(Stack* stack, std::string path);
 
 }

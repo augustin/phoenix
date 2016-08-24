@@ -523,12 +523,13 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		case '(':
 			if (i == start)
 				break;
-			if (expression.size() > 0 && expression[expression.size() - 1].type == AstNode::Variable)
+			if (expression.size() > 0 && expression[expression.size() - 1].type == AstNode::Variable) {
 				expression[expression.size() - 1] =
 					AstNode(AstNode::Literal, ParseCallAndEval(PARSER_PARAMS,
 						expression[expression.size() - 1].variable, true));
-			else
+			} else {
 				expression.push_back(AstNode(AstNode::Literal, ParseAndEvalExpression(PARSER_PARAMS)));
+			}
 		break;
 		case '[':
 			// Assume list
@@ -585,8 +586,36 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				isReturn = true;
 			} else if (thing == "if" || thing == "while") {
 				ConditionalBranchHandler(expression, thing, PARSER_PARAMS);
-			} else { // assume function call
+			} else if (thing == "function") {
 				i++;
+				IgnoreWhitespace(PARSER_PARAMS);
+				if (code[i] != '(') {
+					throw Exception(Exception::SyntaxError,
+						"function must formally begin with '()'");
+				} else
+					i++;
+				IgnoreWhitespace(PARSER_PARAMS);
+				if (code[i] == ')')
+					i++;
+				else {
+					throw Exception(Exception::SyntaxError,
+						"function must formally begin with '()'");
+				}
+				IgnoreWhitespace(PARSER_PARAMS);
+
+				string::size_type funcEnd = LocateEndOfScope(PARSER_PARAMS);
+				i++;
+				string func = code.substr(i, funcEnd - i);
+				expression.push_back(AstNode(AstNode::Literal,
+					FunctionObject(new Function(func, stack->currentInputFile(), line))));
+				i = funcEnd;
+			} else { // This better be a function call
+				i++;
+				IgnoreWhitespace(PARSER_PARAMS);
+				if (code[i] != '(') {
+					throw Exception(Exception::SyntaxError,
+						string("unrecognized keyword '").append(thing).append("'"));
+				}
 				expression.push_back(AstNode(AstNode::Literal, ParseCallAndEval(PARSER_PARAMS, {thing})));
 			}
 		} break;
@@ -765,6 +794,35 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 #undef RETURN
 }
 
+Object EvalString(Stack* stack, const string& code, string fromPath, const uint32_t fromLine, bool popDirs)
+{
+	uint32_t line = fromLine;
+	string::size_type i = 0;
+	try {
+		IgnoreWhitespace(PARSER_PARAMS);
+		while (i < code.length()) {
+			ParseAndEvalExpression(PARSER_PARAMS);
+			i++;
+			IgnoreWhitespace(PARSER_PARAMS);
+		}
+	} catch (ReturnValue& e) {
+		if (popDirs)
+			stack->popDir();
+		return e.value;
+	} catch (Exception& e) {
+		if (popDirs)
+			stack->popDir();
+		if (e.fLine == 0) {
+			e.fFile = fromPath;
+			e.fLine = line;
+		}
+		throw e;
+	}
+	if (popDirs)
+		stack->popDir();
+	return Object(); // undefined
+}
+
 Object Run(Stack* stack, string path)
 {
 	string filename;
@@ -778,28 +836,7 @@ Object Run(Stack* stack, string path)
 	stack->pushDir(FSUtil::parentDirectory(filename));
 	stack->appendInputFile(filename);
 
-	uint32_t line = 1;
-	string::size_type i = 0;
-	try {
-		IgnoreWhitespace(PARSER_PARAMS);
-		while (i < code.length()) {
-			ParseAndEvalExpression(PARSER_PARAMS);
-			i++;
-			IgnoreWhitespace(PARSER_PARAMS);
-		}
-	} catch (ReturnValue& e) {
-		stack->popDir();
-		return e.value;
-	} catch (Exception& e) {
-		stack->popDir();
-		if (e.fLine == 0) {
-			e.fFile = filename;
-			e.fLine = line;
-		}
-		throw e;
-	}
-	stack->popDir();
-	return Object(); // undefined
+	return EvalString(stack, code, filename, 1, true);
 }
 
 }

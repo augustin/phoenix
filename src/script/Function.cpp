@@ -4,18 +4,25 @@
  */
 #include "script/Function.h"
 
+#include "script/Interpreter.h"
+
 using std::function;
 using std::string;
 
 namespace Script {
 
-Function::Function()
+Function::Function(string function, string functionFile, uint32_t functionLine)
 	:
-	fIsNative(false)
+	fIsNull(false),
+	fIsNative(false),
+	fFunction(function),
+	fFunctionFile(functionFile),
+	fFunctionLine(functionLine)
 {
 }
 Function::Function(NativeStdFunction nativeFunction)
 	:
+	fIsNull(false),
 	fNativeFunction(nativeFunction),
 	fIsNative(true)
 {
@@ -23,9 +30,19 @@ Function::Function(NativeStdFunction nativeFunction)
 
 Object Function::call(Stack* stack, Object* context, ObjectMap& args)
 {
+	if (fIsNull) {
+		throw Exception(Exception::AccessViolation, "cannot call null function");
+	}
 	if (fIsNative)
 		return fNativeFunction(stack, context, args);
-	throw Exception(Exception::AccessViolation, "Attempted to call null function");
+
+	stack->push();
+	if (context != nullptr)
+		stack->set_ptr({"this"}, context);
+	stack->set({"_args"}, MapObject(new ObjectMap(args)));
+	Object ret = EvalString(stack, fFunction, fFunctionFile, fFunctionLine, false);
+	stack->pop();
+	return ret;
 }
 
 }

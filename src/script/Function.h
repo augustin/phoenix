@@ -24,14 +24,22 @@ typedef std::function<Object(Stack*, Object*, ObjectMap&)> NativeStdFunction;
 class Function
 {
 public:
-	Function();
+	Function() : fIsNull(true) {}
+	Function(std::string function, std::string functionFile, uint32_t functionLine);
 	Function(NativeStdFunction nativeFunction);
 
 	Object call(Stack* stack, Object* context, ObjectMap& args);
 
+	bool isNative() const { return fIsNative; }
+
 private:
+	bool fIsNull;
 	NativeStdFunction fNativeFunction;
 	bool fIsNative;
+
+	std::string fFunction;
+	std::string fFunctionFile;
+	uint32_t fFunctionLine;
 };
 
 // Convenience constructors

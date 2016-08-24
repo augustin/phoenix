@@ -152,7 +152,9 @@ string Object::asStringRaw() const
 	case Type::String:
 		return string;
 	case Type::Function:
-		return std::string("<Function>");
+		return std::string("<")
+			.append((function && function->isNative()) ? "Native" : "")
+			.append("Function>");
 	case Type::List: {
 		std::string ret("[");
 		for (ObjectList::size_type i = 0; i < list->size(); i++)

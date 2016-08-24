@@ -29,7 +29,8 @@ public:
 	inline Object get(const std::string variable0) {
 		std::vector<std::string> variable = {variable0};
 		return get(variable); }
-	void set(std::vector<std::string> variable, Object value);
+	void set_ptr(std::vector<std::string> variable, Object* value);
+	inline void set(std::vector<std::string> variable, Object value) { set_ptr(variable, new Object(value)); }
 
 	void addSuperglobal(std::string variableName, Object value);
 
@@ -38,6 +39,7 @@ public:
 	inline std::string currentDir() { return fDirectoryStack[fDirectoryStack.size() - 1]; }
 
 	inline void appendInputFile(const std::string& path) { fInputFiles.push_back(path); }
+	inline std::string currentInputFile() { return fInputFiles[fInputFiles.size() - 1]; }
 	inline std::vector<std::string> inputFiles() { return fInputFiles; }
 
 	void print();

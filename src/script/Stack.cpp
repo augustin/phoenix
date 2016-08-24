@@ -75,7 +75,7 @@ Object* Stack::get_ptr(const vector<string> variable)
 	return ret;
 }
 
-void Stack::set(vector<string> variable, Object value)
+void Stack::set_ptr(vector<string> variable, Object* value)
 {
 	if (variable[0][0] == '$') {
 		// it's a superglobal
@@ -83,7 +83,7 @@ void Stack::set(vector<string> variable, Object value)
 	}
 	vector<ObjectMap>::size_type loc = getPos(variable[0]);
 	if (variable.size() == 1) {
-		fStack[loc].set(variable[0], value);
+		fStack[loc].set_ptr(variable[0], value);
 		return;
 	}
 
@@ -93,7 +93,7 @@ void Stack::set(vector<string> variable, Object value)
 		res = res->map->get_ptr(variable[i]);
 		CoerceOrThrowPtr("referenced variable", res, Type::Map);
 	}
-	res->map->set(variable[variable.size() - 1], value);
+	res->map->set_ptr(variable[variable.size() - 1], value);
 }
 
 void Stack::addSuperglobal(string variableName, Object value)

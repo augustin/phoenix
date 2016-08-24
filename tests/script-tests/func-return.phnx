@@ -1,0 +1,3 @@
+#EXPECT: <String:"stuff but longer">
+
+$funky =function(){return ($_args.arg1 + " but longer")};return $funky(arg1: "stuff");

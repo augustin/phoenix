@@ -1,2 +1,2 @@
-#EXPECT: Eattempted to call function 'falge' which does not exist
+#EXPECT: Eunrecognized keyword 'falge'
 return [1, 4, 2, falge, undefined, NINEF];

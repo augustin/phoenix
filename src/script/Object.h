@@ -158,7 +158,8 @@ public:
 
 	Object get(std::string key) const;
 	Object* get_ptr(std::string key);
-	void set(std::string key, Object value);
+	void set_ptr(std::string key, Object* value);
+	inline void set(std::string key, Object value) { set_ptr(key, new Object(value)); }
 
 	size_type size() const { return _inherited::size(); }
 };

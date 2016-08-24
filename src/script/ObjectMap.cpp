@@ -37,13 +37,13 @@ Object* ObjectMap::get_ptr(string key)
 	return nullptr;
 }
 
-void ObjectMap::set(string key, Object value)
+void ObjectMap::set_ptr(string key, Object* value)
 {
 	_inherited::iterator it = find(key);
 	if (it != end())
-		it->second = new Object(value);
+		it->second = value;
 	else
-		insert({key, new Object(value)});
+		insert({key, value});
 }
 
 }
