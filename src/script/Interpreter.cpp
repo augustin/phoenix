@@ -31,7 +31,7 @@ Object AstNode::toObject(Stack* stack)
 			char c = string[i];
 			switch (c) {
 			case '$':
-				if (string[i + 1] != '{') {
+				if (string[i + 1] != '{' && string[i + 2] != '{') {
 					str += c;
 					continue;
 				}
