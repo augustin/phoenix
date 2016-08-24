@@ -35,8 +35,9 @@ Object AstNode::toObject(Stack* stack)
 					str += c;
 					continue;
 				}
-				// There's probably a way to implement eval() using this,
-				// but this is a build system, so screw it
+				// Yes, this is how Phoenix actually has eval().
+				// Please do not try this at home.
+				// See the "string-deref-abuse" test if your curiosity is insatiable.
 				try {
 					str += EvalVariableName(stack, string, line, i).toObject(stack).asStringRaw();
 				} catch (Exception& e) {

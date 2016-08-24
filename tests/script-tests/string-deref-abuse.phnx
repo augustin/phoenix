@@ -1,0 +1,6 @@
+#EXPECT: <String:"We actually got here">
+
+return "${[
+	if (4 > 3)
+		return 'We actually got here';
+]}";
