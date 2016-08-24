@@ -78,10 +78,14 @@ Object CreateTarget(const ObjectMap& params)
 		LanguageInfo* info = LanguageInfo::getLanguageInfo(extraData->languages[0]);
 
 		for (ObjectMap::const_iterator it = m.begin(); it != m.end(); it++) {
-			std::string val = it->second->asStringRaw();
+			std::string name = it->first, val;
+			if (name == "0")
+				name = it->second->asStringRaw();
+			else if (it->second->type() != Type::Boolean && it->second->boolean != true)
+				val = it->second->asStringRaw();
 			StringUtil::replaceAll(val, "\"", "\\\"");
 			extraData->definitionsFlags.append(" \"" + info->compilerDefinition +
-				it->first + "=" + val + "\"");
+				name + (val.empty() ? "\"" : "=" + val + "\""));
 		}
 		return Object();
 	}));
