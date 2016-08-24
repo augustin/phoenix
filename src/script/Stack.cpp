@@ -50,6 +50,8 @@ Object* Stack::get_ptr(const vector<string> variable)
 	} else
 		ret = fStack[getPos(variable[0])].get_ptr(variable[0]);
 	for (vector<string>::size_type i = 1; i < variable.size(); i++) {
+		if (ret == nullptr)
+			return new Object(Type::Undefined);
 		if (ret->type() == Type::Map)
 			ret = ret->map->get_ptr(variable[i]);
 		else if (ret->type() == Type::List) {
