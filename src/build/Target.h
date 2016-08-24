@@ -13,8 +13,12 @@
 class Generator;
 namespace Script { class Stack; }
 
-namespace Target {
-struct ExtraData {
+class Target
+{
+public:
+	static std::vector<Target*> targets;
+	static void addGlobalFunction(Script::Stack* stack);
+
 	std::string name;
 	std::vector<std::string> languages;
 	std::string standardsModeFlag;
@@ -22,10 +26,10 @@ struct ExtraData {
 	std::string includesFlags;
 	std::string otherFlags;
 	std::vector<std::string> sourceFiles;
+
+	void generate(Generator* gen);
+
+private:
+	Target(const Script::ObjectMap& params);
+	Script::ObjectMap* fMapObject;
 };
-extern std::vector<ExtraData*> targets;
-
-void generate(ExtraData* target, Generator* gen);
-
-void addGlobalFunction(Script::Stack* stack);
-}

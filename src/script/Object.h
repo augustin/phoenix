@@ -94,7 +94,6 @@ public: // Data storage
 	Function* function;
 	ObjectList* list;
 	ObjectMap* map;
-	void* extradata;
 
 private:
 	Type fObjectType;

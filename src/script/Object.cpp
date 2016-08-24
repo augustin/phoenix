@@ -48,7 +48,6 @@ Object::Object(const Type type)
 	function(nullptr),
 	list(nullptr),
 	map(nullptr),
-	extradata(nullptr),
 
 	fObjectType(type)
 {
@@ -58,7 +57,6 @@ Object::Object(const Object& other)
 	function(nullptr),
 	list(nullptr),
 	map(nullptr),
-	extradata(nullptr),
 	fObjectType(other.fObjectType)
 {
 	boolean = other.boolean;
@@ -67,7 +65,6 @@ Object::Object(const Object& other)
 	if (other.function) function = new Function(*other.function);
 	else if (other.list) list = new ObjectList(*other.list);
 	else if (other.map) map = new ObjectMap(*other.map);
-	extradata = other.extradata; // Yep, this never gets deleted.
 }
 Object& Object::operator=(const Object& other)
 {
@@ -82,7 +79,6 @@ Object& Object::operator=(const Object& other)
 	if (other.function) function = new Function(*other.function);
 	else if (other.list) list = new ObjectList(*other.list);
 	else if (other.map) map = new ObjectMap(*other.map);
-	extradata = other.extradata; // Yep, this never gets deleted.
 
 	return *this;
 }

@@ -118,8 +118,8 @@ int main(int argc, char* argv[])
 
 		std::cout << "generating build files for " << generator << "... ";
 		gen->setBuildScriptFiles(StringUtil::join(arguments, " "), stack->inputFiles());
-		for (Target::ExtraData* data : Target::targets)
-			Target::generate(data, gen);
+		for (Target* target : Target::targets)
+			target->generate(gen);
 		gen->write();
 		std::cout << "done" << std::endl;
 	} catch (Script::Exception e) {
