@@ -81,6 +81,10 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 					compilerLinkBinaryFlag = comp["linkBinary"].asStringRaw();
 					compilerDefinition = comp["definition"].asStringRaw();
 					compilerInclude = comp["include"].asStringRaw();
+
+					// Update superglobals
+					sStack->addSuperglobal(compilerName, Script::BooleanObject(true));
+					sStack->get_ptr({"$Compilers"})->map->set(name, Script::StringObject(compilerName));
 					return true;
 				}
 			}
@@ -171,9 +175,8 @@ void LanguageInfo::generate(Generator* gen)
 	if (fGenerated)
 		return;
 
-	// FIXME: shouldn't be done here
 	gen->setProgramLinkRule(compilerBinary + " %INPUTFILE% " + compilerLinkBinaryFlag +
-		"%OUTPUTFILE% %TARGETFLAGS%");
+		"%OUTPUTFILE% %TARGETFLAGS%", "Link" + name);
 
 	string genName = name;
 	StringUtil::replaceAll(genName, "+", "P");

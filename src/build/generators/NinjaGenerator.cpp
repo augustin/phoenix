@@ -68,7 +68,7 @@ void NinjaGenerator::addRegularRule(const string& ruleName, const string& descNa
 		fRulesForExts.insert({ext, itm});
 }
 
-void NinjaGenerator::setProgramLinkRule(const string& rule)
+void NinjaGenerator::setProgramLinkRule(const string& rule, const string& ruleDescription)
 {
 	string realRule = rule;
 	StringUtil::replaceAll(realRule, "%INPUTFILE%", "$in");
@@ -76,7 +76,7 @@ void NinjaGenerator::setProgramLinkRule(const string& rule)
 	StringUtil::replaceAll(realRule, "%TARGETFLAGS%", "$targetflags");
 	fRulesLines.push_back("rule link\n"
 		"  command = " + realRule + "\n"
-		"  description = LINK $out");
+		"  description = " + ruleDescription + " $out");
 }
 
 void NinjaGenerator::addTarget(const string& outputBinaryName,

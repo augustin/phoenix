@@ -97,6 +97,7 @@ int main(int argc, char* argv[])
 	stack->addSuperglobal("Phoenix", Script::GlobalLanguageObject(stack));
 	Target::addGlobalFunction(stack);
 	LanguageInfo::sStack = stack;
+	stack->addSuperglobal("Compilers", Script::MapObject(new Script::ObjectMap()));
 
 	try {
 		Script::Run(stack, sourceDirectory);
