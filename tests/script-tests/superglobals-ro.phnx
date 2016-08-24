@@ -1,0 +1,3 @@
+#EXPECT: Esuperglobals are read-only
+
+$$Blah = false;

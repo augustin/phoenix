@@ -1,0 +1,2 @@
+#EXPECT: Eminimum version of Phoenix required is 99.99.99 and this is Phoenix 0.0.1
+$$Phoenix.checkVersion(minimum: "99.99.99");

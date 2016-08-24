@@ -1,0 +1,3 @@
+#EXPECT: Esuperglobals cannot be copied
+
+$copy = $$Phoenix;

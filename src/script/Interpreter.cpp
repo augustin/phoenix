@@ -729,6 +729,10 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			if (expression[j].type != AstNode::Variable)
 				throw Exception(Exception::TypeError,
 					string("the left-hand side of '=' must be a variable"));
+			if (expression[j + 2].type == AstNode::Variable &&
+				expression[j + 2].variable[0][0] == '$')
+				throw Exception(Exception::TypeError,
+					string("superglobals cannot be copied"));
 			Object result = expression[j + 2].toObject(stack);
 			stack->set(expression[j].variable, result);
 			/* Now update the expression vector */
