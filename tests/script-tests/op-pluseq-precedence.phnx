@@ -1,0 +1,6 @@
+#EXPECT: <String:"thingified">
+
+$bla = "thing";
+$a = "ifi";
+$bla += $a + "ed";
+return $bla;

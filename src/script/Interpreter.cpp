@@ -671,17 +671,16 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 #define UNKNOWN_OPERATOR \
 	Exception(Exception::SyntaxError, \
 		string("unknown operator '").append(oper).append("'"));
-#define IMPLEMENT_OPERATOR(OP_NAME, TOKEN, TOKEQ_ALLOWED) { \
+#define IMPLEMENT_OPERATOR(OP_NAME, TOKEN, DOING_TOKEQ) { \
 	j--; \
 	Object result = Object::op_##OP_NAME(expression[j].toObject(stack), \
 		expression[j + 2].toObject(stack)); \
-	if (TOKEQ_ALLOWED && oper == (#TOKEN "=")) { \
+	if (DOING_TOKEQ && oper == (#TOKEN "=")) { \
 		if (expression[j].type != AstNode::Variable) \
 			throw Exception(Exception::TypeError, string("the left-hand side of '" #TOKEN \
 				"=' must be a variable")); \
 		stack->set(expression[j].variable, result); \
-	} else if (oper == (#TOKEN "=") && oper.length() > 1) \
-		throw UNKNOWN_OPERATOR; \
+	} \
 	/* Now update the expression vector */  \
 	expression[j] = AstNode(AstNode::Literal, result); \
 	expression.erase(expression.begin() + j + 1, expression.begin() + j + 3); }
@@ -689,26 +688,26 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	// Pass 1: /, *
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
-		if (oper[0] == '/')
+		if (oper == "/")
 			IMPLEMENT_OPERATOR(/* operator name */ div,
 							   /* token */ 	       /,
-							   /* "TOKEN="? */     true)
-		else if (oper[0] == '*')
+							   /* "TOKEN="? */     false)
+		else if (oper == "*")
 			IMPLEMENT_OPERATOR(/* operator name */ mult,
 							   /* token */ 	       *,
-							   /* "TOKEN="? */     true)
+							   /* "TOKEN="? */     false)
 	}
 	// Pass 2: +, -
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
-		if (oper[0] == '-')
+		if (oper == "-")
 			IMPLEMENT_OPERATOR(/* operator name */ subt,
 							   /* token */ 	       -,
-							   /* "TOKEN="? */     true)
-		else if (oper[0] == '+')
+							   /* "TOKEN="? */     false)
+		else if (oper == "+")
 			IMPLEMENT_OPERATOR(/* operator name */ add,
 							   /* token */ 	       +,
-							   /* "TOKEN="? */     true)
+							   /* "TOKEN="? */     false)
 	}
 	// Pass 3: !, !! (no macro, they only affect right-hand side)
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
@@ -751,7 +750,31 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* token */ 	       >=,
 							   /* "TOKEN="? */     false)
 	}
-	// Pass 5: =
+	// Pass 5: /=, *=
+	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+		GET_OPERATOR_OR_CONTINUE;
+		if (oper == "/=")
+			IMPLEMENT_OPERATOR(/* operator name */ div,
+							   /* token */ 	       /,
+							   /* "TOKEN="? */     true)
+		else if (oper == "*=")
+			IMPLEMENT_OPERATOR(/* operator name */ mult,
+							   /* token */ 	       *,
+							   /* "TOKEN="? */     true)
+	}
+	// Pass 6: +=, -=
+	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+		GET_OPERATOR_OR_CONTINUE;
+		if (oper == "-=")
+			IMPLEMENT_OPERATOR(/* operator name */ subt,
+							   /* token */ 	       -,
+							   /* "TOKEN="? */     true)
+		else if (oper == "+=")
+			IMPLEMENT_OPERATOR(/* operator name */ add,
+							   /* token */ 	       +,
+							   /* "TOKEN="? */     true)
+	}
+	// Pass 7: =
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "=") {
@@ -770,7 +793,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			expression.erase(expression.begin() + j + 1, expression.begin() + j + 3);
 		}
 	}
-	// Pass 6: &&, ||
+	// Pass 8: &&, ||
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "&&")
@@ -782,7 +805,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* token */ 	       ||,
 							   /* "TOKEN="? */     false)
 	}
-	// Pass 7: throw if there are remaining operators
+	// Pass 9: throw if there are remaining operators
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		throw UNKNOWN_OPERATOR;
