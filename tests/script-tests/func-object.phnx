@@ -1,0 +1,13 @@
+#EXPECT: <String:"this is another string47">
+
+$obj = Map(
+	blah: "this is a string",
+	whatever: "this is another string",
+	number: 42, # life, the universe, and everything
+	func: function () {
+		return $this.whatever+$this.number;
+	}
+);
+$copy = $obj;
+$copy.number = 47; # not the answer
+return $copy.func();
