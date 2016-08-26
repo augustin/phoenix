@@ -81,6 +81,10 @@ Pretty-prints the first (unnamed) argument to standard-output.
 Immediately aborts, printing the message from the first (unnamed) argument as the
 exit reason.
 
+### `parseInt(0: string)`
+Parses the first argument as an integer and returns the result. If it cannot
+be parsed as such, it returns `undefined`.
+
 ### `CreateTarget(0: string, language: string)`
 Creates a new build target with the name `0`, written in the programming language
 `language`. The returned Target object will have the following members:

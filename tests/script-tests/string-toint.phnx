@@ -1,0 +1,5 @@
+#EXPECT: <Integer:567>
+
+$a = "5";
+$a += "67";
+return parseInt($a);
