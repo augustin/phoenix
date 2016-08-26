@@ -72,8 +72,10 @@ Functions
 ---------------------------------------
 
 ### `print(0: any)`
-Prints the first (unnamed) argument to standard-output. If it is a string, it
-is printed as-is; if not, it will be pretty-printed.
+Prints the first (unnamed) argument to standard-output, in "raw" form.
+
+### `dump(0: any)`
+Pretty-prints the first (unnamed) argument to standard-output.
 
 ### `fatal(0: any)`
 Immediately aborts, printing the message from the first (unnamed) argument as the

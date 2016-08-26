@@ -60,12 +60,12 @@ GlobalLanguageObject::GlobalLanguageObject(Stack* stack)
 	// Also instantiate the GlobalFunctions object
 	stack->GlobalFunctions.insert({"print", Function([](Stack*, Object*, ObjectMap& params) -> Object {
 		Object zero = params.get("0");
-		std::string message;
-		if (zero.type() == Type::String)
-			message += zero.string;
-		else
-			message += zero.asStringPretty();
-		PrintUtil::message(message);
+		PrintUtil::message(zero.asStringRaw());
+		return Object();
+	})});
+	stack->GlobalFunctions.insert({"dump", Function([](Stack*, Object*, ObjectMap& params) -> Object {
+		Object zero = params.get("0");
+		PrintUtil::message(zero.asStringPretty());
 		return Object();
 	})});
 	stack->GlobalFunctions.insert({"fatal", Function([](Stack*, Object*, ObjectMap& params) -> Object {
