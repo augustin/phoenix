@@ -9,6 +9,9 @@
 class OSUtil
 {
 public:
+	static std::string name(bool userfriendly = true);
+	static bool isFamilyUnix();
+
 	struct ExecResult {
 		std::string output;
 		int exitcode;

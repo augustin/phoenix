@@ -14,6 +14,7 @@
 
 #include "util/PrintUtil.h"
 #include "util/StringUtil.h"
+#include "util/OSUtil.h"
 
 using std::vector;
 
@@ -49,6 +50,12 @@ GlobalLanguageObject::GlobalLanguageObject(Stack* stack)
 				 .append(" and this is Phoenix " PHOENIX_VERSION));
 		return Object();
 	}));
+
+	// Also create $$OS superglobals
+	stack->addSuperglobal("OS", StringObject(OSUtil::name()));
+	stack->addSuperglobal(OSUtil::name(false), BooleanObject(true));
+	if (OSUtil::isFamilyUnix())
+		stack->addSuperglobal("UNIX", BooleanObject(true));
 
 	// Also instantiate the GlobalFunctions object
 	stack->GlobalFunctions.insert({"print", Function([](Stack*, Object*, ObjectMap& params) -> Object {

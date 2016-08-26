@@ -59,6 +59,15 @@ Additionally, for all the values specified inside `$$Compilers`, they are also a
 namespace as a true boolean (e.g., so if `$$Compilers['C']` is `"Clang"`, then `$$Clang` will be `true`,
 a useful shorthand).
 
+### `$$OS: string`
+Contains the user-friendly name of the operating system that the software is
+being built for. Possible values are: `"Windows"`, `"Linux"`, `"FreeBSD"`,
+`"Haiku"`, or `"Apple"`.
+
+Additionally, the OS' "raw" name will be added to the superglobals as a true
+boolean, one of `$$WIN32`, `$$LINUX`, `$$FREEBSD`, `$$HAIKU`, or `$$APPLE`.
+And on UNIX (POSIX) systems, `$$UNIX` will also be set to `true`.
+
 Functions
 ---------------------------------------
 

@@ -14,6 +14,35 @@ using std::string;
 #  define pclose _pclose
 #endif
 
+string OSUtil::name(bool userfriendly)
+{
+#if defined(_WIN32)
+	return userfriendly ? "Windows" : "WIN32";
+#elif defined(__linux__)
+	return userfriendly ? "Linux" : "LINUX";
+#elif defined(__FreeBSD__)
+	return userfriendly ? "FreeBSD" : "FREEBSD";
+#elif defined(__HAIKU__)
+	return userfriendly ? "Haiku" : "HAIKU";
+#elif defined(__APPLE__)
+	return userfriendly ? "Apple" : "APPLE";
+#else
+#  error "Unknown OS (::name)."
+#endif
+}
+
+bool OSUtil::isFamilyUnix()
+{
+#if defined(_WIN32)
+	return false;
+#elif (defined(__linux__) || defined(__FreeBSD__) || defined(__HAIKU__) \
+  || defined(__APPLE__))
+	return true;
+#else
+#  error "Unknown OS (::isUnixFamily)."
+#endif
+}
+
 OSUtil::ExecResult OSUtil::exec(const string& program, const string& args)
 {
 	string cmd = "\"" + program + "\"" + " " + args + " 2>&1";
