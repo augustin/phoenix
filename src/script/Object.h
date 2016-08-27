@@ -154,6 +154,9 @@ class ObjectMap : private std::map<std::string, Object>
 public:
 	ObjectMap();
 	~ObjectMap();
+	// Copy constructors
+	ObjectMap(const ObjectMap& other);
+	ObjectMap& operator=(const ObjectMap& other);
 
 	typedef _inherited::const_iterator const_iterator;
 	const_iterator begin() const { return _inherited::begin(); }
@@ -173,6 +176,9 @@ class ObjectList : private std::vector<Object>
 public:
 	ObjectList() {}
 	~ObjectList() {}
+	// Copy constructors
+	ObjectList(const ObjectList& other);
+	ObjectList& operator=(const ObjectList& other);
 
 	typedef _inherited::const_iterator const_iterator;
 	typedef _inherited::size_type size_type;

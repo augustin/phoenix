@@ -281,4 +281,19 @@ Object CObject::op_gteq(const Object left, const Object right)
 		"(left type '" + left->typeName() + "', right type '" + right->typeName() + "')");
 }
 
+ObjectList::ObjectList(const ObjectList& other)
+	:
+	_inherited()
+{
+	for (const_iterator it = other.begin(); it != other.end(); it++)
+		push_back(CopyObject(*it));
+}
+ObjectList& ObjectList::operator=(const ObjectList& other)
+{
+	clear();
+	for (const_iterator it = other.begin(); it != other.end(); it++)
+		push_back(CopyObject(*it));
+	return *this;
+}
+
 }

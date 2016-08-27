@@ -18,6 +18,21 @@ ObjectMap::~ObjectMap()
 {
 }
 
+ObjectMap::ObjectMap(const ObjectMap& other)
+	:
+	_inherited()
+{
+	for (const_iterator it = other.begin(); it != other.end(); it++)
+		insert({it->first, CopyObject(it->second)});
+}
+ObjectMap& ObjectMap::operator=(const ObjectMap& other)
+{
+	clear();
+	for (const_iterator it = other.begin(); it != other.end(); it++)
+		insert({it->first, CopyObject(it->second)});
+	return *this;
+}
+
 Object ObjectMap::get(string key) const
 {
 	_inherited::const_iterator it = find(key);

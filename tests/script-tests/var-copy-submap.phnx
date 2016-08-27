@@ -1,0 +1,10 @@
+#EXPECT: <List:[<Map:{bla: <Integer:4>, els: <Integer:3>, sub: <Map:{otherthing: <Integer:8>, thing: <Integer:7>}>}>, <Map:{bla: <Integer:4>, els: <Integer:3>, sub: <Map:{otherthing: <Integer:8>, thing: <Integer:999>}>}>]>
+
+$a = Map(
+	els: 3,
+	bla: 4,
+	sub: Map(thing: 7, otherthing: 8)
+);
+$b = $a;
+$b.sub.thing = 999;
+return [$a, $b];
