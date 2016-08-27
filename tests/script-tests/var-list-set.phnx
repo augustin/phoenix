@@ -1,0 +1,5 @@
+#EXPECT: <List:[<String:"hat">, <String:"rat">, <String:"nat">]>
+
+$list = ["hat","rat","cat"];
+$list[2] = "nat";
+return $list;

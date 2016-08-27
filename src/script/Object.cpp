@@ -125,7 +125,7 @@ string CObject::asStringPretty() const
 	case Type::List: {
 		std::string ret("<List:[");
 		for (ObjectList::size_type i = 0; i < list->size(); i++)
-			ret.append((*list)[i]->asStringPretty()).append(", ");
+			ret.append(list->get(i)->asStringPretty()).append(", ");
 		ret.erase(ret.length() - 2);
 		return ret.append("]>");
 	}
@@ -158,7 +158,7 @@ string CObject::asStringRaw() const
 	case Type::List: {
 		std::string ret("[");
 		for (ObjectList::size_type i = 0; i < list->size(); i++)
-			ret.append((*list)[i]->asStringRaw()).append(", ");
+			ret.append(list->get(i)->asStringRaw()).append(", ");
 		ret.erase(ret.length() - 2);
 		return ret.append("]");
 	}

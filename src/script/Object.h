@@ -181,8 +181,11 @@ public:
 
 	void push_back(const Object obj) { _inherited::push_back(CopyObject(obj)); }
 
-	Object operator[](_inherited::size_type i) { return CopyObject(get_ptr(i)); }
+	Object get(_inherited::size_type i) { return CopyObject(get_ptr(i)); }
 	Object get_ptr(_inherited::size_type i) { return _inherited::at(i); }
+
+	void set(_inherited::size_type i, const Object obj) { set_ptr(i, CopyObject(obj)); }
+	void set_ptr(_inherited::size_type i, const Object obj) { _inherited::operator[](i) = obj; }
 
 	size_type size() const { return _inherited::size(); }
 };

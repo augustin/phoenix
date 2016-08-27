@@ -88,12 +88,34 @@ void Stack::set_ptr(vector<string> variable, Object value)
 	}
 
 	Object res = fStack[loc].get_ptr(variable[0]);
-	CoerceOrThrow("referenced variable", res, Type::Map);
+	if (res->type() != Type::Map && res->type() != Type::List)
+		throw Exception(Exception::TypeError, "'" + variable[0] + "' should be either 'List' or 'Map' "
+			"but is neither");
 	for (vector<string>::size_type i = 1; i < variable.size() - 1; i++) {
-		res = res->map->get_ptr(variable[i]);
-		CoerceOrThrow("referenced variable", res, Type::Map);
+		if (res->type() == Type::Map) {
+			res = res->map->get_ptr(variable[i]);
+		} else if (res->type() == Type::List) {
+			try {
+				res = res->list->get_ptr(std::stoi(variable[i]));
+			} catch (...) {
+				throw Exception(Exception::SyntaxError, "'" + variable[i - 1] + "' is of type 'List,"
+					"but the program attempted to reference a non-integer");
+			}
+		}
+		if (res->type() != Type::Map && res->type() != Type::List)
+			throw Exception(Exception::TypeError, "'" + variable[i - 1] + "' should be either 'List' or 'Map' "
+				"but is neither");
 	}
-	res->map->set_ptr(variable[variable.size() - 1], value);
+	if (res->type() == Type::Map)
+		res->map->set_ptr(variable[variable.size() - 1], value);
+	else if (res->type() == Type::List) {
+		try {
+			res->list->set(std::stoi(variable[variable.size() - 1]), value);
+		} catch (...) {
+			throw Exception(Exception::SyntaxError, "'" + variable[variable.size() - 1] + "' is of type 'List,"
+				"but the program attempted to reference a non-integer");
+		}
+	}
 }
 
 void Stack::addSuperglobal(string variableName, Object value)
