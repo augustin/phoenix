@@ -1,0 +1,11 @@
+#EXPECT: <String:"0,1,2,3,4,5,">
+
+$b = "";
+$i = 0;
+while ($i < 10) {
+	$b += $i + ",";
+	$i++;
+	if ($i == 6)
+		break;
+}
+return $b;

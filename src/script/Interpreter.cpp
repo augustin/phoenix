@@ -413,6 +413,15 @@ public:
 };
 ReturnValue::~ReturnValue() noexcept {}
 
+class Break : public std::exception
+{
+public:
+	Break() {}
+	virtual ~Break() noexcept;
+	virtual const char* what() const noexcept { return "Break"; }
+};
+Break::~Break() noexcept {}
+
 string::size_type LocateEndOfScope(Stack*, const string& code, uint32_t&, const string::size_type& i)
 {
 	std::string scope;
@@ -469,18 +478,20 @@ void ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* s
 	IgnoreWhitespace(PARSER_PARAMS);
 	if (code[i] != '(')
 		throw UNEXPECTED_TOKEN_EXPECTED("(");
+	string::size_type endOfBlock = string::npos;
 
 	auto CBH_Inner = [&]() -> bool {
 		bool exec = ParseAndEvalExpression(PARSER_PARAMS)->coerceToBoolean();
 		i++;
 		IgnoreWhitespace(PARSER_PARAMS);
-		string::size_type j = LocateEndOfScope(PARSER_PARAMS);
+		if (endOfBlock == string::npos)
+			endOfBlock = LocateEndOfScope(PARSER_PARAMS);
 		if (exec) {
 			bool oneliner = code[i] != '{';
 			if (!oneliner)
 				i++;
 			stack->push();
-			while (i < j) {
+			while (i < endOfBlock) {
 				ParseAndEvalExpression(PARSER_PARAMS);
 				i++;
 				IgnoreWhitespace(PARSER_PARAMS);
@@ -489,8 +500,8 @@ void ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* s
 				i--;
 			stack->pop();
 		} else {
-			// Skip the block;
-			while (i < j) {
+			// Skip the block.
+			while (i < endOfBlock) {
 				if (code[i] == '\n')
 					line++;
 				i++;
@@ -502,9 +513,18 @@ void ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* s
 	if (thing == "while") {
 		uint32_t old_line = line;
 		string::size_type old_i = i;
-		while (CBH_Inner()) {
-			line = old_line;
-			i = old_i;
+		try {
+			while (CBH_Inner()) {
+				line = old_line;
+				i = old_i;
+			}
+		} catch (Break) {
+			// Skip the rest of the block.
+			while (i < endOfBlock) {
+				if (code[i] == '\n')
+					line++;
+				i++;
+			}
 		}
 	} else if (thing == "if")
 		CBH_Inner();
@@ -584,8 +604,13 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				if (expression.size() != 0)
 					throw Exception(Exception::SyntaxError, string("incorrectly placed 'return'"));
 				isReturn = true;
+			} else if (thing == "break") {
+				if (expression.size() != 0)
+					throw Exception(Exception::SyntaxError, string("incorrectly placed 'break'"));
+				throw Break();
 			} else if (thing == "if" || thing == "while") {
 				ConditionalBranchHandler(expression, thing, PARSER_PARAMS);
+				atEOE = true;
 			} else if (thing == "function") {
 				i++;
 				IgnoreWhitespace(PARSER_PARAMS);
@@ -832,6 +857,10 @@ Object EvalString(Stack* stack, const string& code, string fromPath, const uint3
 		if (popDirs)
 			stack->popDir();
 		return e.value;
+	} catch (Break) {
+		if (popDirs)
+			stack->popDir();
+	   throw Exception(Exception::SyntaxError, "unexpected 'break'", fromPath, line);
 	} catch (Exception& e) {
 		if (popDirs)
 			stack->popDir();

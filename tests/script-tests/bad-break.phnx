@@ -1,0 +1,5 @@
+#EXPECT: Eunexpected 'break'
+
+$b = 7;
+break;
+return b;
