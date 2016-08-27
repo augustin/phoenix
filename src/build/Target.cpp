@@ -30,14 +30,14 @@ Target::Target(const ObjectMap& params)
 	targets.push_back(this);
 
 	NativeFunction_COERCE_OR_THROW("0", nm, Type::String);
-	name = nm.asStringRaw();
+	name = nm->asStringRaw();
 
 	const Object obj = params.get("language");
-	if (obj.type() == Type::List) {
-		for (const Object* o : *obj.list)
+	if (obj->type() == Type::List) {
+		for (const Object o : *obj->list)
 			languages.push_back(o->asStringRaw());
 	} else
-		languages.push_back(obj.asStringRaw());
+		languages.push_back(obj->asStringRaw());
 
 	// Prefetch all LanguageInfos
 	for (std::string lang : languages)
@@ -46,11 +46,11 @@ Target::Target(const ObjectMap& params)
 	// TODO: get rid of hard-coded languages[0]
 	otherFlags = LanguageInfo::getLanguageInfo(languages[0])->compilerDefaultFlags;
 
-	map->set("setStandardsMode", FunctionObject([this](Stack*, Object*, ObjectMap& params) -> Object {
+	map->set("setStandardsMode", FunctionObject([this](Stack*, Object, ObjectMap& params) -> Object {
 		NativeFunction_COERCE_OR_THROW("0", modeNameObj, Type::String);
 
-		bool strict = params.get("strict").boolean;
-		std::string modeName = modeNameObj.asStringRaw();
+		bool strict = params.get("strict")->boolean;
+		std::string modeName = modeNameObj->asStringRaw();
 		// TODO: get rid of hardcoded languages[0]
 		LanguageInfo* info = LanguageInfo::getLanguageInfo(this->languages[0]);
 		if (StringUtil::startsWith(modeName, info->name))
@@ -66,10 +66,10 @@ Target::Target(const ObjectMap& params)
 		} else
 			PrintUtil::warning("standards mode '" + modeName + "' for language "
 				+ info->name + " unsupported!");
-		return Object();
+		return Script::UndefinedObject();
 	}));
 
-	map->set("addDefinitions", FunctionObject([this](Stack*, Object*, ObjectMap& m) -> Object {
+	map->set("addDefinitions", FunctionObject([this](Stack*, Object, ObjectMap& m) -> Object {
 		// TODO: get rid of hardcoded languages[0]
 		LanguageInfo* info = LanguageInfo::getLanguageInfo(this->languages[0]);
 
@@ -83,46 +83,46 @@ Target::Target(const ObjectMap& params)
 			this->definitionsFlags.append(" \"" + info->compilerDefinition +
 				name + (val.empty() ? "\"" : "=" + val + "\""));
 		}
-		return Object();
+		return Script::UndefinedObject();
 	}));
 
 	map->set("addSources", FunctionObject([this](Stack* stack,
-			Object*, ObjectMap& params) -> Object {
+			Object, ObjectMap& params) -> Object {
 		NativeFunction_COERCE_OR_THROW("0", filesObj, Type::List);
-		for (const Object* o : *filesObj.list) {
+		for (const Object o : *filesObj->list) {
 			this->sourceFiles.push_back(FSUtil::absolutePath(FSUtil::combinePaths({
 				stack->currentDir(), o->asStringRaw()})));
 		}
-		return Object();
+		return Script::UndefinedObject();
 	}));
-	map->set("addSourceDirectory", FunctionObject([this](Stack* stack, Object*,
+	map->set("addSourceDirectory", FunctionObject([this](Stack* stack, Object,
 			ObjectMap& params) -> Object {
 		// TODO: get rid of hardcoded languages[0]
 		LanguageInfo* info = LanguageInfo::getLanguageInfo(this->languages[0]);
 		NativeFunction_COERCE_OR_THROW("0", dirNameObj, Type::String);
 		std::string dirName = FSUtil::combinePaths({stack->currentDir(),
-			dirNameObj.asStringRaw()});
-		bool recurse = params.get("recursive").boolean;
+			dirNameObj->asStringRaw()});
+		bool recurse = params.get("recursive")->boolean;
 		vector<std::string> newFiles =
 			FSUtil::searchForFiles(dirName, info->sourceExtensions, recurse);
 		for (vector<std::string>::size_type i = 0; i < newFiles.size(); i++)
 			newFiles[i] = FSUtil::absolutePath(newFiles[i]);
 		this->sourceFiles.insert(this->sourceFiles.end(), newFiles.begin(),
 			newFiles.end());
-		return Object();
+		return Script::UndefinedObject();
 	}));
 
 	map->set("addIncludeDirectories", FunctionObject([this](Stack* stack,
-			Object*, ObjectMap& params) -> Object {
+			Object, ObjectMap& params) -> Object {
 		// TODO: get rid of hardcoded languages[0]
 		LanguageInfo* info = LanguageInfo::getLanguageInfo(this->languages[0]);
 		NativeFunction_COERCE_OR_THROW("0", dirsList, Type::List);
 
-		for (const Object* itm : *dirsList.list) {
+		for (const Object itm : *dirsList->list) {
 			this->includesFlags.append(" " + info->compilerInclude + "\"" +
 				FSUtil::combinePaths({stack->currentDir(), itm->asStringRaw()}) + "\"");
 		}
-		return Object();
+		return Script::UndefinedObject();
 	}));
 }
 
@@ -140,7 +140,7 @@ void Target::generate(Generator* gen)
 
 void Target::addGlobalFunction(Script::Stack* stack)
 {
-	stack->GlobalFunctions.insert({"CreateTarget", Function([](Stack*, Object*, ObjectMap& params)
+	stack->GlobalFunctions.insert({"CreateTarget", Function([](Stack*, Object, ObjectMap& params)
 		-> Script::Object {
 		return Script::MapObject((new Target(params))->fMapObject);
 	})});

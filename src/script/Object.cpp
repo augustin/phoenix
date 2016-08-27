@@ -41,7 +41,7 @@ void Exception::print()
 }
 
 
-Object::Object(const Type type)
+CObject::CObject(const Type type)
 	:
 	boolean(false),
 	integer(0),
@@ -49,15 +49,15 @@ Object::Object(const Type type)
 	list(nullptr),
 	map(nullptr),
 
-	fObjectType(type)
+	fType(type)
 {
 }
-Object::Object(const Object& other)
+CObject::CObject(const CObject& other)
 	:
 	function(nullptr),
 	list(nullptr),
 	map(nullptr),
-	fObjectType(other.fObjectType)
+	fType(other.fType)
 {
 	boolean = other.boolean;
 	integer = other.integer;
@@ -66,13 +66,13 @@ Object::Object(const Object& other)
 	else if (other.list) list = new ObjectList(*other.list);
 	else if (other.map) map = new ObjectMap(*other.map);
 }
-Object& Object::operator=(const Object& other)
+CObject& CObject::operator=(const CObject& other)
 {
 	delete function;
 	delete list;
 	delete map;
 
-	fObjectType = other.fObjectType;
+	fType = other.fType;
 	boolean = other.boolean;
 	integer = other.integer;
 	string = other.string;
@@ -83,14 +83,14 @@ Object& Object::operator=(const Object& other)
 	return *this;
 }
 
-Object::~Object()
+CObject::~CObject()
 {
 	delete function;
 	delete list;
 	delete map;
 }
 
-string Object::typeName(Type type)
+string CObject::typeName(Type type)
 {
 	switch (type) {
 	case Type::Undefined:	return "Undefined";
@@ -103,15 +103,15 @@ string Object::typeName(Type type)
 	}
 	return "UNKNOWN";
 }
-string Object::typeName() const
+string CObject::typeName() const
 {
-	return typeName(fObjectType);
+	return typeName(fType);
 }
 
-string Object::asStringPretty() const
+string CObject::asStringPretty() const
 {
 	// Modify asStringRaw() below simultaneously with this one!
-	switch (fObjectType) {
+	switch (fType) {
 	case Type::Undefined:
 		return "<Undefined>";
 	case Type::Boolean:
@@ -125,7 +125,7 @@ string Object::asStringPretty() const
 	case Type::List: {
 		std::string ret("<List:[");
 		for (ObjectList::size_type i = 0; i < list->size(); i++)
-			ret.append((*list)[i].asStringPretty()).append(", ");
+			ret.append((*list)[i]->asStringPretty()).append(", ");
 		ret.erase(ret.length() - 2);
 		return ret.append("]>");
 	}
@@ -139,10 +139,10 @@ string Object::asStringPretty() const
 	}
 	return "UNKNOWN";
 }
-string Object::asStringRaw() const
+string CObject::asStringRaw() const
 {
 	// Modify asStringPretty() above simultaneously with this one!
-	switch (fObjectType) {
+	switch (fType) {
 	case Type::Undefined:
 		return "<Undefined>";
 	case Type::Boolean:
@@ -158,7 +158,7 @@ string Object::asStringRaw() const
 	case Type::List: {
 		std::string ret("[");
 		for (ObjectList::size_type i = 0; i < list->size(); i++)
-			ret.append((*list)[i].asStringRaw()).append(", ");
+			ret.append((*list)[i]->asStringRaw()).append(", ");
 		ret.erase(ret.length() - 2);
 		return ret.append("]");
 	}
@@ -173,9 +173,9 @@ string Object::asStringRaw() const
 	return "UNKNOWN";
 }
 
-bool Object::coerceToBoolean() const
+bool CObject::coerceToBoolean() const
 {
-	switch (fObjectType) {
+	switch (fType) {
 	case Type::Undefined:	return false;
 	case Type::Boolean:		return boolean;
 	case Type::Integer:		return integer != 0;
@@ -187,98 +187,98 @@ bool Object::coerceToBoolean() const
 	return false;
 }
 
-Object Object::op_div(const Object& left, const Object& right)
+Object CObject::op_div(const Object left, const Object right)
 {
 	CoerceOrThrow("left-hand side of '/'", left, Type::Integer);
 	CoerceOrThrow("right-hand side of '/'", right, Type::Integer);
-	return IntegerObject(left.integer / right.integer);
+	return IntegerObject(left->integer / right->integer);
 }
-Object Object::op_mult(const Object& left, const Object& right)
+Object CObject::op_mult(const Object left, const Object right)
 {
 	CoerceOrThrow("left-hand side of '*'", left, Type::Integer);
 	CoerceOrThrow("right-hand side of '*'", right, Type::Integer);
-	return IntegerObject(left.integer * right.integer);
+	return IntegerObject(left->integer * right->integer);
 }
-Object Object::op_subt(const Object& left, const Object& right)
+Object CObject::op_subt(const Object left, const Object right)
 {
 	CoerceOrThrow("left-hand side of '-'", left, Type::Integer);
 	CoerceOrThrow("right-hand side of '-'", right, Type::Integer);
-	return IntegerObject(left.integer - right.integer);
+	return IntegerObject(left->integer - right->integer);
 }
-Object Object::op_add(const Object& left, const Object& right)
+Object CObject::op_add(const Object left, const Object right)
 {
-	if (left.type() == Type::Undefined && right.type() == Type::Undefined)
+	if (left->type() == Type::Undefined && right->type() == Type::Undefined)
 		throw Exception(Exception::TypeError, "undefined cannot be added to undefined");
-	else if (left.type() == Type::String && right.type() == Type::String)
-		return StringObject(left.string + right.string);
-	else if (left.type() == Type::Integer && right.type() == Type::Integer)
-		return IntegerObject(left.integer + right.integer);
-	else if (left.type() == Type::Integer && right.type() == Type::String)
-		return StringObject(std::to_string(left.integer) + right.string);
-	else if (left.type() == Type::String && right.type() == Type::Integer)
-		return StringObject(left.string + std::to_string(right.integer));
-	else if (left.type() == Type::List) {
-		Object o = ListObject(*left.list);
-		o.list->push_back(right);
+	else if (left->type() == Type::String && right->type() == Type::String)
+		return StringObject(left->string + right->string);
+	else if (left->type() == Type::Integer && right->type() == Type::Integer)
+		return IntegerObject(left->integer + right->integer);
+	else if (left->type() == Type::Integer && right->type() == Type::String)
+		return StringObject(std::to_string(left->integer) + right->string);
+	else if (left->type() == Type::String && right->type() == Type::Integer)
+		return StringObject(left->string + std::to_string(right->integer));
+	else if (left->type() == Type::List) {
+		Object o = ListObject(new ObjectList(*left->list));
+		o->list->push_back(right);
 		return o;
 	}
 	throw Exception(Exception::TypeError, "unexpected operand types for add operation (left type '"
-		+ left.typeName() + "', right type '" + right.typeName() + "')");
+		+ left->typeName() + "', right type '" + right->typeName() + "')");
 }
-Object Object::op_eq(const Object& left, const Object& right)
+Object CObject::op_eq(const Object left, const Object right)
 {
-	if (left.type() == Type::String && right.type() == Type::String)
-		return BooleanObject(left.string == right.string);
-	else if (left.type() == Type::Integer && right.type() == Type::Integer)
-		return BooleanObject(left.integer == right.integer);
-	else if (left.type() == Type::Boolean && right.type() == Type::Boolean)
-		return BooleanObject(left.boolean == right.boolean);
+	if (left->type() == Type::String && right->type() == Type::String)
+		return BooleanObject(left->string == right->string);
+	else if (left->type() == Type::Integer && right->type() == Type::Integer)
+		return BooleanObject(left->integer == right->integer);
+	else if (left->type() == Type::Boolean && right->type() == Type::Boolean)
+		return BooleanObject(left->boolean == right->boolean);
 
-	else if (left.type() == Type::Undefined && right.type() == Type::Undefined)
+	else if (left->type() == Type::Undefined && right->type() == Type::Undefined)
 		return BooleanObject(true);
-	else if ((left.type() == Type::Undefined) ^ (right.type() == Type::Undefined))
+	else if ((left->type() == Type::Undefined) ^ (right->type() == Type::Undefined))
 		return BooleanObject(false);
 	else // Compare as strings
-		return BooleanObject(left.asStringRaw() == right.asStringRaw());
+		return BooleanObject(left->asStringRaw() == right->asStringRaw());
 }
 
-Object Object::op_and(const Object& left, const Object& right)
+Object CObject::op_and(const Object left, const Object right)
 {
-	if (left.type() == Type::Undefined || right.type() == Type::Undefined)
+	if (left->type() == Type::Undefined || right->type() == Type::Undefined)
 		return BooleanObject(false);
-	return BooleanObject(left.coerceToBoolean() && right.coerceToBoolean());
+	return BooleanObject(left->coerceToBoolean() && right->coerceToBoolean());
 }
-Object Object::op_or(const Object& left, const Object& right)
+Object CObject::op_or(const Object left, const Object right)
 {
-	return BooleanObject(left.coerceToBoolean() || right.coerceToBoolean());
+	return BooleanObject(left->coerceToBoolean() || right->coerceToBoolean());
 }
-Object Object::op_lt(const Object& left, const Object& right)
+Object CObject::op_lt(const Object left, const Object right)
 {
-	if (left.type() == Type::Integer && right.type() == Type::Integer)
-		return BooleanObject(left.integer < right.integer);
+	if (left->type() == Type::Integer && right->type() == Type::Integer)
+		return BooleanObject(left->integer < right->integer);
 	throw Exception(Exception::TypeError, "unexpected operand types for less-than operation (left type '"
-		+ left.typeName() + "', right type '" + right.typeName() + "')");
+		+ left->typeName() + "', right type '" + right->typeName() + "')");
 }
-Object Object::op_gt(const Object& left, const Object& right)
+Object CObject::op_gt(const Object left, const Object right)
 {
-	if (left.type() == Type::Integer && right.type() == Type::Integer)
-		return BooleanObject(left.integer > right.integer);
+	if (left->type() == Type::Integer && right->type() == Type::Integer)
+		return BooleanObject(left->integer > right->integer);
 	throw Exception(Exception::TypeError, "unexpected operand types for greater-than operation (left type '"
-		+ left.typeName() + "', right type '" + right.typeName() + "')");
+		+ left->typeName() + "', right type '" + right->typeName() + "')");
 }
-Object Object::op_lteq(const Object& left, const Object& right)
+Object CObject::op_lteq(const Object left, const Object right)
 {
-	if (left.type() == Type::Integer && right.type() == Type::Integer)
-		return BooleanObject(left.integer <= right.integer);
+	if (left->type() == Type::Integer && right->type() == Type::Integer)
+		return BooleanObject(left->integer <= right->integer);
 	throw Exception(Exception::TypeError, "unexpected operand types for less-than-or-equals operation"
-		"(left type '" + left.typeName() + "', right type '" + right.typeName() + "')");
+		"(left type '" + left->typeName() + "', right type '" + right->typeName() + "')");
 }
-Object Object::op_gteq(const Object& left, const Object& right)
+Object CObject::op_gteq(const Object left, const Object right)
 {
-	if (left.type() == Type::Integer && right.type() == Type::Integer)
-		return BooleanObject(left.integer >= right.integer);
+	if (left->type() == Type::Integer && right->type() == Type::Integer)
+		return BooleanObject(left->integer >= right->integer);
 	throw Exception(Exception::TypeError, "unexpected operand types for greater-than-or-equals operation"
-		"(left type '" + left.typeName() + "', right type '" + right.typeName() + "')");
+		"(left type '" + left->typeName() + "', right type '" + right->typeName() + "')");
 }
 
 }

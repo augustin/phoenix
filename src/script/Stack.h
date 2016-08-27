@@ -23,14 +23,14 @@ public:
 
 	std::map<std::string, Function> GlobalFunctions;
 
-	Object* get_ptr(const std::vector<std::string> variable);
+	Object get_ptr(const std::vector<std::string> variable);
 	inline Object get(const std::vector<std::string> variable) {
-		Object* o = get_ptr(variable); if (o == nullptr) return Object(); else return *o; }
+		Object o = get_ptr(variable); if (o == nullptr) return UndefinedObject(); else return o; }
 	inline Object get(const std::string variable0) {
 		std::vector<std::string> variable = {variable0};
 		return get(variable); }
-	void set_ptr(std::vector<std::string> variable, Object* value);
-	inline void set(std::vector<std::string> variable, Object value) { set_ptr(variable, new Object(value)); }
+	void set_ptr(std::vector<std::string> variable, Object value);
+	inline void set(std::vector<std::string> variable, Object value) { set_ptr(variable, CopyObject(value)); }
 
 	void addSuperglobal(std::string variableName, Object value);
 

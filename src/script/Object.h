@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace Script {
 
@@ -15,6 +16,8 @@ namespace Script {
 class Function;
 class ObjectMap;
 class ObjectList;
+class CObject;
+typedef std::shared_ptr<CObject> Object;
 
 class Exception : public std::exception
 {
@@ -53,39 +56,39 @@ enum class Type {
 	Map,
 };
 
-class Object
+class CObject
 {
 public:
-	Object(const Type type = Type::Undefined);
-	~Object();
+	CObject(const Type type = Type::Undefined);
+	~CObject();
 	// Copy constructors
-	Object(const Object& other);
-	Object& operator=(const Object& other);
+	CObject(const CObject& other);
+	CObject& operator=(const CObject& other);
 
-	inline Type type() const { return fObjectType; }
+	inline Type type() const { return fType; }
 	static std::string typeName(Type type);
 	std::string typeName() const;
 	std::string asStringPretty() const;
 	std::string asStringRaw() const;
 
-	inline Object operator[](const char* key) const;
+	inline Object get(const char* key) const;
 
 	// Helpers
 	bool coerceToBoolean() const;
 	// Operators
-	static Object op_div(const Object& left, const Object& right);
-	static Object op_mult(const Object& left, const Object& right);
-	static Object op_subt(const Object& left, const Object& right);
-	static Object op_add(const Object& left, const Object& right);
-	static Object op_eq(const Object& left, const Object& right);
-	inline static Object op_neq(const Object& left, const Object& right)
-		{ Object o = op_eq(left, right); o.boolean = !o.boolean; return o; }
-	static Object op_and(const Object& left, const Object& right);
-	static Object op_or(const Object& left, const Object& right);
-	static Object op_lt(const Object& left, const Object& right);
-	static Object op_gt(const Object& left, const Object& right);
-	static Object op_lteq(const Object& left, const Object& right);
-	static Object op_gteq(const Object& left, const Object& right);
+	static Object op_div(const Object left, const Object right);
+	static Object op_mult(const Object left, const Object right);
+	static Object op_subt(const Object left, const Object right);
+	static Object op_add(const Object left, const Object right);
+	static Object op_eq(const Object left, const Object right);
+	inline static Object op_neq(const Object left, const Object right)
+		{ Object o = op_eq(left, right); o->boolean = !o->boolean; return o; }
+	static Object op_and(const Object left, const Object right);
+	static Object op_or(const Object left, const Object right);
+	static Object op_lt(const Object left, const Object right);
+	static Object op_gt(const Object left, const Object right);
+	static Object op_lteq(const Object left, const Object right);
+	static Object op_gteq(const Object left, const Object right);
 
 public: // Data storage
 	bool boolean;
@@ -96,120 +99,117 @@ public: // Data storage
 	ObjectMap* map;
 
 private:
-	Type fObjectType;
+	Type fType;
 };
 
 // Helper functions
-inline void CoerceOrThrow(const std::string& what, const Object& variable, Type type)
-{
-	if (variable.type() != type) {
-		throw Exception(Exception::TypeError,
-			std::string(what).append(" should be of type '")
-				.append(Object::typeName(type)).append("' but is of type '")
-				.append(variable.typeName()).append("'"));
-	}
-}
-inline void CoerceOrThrowPtr(const std::string& what, const Object* variable, Type type)
+inline void CoerceOrThrow(const std::string& what, const Object variable, Type type)
 {
 	if (variable == nullptr) {
 		throw Exception(Exception::TypeError,
-			std::string(what).append(" should be of type '").append(Object::typeName(type))
+			std::string(what).append(" should be of type '").append(CObject::typeName(type))
 				.append("' but is of type 'undefined'"));
 	}
 	if (variable->type() != type) {
 		throw Exception(Exception::TypeError,
 			std::string(what).append(" should be of type '")
-				.append(Object::typeName(type)).append("' but is of type '")
+				.append(CObject::typeName(type)).append("' but is of type '")
 				.append(variable->typeName()).append("'"));
 	}
 }
 
 // Convenience constructors
+inline Object UndefinedObject()
+{
+	Object ret = std::make_shared<CObject>(Type::Undefined);
+	return ret;
+}
 inline Object BooleanObject(const bool value)
 {
-	Object ret(Type::Boolean);
-	ret.boolean = value;
+	Object ret = std::make_shared<CObject>(Type::Boolean);
+	ret->boolean = value;
 	return ret;
 }
 inline Object IntegerObject(const int value)
 {
-	Object ret(Type::Integer);
-	ret.integer = value;
+	Object ret = std::make_shared<CObject>(Type::Integer);
+	ret->integer = value;
 	return ret;
 }
 inline Object StringObject(const std::string& value)
 {
-	Object ret(Type::String);
-	ret.string = std::string(value);
+	Object ret = std::make_shared<CObject>(Type::String);
+	ret->string = std::string(value);
 	return ret;
+}
+inline Object CopyObject(const Object other)
+{
+	return std::make_shared<CObject>(*other.get());
 }
 
 // ObjectMap (defined here, implemented in ObjectMap.cpp)
-class ObjectMap : private std::map<std::string, Object*>
+class ObjectMap : private std::map<std::string, Object>
 {
-	typedef std::map<std::string, Object*> _inherited;
+	typedef std::map<std::string, Object> _inherited;
 public:
 	ObjectMap();
 	~ObjectMap();
+	// Copy constructors
+	//ObjectMap(const ObjectMap& other);
+	ObjectMap& operator=(const ObjectMap& other) = delete;
 
 	typedef _inherited::const_iterator const_iterator;
 	const_iterator begin() const { return _inherited::begin(); }
 	const_iterator end() const { return _inherited::end(); }
 
 	Object get(std::string key) const;
-	Object* get_ptr(std::string key);
-	void set_ptr(std::string key, Object* value);
-	inline void set(std::string key, Object value) { set_ptr(key, new Object(value)); }
+	Object get_ptr(std::string key);
+	void set_ptr(std::string key, Object value);
+	inline void set(std::string key, Object value) { set_ptr(key, CopyObject(value)); }
 
 	size_type size() const { return _inherited::size(); }
 };
 
-class ObjectList : private std::vector<Object*>
+class ObjectList : private std::vector<Object>
 {
-	typedef std::vector<Object*> _inherited;
+	typedef std::vector<Object> _inherited;
 public:
 	ObjectList() {}
-	~ObjectList() { /* for (Object* obj : *this) delete obj; // FIXME */ }
+	~ObjectList() {}
+	// Copy constructors
+	//ObjectList(const ObjectList& other);
+	ObjectList& operator=(const ObjectList& other) = delete;
 
 	typedef _inherited::const_iterator const_iterator;
 	typedef _inherited::size_type size_type;
 	const_iterator begin() const { return _inherited::begin(); }
 	const_iterator end() const { return _inherited::end(); }
 
-	void push_back(const Object& obj) { Object* o = new Object(obj); _inherited::push_back(o); }
+	void push_back(const Object obj) { _inherited::push_back(CopyObject(obj)); }
 
-	Object operator[](_inherited::size_type i) { return *get_ptr(i); }
-	Object* get_ptr(_inherited::size_type i) { return _inherited::at(i); }
+	Object operator[](_inherited::size_type i) { return CopyObject(get_ptr(i)); }
+	Object get_ptr(_inherited::size_type i) { return _inherited::at(i); }
 
 	size_type size() const { return _inherited::size(); }
 };
 
-// Must be down here, as it needs ListObject's definition
+// Must be down here, as it needs ObjectList's definition
 inline Object ListObject(ObjectList* value)
 {
-	Object ret(Type::List);
-	ret.list = value;
-	return ret;
-}
-inline Object ListObject(const ObjectList value)
-{
-	Object ret(Type::List);
-	ret.list = new ObjectList;
-	*ret.list = value;
+	Object ret = std::make_shared<CObject>(Type::List);
+	ret->list = value;
 	return ret;
 }
 
 // Must be down here, as it needs ObjectMap's definition
-inline Object Object::operator[](const char* key) const
+inline Object CObject::get(const char* key) const
 {
 	return map->get(key);
 }
-
-// Convenience constructors
 inline Object MapObject(ObjectMap* value)
 {
-	Object ret(Type::Map);
-	ret.map = value;
+	Object ret = std::make_shared<CObject>(Type::Map);
+	ret->map = value;
 	return ret;
 }
 

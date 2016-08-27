@@ -19,7 +19,7 @@ class Stack;
 	Script::Object VARIABLE = params.get(NAME); \
 	Script::CoerceOrThrow("parameter '" NAME "'", VARIABLE, TYPE)
 
-typedef std::function<Object(Stack*, Object*, ObjectMap&)> NativeStdFunction;
+typedef std::function<Object(Stack*, Object /* context */, ObjectMap& /* params */)> NativeStdFunction;
 
 class Function
 {
@@ -28,7 +28,7 @@ public:
 	Function(std::string function, std::string functionFile, uint32_t functionLine);
 	Function(NativeStdFunction nativeFunction);
 
-	Object call(Stack* stack, Object* context, ObjectMap& args);
+	Object call(Stack* stack, Object context, ObjectMap& args);
 
 	bool isNative() const { return fIsNative; }
 
@@ -45,14 +45,14 @@ private:
 // Convenience constructors
 inline Object FunctionObject(NativeStdFunction nativeFunction)
 {
-	Object ret(Type::Function);
-	ret.function = new Function(nativeFunction);
+	Object ret = std::make_shared<CObject>(Type::Function);
+	ret->function = new Function(nativeFunction);
 	return ret;
 }
 inline Object FunctionObject(Function* value)
 {
-	Object ret(Type::Function);
-	ret.function = value;
+	Object ret = std::make_shared<CObject>(Type::Function);
+	ret->function = value;
 	return ret;
 }
 

@@ -11,7 +11,7 @@ namespace Script {
 // Predefinitions
 class Stack;
 
-class GlobalLanguageObject : public Object
+class GlobalLanguageObject : public CObject
 {
 public:
 	GlobalLanguageObject(Stack* stack);

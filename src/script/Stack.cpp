@@ -39,9 +39,9 @@ std::vector<ObjectMap>::size_type Stack::getPos(std::string variable)
 	return last;
 }
 
-Object* Stack::get_ptr(const vector<string> variable)
+Object Stack::get_ptr(const vector<string> variable)
 {
-	Object* ret = nullptr;
+	Object ret = nullptr;
 	if (variable[0][0] == '$') {
 		// it's a superglobal
 		string var = variable[0];
@@ -51,12 +51,12 @@ Object* Stack::get_ptr(const vector<string> variable)
 		ret = fStack[getPos(variable[0])].get_ptr(variable[0]);
 	for (vector<string>::size_type i = 1; i < variable.size(); i++) {
 		if (ret == nullptr)
-			return new Object(Type::Undefined);
+			return UndefinedObject();
 		if (ret->type() == Type::Map)
 			ret = ret->map->get_ptr(variable[i]);
 		else if (ret->type() == Type::List) {
 			if (variable[i] == "length") {
-				Object* newRet = new Object(Type::Integer);
+				Object newRet = IntegerObject(0);
 				newRet->integer = ret->list->size();
 				ret = newRet;
 			} else {
@@ -75,7 +75,7 @@ Object* Stack::get_ptr(const vector<string> variable)
 	return ret;
 }
 
-void Stack::set_ptr(vector<string> variable, Object* value)
+void Stack::set_ptr(vector<string> variable, Object value)
 {
 	if (variable[0][0] == '$') {
 		// it's a superglobal
@@ -87,11 +87,11 @@ void Stack::set_ptr(vector<string> variable, Object* value)
 		return;
 	}
 
-	Object* res = fStack[loc].get_ptr(variable[0]);
-	CoerceOrThrowPtr("referenced variable", res, Type::Map);
+	Object res = fStack[loc].get_ptr(variable[0]);
+	CoerceOrThrow("referenced variable", res, Type::Map);
 	for (vector<string>::size_type i = 1; i < variable.size() - 1; i++) {
 		res = res->map->get_ptr(variable[i]);
-		CoerceOrThrowPtr("referenced variable", res, Type::Map);
+		CoerceOrThrow("referenced variable", res, Type::Map);
 	}
 	res->map->set_ptr(variable[variable.size() - 1], value);
 }

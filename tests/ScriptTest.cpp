@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 		string expect = test.substr(openerLen, test.find_first_of("\n") - openerLen);
 
 		Script::Stack stack;
-		stack.addSuperglobal("Phoenix", Script::GlobalLanguageObject(&stack));
+		stack.addSuperglobal("Phoenix", std::make_shared<Script::GlobalLanguageObject>(&stack));
 		Script::Object result;
 		bool threwException = false;
 		Script::Exception exceptionResult(Script::Exception::InternalError, "");
@@ -56,11 +56,11 @@ int main(int argc, char* argv[])
 			}
 			continue;
 		} else {
-			bool res = (result.asStringPretty() == expect);
+			bool res = (result->asStringPretty() == expect);
 			if (res)
 				t.result(true, name);
 			else
-				t.result(false, name + " (got " + result.asStringPretty() + ", expected " + expect + ")");
+				t.result(false, name + " (got " + result->asStringPretty() + ", expected " + expect + ")");
 		}
 	}
 	return t.done();

@@ -16,20 +16,17 @@ ObjectMap::ObjectMap()
 }
 ObjectMap::~ObjectMap()
 {
-	for (_inherited::const_iterator it = begin(); it != end(); it++) {
-		//delete it->second; // FIXME
-	}
 }
 
 Object ObjectMap::get(string key) const
 {
 	_inherited::const_iterator it = find(key);
 	if (it != end())
-		return *it->second;
-	return Object(Type::Undefined);
+		return CopyObject(it->second);
+	return UndefinedObject();
 }
 
-Object* ObjectMap::get_ptr(string key)
+Object ObjectMap::get_ptr(string key)
 {
 	_inherited::iterator it = find(key);
 	if (it != end())
@@ -37,7 +34,7 @@ Object* ObjectMap::get_ptr(string key)
 	return nullptr;
 }
 
-void ObjectMap::set_ptr(string key, Object* value)
+void ObjectMap::set_ptr(string key, Object value)
 {
 	_inherited::iterator it = find(key);
 	if (it != end())

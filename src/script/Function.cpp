@@ -28,7 +28,7 @@ Function::Function(NativeStdFunction nativeFunction)
 {
 }
 
-Object Function::call(Stack* stack, Object* context, ObjectMap& args)
+Object Function::call(Stack* stack, Object context, ObjectMap& args)
 {
 	if (fIsNull) {
 		throw Exception(Exception::AccessViolation, "cannot call null function");

@@ -39,7 +39,7 @@ Object AstNode::toObject(Stack* stack)
 				// Please do not try this at home.
 				// See the "string-deref-abuse" test if your curiosity is insatiable.
 				try {
-					str += EvalVariableName(stack, string, line, i).toObject(stack).asStringRaw();
+					str += EvalVariableName(stack, string, line, i).toObject(stack)->asStringRaw();
 				} catch (Exception& e) {
 					if (e.fLine == 0) {
 						e.fFile = "(string dereferencing)";
@@ -161,7 +161,7 @@ AstNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, strin
 			}
 			i++;
 			Object result = ParseAndEvalExpression(PARSER_PARAMS);
-			realRet.variable.push_back(result.asStringRaw());
+			realRet.variable.push_back(result->asStringRaw());
 		} break;
 
 		case '.':
@@ -268,7 +268,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 	if (variable) {
 		Object o = stack->get(funcRef);
 		CoerceOrThrow("referenced variable", o, Type::Function);
-		func = *o.function;
+		func = *o->function;
 	} else {
 		auto funcIter = stack->GlobalFunctions.find(funcRef[0]);
 		if (funcIter == stack->GlobalFunctions.end()) {
@@ -323,7 +323,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 					if (pastEndOfParamName)
 						throw UNEXPECTED_TOKEN;
 					if (paramName.length() == 0) {
-						paramName = ParseString(PARSER_PARAMS, c).toObject(stack).string;
+						paramName = ParseString(PARSER_PARAMS, c).toObject(stack)->string;
 						pastEndOfParamName = true;
 					} else
 						throw UNEXPECTED_TOKEN;
@@ -366,7 +366,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 		}
 	}
 
-	Object* context = nullptr;
+	Object context = nullptr;
 	if (funcRef.size() > 1) {
 		vector<string> parentRef = funcRef;
 		parentRef.pop_back();
@@ -471,7 +471,7 @@ void ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* s
 		throw UNEXPECTED_TOKEN_EXPECTED("(");
 
 	auto CBH_Inner = [&]() -> bool {
-		bool exec = ParseAndEvalExpression(PARSER_PARAMS).coerceToBoolean();
+		bool exec = ParseAndEvalExpression(PARSER_PARAMS)->coerceToBoolean();
 		i++;
 		IgnoreWhitespace(PARSER_PARAMS);
 		string::size_type j = LocateEndOfScope(PARSER_PARAMS);
@@ -579,7 +579,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			else if (thing == "false")
 				expression.push_back(AstNode(AstNode::Literal, BooleanObject(false)));
 			else if (thing == "undefined")
-				expression.push_back(AstNode(AstNode::Literal, Object()));
+				expression.push_back(AstNode(AstNode::Literal, UndefinedObject()));
 			else if (thing == "return") {
 				if (expression.size() != 0)
 					throw Exception(Exception::SyntaxError, string("incorrectly placed 'return'"));
@@ -654,7 +654,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 
 #define RETURN(x) if (isReturn) { throw ReturnValue(x); } else { return x; }
 	if (expression.size() == 0) {
-		RETURN(Object()); // undefined
+		RETURN(UndefinedObject()); // undefined
 	}
 	if (expression.size() == 1) {
 		RETURN(expression[0].toObject(stack));
@@ -673,7 +673,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		string("unknown operator '").append(oper).append("'"));
 #define IMPLEMENT_OPERATOR(OP_NAME, TOKEN, DOING_TOKEQ) { \
 	j--; \
-	Object result = Object::op_##OP_NAME(expression[j].toObject(stack), \
+	Object result = CObject::op_##OP_NAME(expression[j].toObject(stack), \
 		expression[j + 2].toObject(stack)); \
 	if (DOING_TOKEQ && oper == (#TOKEN "=")) { \
 		if (expression[j].type != AstNode::Variable) \
@@ -713,11 +713,11 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "!") {
-			Object result = BooleanObject(!(expression[j + 1].toObject(stack).coerceToBoolean()));
+			Object result = BooleanObject(!(expression[j + 1].toObject(stack)->coerceToBoolean()));
 			expression[j] = AstNode(AstNode::Literal, result);
 			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
 		} else if (oper == "!!") {
-			Object result = BooleanObject(expression[j + 1].toObject(stack).coerceToBoolean());
+			Object result = BooleanObject(expression[j + 1].toObject(stack)->coerceToBoolean());
 			expression[j] = AstNode(AstNode::Literal, result);
 			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
 		}
@@ -843,7 +843,7 @@ Object EvalString(Stack* stack, const string& code, string fromPath, const uint3
 	}
 	if (popDirs)
 		stack->popDir();
-	return Object(); // undefined
+	return UndefinedObject(); // undefined
 }
 
 Object Run(Stack* stack, string path)

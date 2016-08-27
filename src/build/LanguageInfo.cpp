@@ -25,62 +25,61 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	  fGenerated(false)
 {
 	Script::CoerceOrThrow("language information", info, Type::Map);
-	Object type = info["type"];
+	Object type = info->get("type");
 	Script::CoerceOrThrow("languageInfo.type", type, Type::String);
-	if (type.string != "CompiledToMachineCode")
+	if (type->string != "CompiledToMachineCode")
 		throw Script::Exception(Script::Exception::Type::UserError,
 			"only 'CompiledToMachineCode' is supported at this time");
 
 	// File extensions
-	Object srcExts = info["sourceExtensions"];
+	Object srcExts = info->get("sourceExtensions");
 	Script::CoerceOrThrow("languageInfo.sourceExtensions", srcExts, Type::List);
-	for (const Object* obj : *srcExts.list)
+	for (const Object obj : *srcExts->list)
 		sourceExtensions.push_back(obj->asStringRaw());
-	Object extraExts = info["extraExtensions"];
-	if (extraExts.type() == Script::Type::List) {
-		for (const Object* obj : *extraExts.list)
+	Object extraExts = info->get("extraExtensions");
+	if (extraExts->type() == Script::Type::List) {
+		for (const Object obj : *extraExts->list)
 			extraExtensions.push_back(obj->asStringRaw());
 	}
 
-	Object envir = info["compilerEnviron"];
-	if (envir.type() != Script::Type::Undefined)
-		compilerEnviron = envir.asStringRaw();
+	Object envir = info->get("compilerEnviron");
+	if (envir->type() != Script::Type::Undefined)
+		compilerEnviron = envir->asStringRaw();
 
 	// Figure out what compiler we're using
-	Object comps = info["compilers"];
+	Object comps = info->get("compilers");
 	Script::CoerceOrThrow("languageInfo.compilers", comps, Type::Map);
 	auto tryCompiler = [&](const string& binary) -> bool {
 		string compilerBin = FSUtil::which(binary);
 		if (FSUtil::exists(compilerBin)) {
 			// Which compiler is this?
 			for (Script::ObjectMap::const_iterator it =
-				 comps.map->begin(); it != comps.map->end(); it++) {
-				Object* compPtr = it->second;
-				Script::CoerceOrThrowPtr("languageInfo.compiler", compPtr, Type::Map);
-				Object comp = *compPtr;
-				Object detect = comp["detect"];
+				 comps->map->begin(); it != comps->map->end(); it++) {
+				Object comp = it->second;
+				Script::CoerceOrThrow("languageInfo.compiler", comp, Type::Map);
+				Object detect = comp->get("detect");
 				Script::CoerceOrThrow("languageInfo.compiler.detect", detect, Type::Map);
 				OSUtil::ExecResult res =
-					OSUtil::exec(binary, detect["arguments"].asStringRaw());
+					OSUtil::exec(binary, detect->get("arguments")->asStringRaw());
 				if (res.exitcode != 0)
 					continue; // did not exit with 0 -- something wrong
-				Object contains = detect["contains"];
+				Object contains = detect->get("contains");
 				Script::CoerceOrThrow("languageInfo.compiler.detect.contains", contains, Type::List);
 				bool OK = true;
-				for (const Object* obj : *contains.list) {
+				for (const Object obj : *contains->list) {
 					if (OK && res.output.find(obj->asStringRaw()) == string::npos)
 						OK = false;
 				}
 				if (OK) {
 					compilerName = it->first;
 					compilerBinary = compilerBin;
-					compilerDefaultFlags = comp["defaultFlags"].asStringRaw();
-					compilerCompileFlag = comp["compile"].asStringRaw();
-					compilerOutputFlag = comp["output"].asStringRaw();
-					compilerOutputExtension = comp["outputExtension"].asStringRaw();
-					compilerLinkBinaryFlag = comp["linkBinary"].asStringRaw();
-					compilerDefinition = comp["definition"].asStringRaw();
-					compilerInclude = comp["include"].asStringRaw();
+					compilerDefaultFlags = comp->get("defaultFlags")->asStringRaw();
+					compilerCompileFlag = comp->get("compile")->asStringRaw();
+					compilerOutputFlag = comp->get("output")->asStringRaw();
+					compilerOutputExtension = comp->get("outputExtension")->asStringRaw();
+					compilerLinkBinaryFlag = comp->get("linkBinary")->asStringRaw();
+					compilerDefinition = comp->get("definition")->asStringRaw();
+					compilerInclude = comp->get("include")->asStringRaw();
 
 					// Update superglobals
 					sStack->addSuperglobal(compilerName, Script::BooleanObject(true));
@@ -104,10 +103,10 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	if (compilerName.empty()) {
 		// Preferred & environ didn't work, try everything in succession instead
 		for (Script::ObjectMap::const_iterator it =
-			 comps.map->begin(); it != comps.map->end(); it++) {
-			Object* comp = it->second;
-			Script::CoerceOrThrowPtr("languageInfo.compiler", comp, Type::Map);
-			if (tryCompiler(comp->map->get("binary").asStringRaw()))
+			 comps->map->begin(); it != comps->map->end(); it++) {
+			Object comp = it->second;
+			Script::CoerceOrThrow("languageInfo.compiler", comp, Type::Map);
+			if (tryCompiler(comp->get("binary")->asStringRaw()))
 				break;
 		}
 	}
@@ -119,26 +118,26 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 		PrintUtil::checkFinished(compilerName + " ('" + compilerBinary + "')", 2);
 
 	// Grab standards modes
-	Object* stdsModes = info.map->get_ptr("standardsModes");
-	Script::CoerceOrThrowPtr("languageInfo.standardsModes", stdsModes, Type::Map);
+	Object stdsModes = info->map->get_ptr("standardsModes");
+	Script::CoerceOrThrow("languageInfo.standardsModes", stdsModes, Type::Map);
 	for (Script::ObjectMap::const_iterator it =
 		 stdsModes->map->begin(); it != stdsModes->map->end(); it++) {
 		StandardsMode mode;
 		mode.status = 0;
-		Object* obj = it->second;
-		Script::CoerceOrThrowPtr("languageInfo.standardsModes[i]", obj, Type::Map);
-		mode.test = obj->map->get("test").asStringRaw();
-		Object* forComp = obj->map->get_ptr(compilerName);
-		Script::CoerceOrThrowPtr("languageInfo.standardsModes[i][comp]", forComp, Type::Map);
-		mode.normalFlag = forComp->map->get("normal").asStringRaw();
-		mode.strictFlag = forComp->map->get("strict").asStringRaw();
+		Object obj = it->second;
+		Script::CoerceOrThrow("languageInfo.standardsModes[i]", obj, Type::Map);
+		mode.test = obj->get("test")->asStringRaw();
+		Object forComp = obj->map->get_ptr(compilerName);
+		Script::CoerceOrThrow("languageInfo.standardsModes[i][comp]", forComp, Type::Map);
+		mode.normalFlag = forComp->map->get("normal")->asStringRaw();
+		mode.strictFlag = forComp->map->get("strict")->asStringRaw();
 		standardsModes.insert({it->first, mode});
 	}
 
 	// Check that the compiler works
 	PrintUtil::checking("if the " + langName + " compiler works");
 	OSUtil::ExecResult res =
-		checkIfCompiles("test" + langName, info["test"].asStringRaw());
+		checkIfCompiles("test" + langName, info->get("test")->asStringRaw());
 	if (res.exitcode == 0) {
 		PrintUtil::checkFinished("yes", 2);
 	} else {

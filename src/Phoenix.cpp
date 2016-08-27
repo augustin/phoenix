@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 	FSUtil::mkdir("PhoenixTemp");
 
 	Script::Stack* stack = new Script::Stack();
-	stack->addSuperglobal("Phoenix", Script::GlobalLanguageObject(stack));
+	stack->addSuperglobal("Phoenix", std::make_shared<Script::GlobalLanguageObject>(stack));
 	Target::addGlobalFunction(stack);
 	LanguageInfo::sStack = stack;
 	stack->addSuperglobal("Compilers", Script::MapObject(new Script::ObjectMap()));
