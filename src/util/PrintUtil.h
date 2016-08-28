@@ -19,4 +19,5 @@ public:
 
 private:
 	static bool sChecking;
+	static const bool sIsTTY;
 };
