@@ -20,7 +20,7 @@ return Map(
 			definition: "-D",
 			include: "-I"
 		),
-		"GNU": Map(
+		"GCC": Map(
 			binary: "g++",
 			detect: Map(arguments: "--version", contains: ["g++", "Free Software Foundation"]),
 			defaultFlags: "",
@@ -46,13 +46,13 @@ return Map(
 	standardsModes: Map(
 		"98": Map(
 			test: "int main(){\n#if __cplusplus != 199711L\n#error Not Cpp98\n#endif\nreturn 0;}",
-			"GNU": Map(normal: "-std=gnu++98", strict: "-std=c++98"),
+			"GCC": Map(normal: "-std=gnu++98", strict: "-std=c++98"),
 			"Clang": Map(normal: "-std=gnu++98", strict: "-std=c++98"),
 			"MSVC": Map(normal: "", strict: "")
 		),
 		"11": Map(
 			test: "#include<vector>\nint main(){std::vector<int>v={1,2,3,4};for(int i:v)i++;return 0;}",
-			"GNU": Map(normal: "-std=gnu++0x", strict: "-std=c++0x"),
+			"GCC": Map(normal: "-std=gnu++0x", strict: "-std=c++0x"),
 			"Clang": Map(normal: "-std=gnu++0x", strict: "-std=c++0x"),
 			"MSVC": Map(normal: "", strict: "")
 		)
