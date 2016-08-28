@@ -16,6 +16,8 @@ public:
 	NinjaGenerator();
 	virtual ~NinjaGenerator();
 
+	virtual bool check() override;
+
 	virtual void setBuildScriptFiles(std::string program,
 		const std::vector<std::string> files) override;
 
@@ -37,6 +39,9 @@ public:
 
 private:
 	std::string escapeString(const std::string& str);
+
+	bool fFeaturePoolConsole;
+	std::string fRequiredVersion;
 
 	typedef struct {
 		std::string ruleName;

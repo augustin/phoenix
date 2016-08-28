@@ -113,6 +113,10 @@ int main(int argc, char* argv[])
 			FSUtil::rmdir("PhoenixTemp");
 			return 1;
 		}
+		if (!gen->check()) {
+			FSUtil::rmdir("PhoenixTemp");
+			return 1;
+		}
 
 		Script::Run(stack, sourceDirectory);
 
