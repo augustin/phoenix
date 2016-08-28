@@ -24,6 +24,10 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 	: name(langName),
 	  fGenerated(false)
 {
+	genName = name;
+	StringUtil::replaceAll(genName, "+", "P");
+	StringUtil::replaceAll(genName, "-", "D");
+
 	Script::CoerceOrThrow("language information", info, Type::Map);
 	Object type = info->get("type");
 	Script::CoerceOrThrow("languageInfo.type", type, Type::String);
@@ -174,15 +178,11 @@ void LanguageInfo::generate(Generator* gen)
 	if (fGenerated)
 		return;
 
-	gen->setProgramLinkRule(compilerBinary + " %INPUTFILE% " + compilerLinkBinaryFlag +
-		"%OUTPUTFILE% %TARGETFLAGS%", "Link" + name);
-
-	string genName = name;
-	StringUtil::replaceAll(genName, "+", "P");
-	StringUtil::replaceAll(genName, "-", "D");
 	gen->addRegularRule("lang" + genName, name, sourceExtensions, compilerBinary,
 		compilerOutputExtension, compilerCompileFlag + "%INPUTFILE% " +
 		compilerOutputFlag + "%OUTPUTFILE% %TARGETFLAGS%");
+	gen->addLinkRule("link" + genName, "Link" + name, compilerBinary,
+		"%INPUTFILE% " + compilerLinkBinaryFlag + "%OUTPUTFILE% %TARGETFLAGS%");
 
 	fGenerated = true;
 }

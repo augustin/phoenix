@@ -68,18 +68,19 @@ void NinjaGenerator::addRegularRule(const string& ruleName, const string& descNa
 		fRulesForExts.insert({ext, itm});
 }
 
-void NinjaGenerator::setProgramLinkRule(const string& rule, const string& ruleDescription)
+void NinjaGenerator::addLinkRule(const string& ruleName,
+	const string& descName, const string& program, const string& rule)
 {
 	string realRule = rule;
 	StringUtil::replaceAll(realRule, "%INPUTFILE%", "$in");
 	StringUtil::replaceAll(realRule, "%OUTPUTFILE%", "$out");
 	StringUtil::replaceAll(realRule, "%TARGETFLAGS%", "$targetflags");
-	fRulesLines.push_back("rule link\n"
-		"  command = " + realRule + "\n"
-		"  description = " + ruleDescription + " $out");
+	fRulesLines.push_back("rule " + ruleName + "\n"
+		"  command = " + program + " " + realRule + "\n"
+		"  description = " + descName + " $out");
 }
 
-void NinjaGenerator::addTarget(const string& outputBinaryName,
+void NinjaGenerator::addTarget(const string& linkRule, const string& outputBinaryName,
 	const vector<string>& inputFiles, const string& targetFlags)
 {
 	vector<string> outfiles;
@@ -102,8 +103,8 @@ void NinjaGenerator::addTarget(const string& outputBinaryName,
 		fBuildLines.push_back(line);
 	}
 	std::string targetFile = /* TODO: runtimeOutputDirectory */ outputBinaryName;
-	fBuildLines.push_back("build " + targetFile + ": " +
-		"link " + StringUtil::join(outfiles, " ") + "\n");
+	fBuildLines.push_back("build " + targetFile + ": " + linkRule +
+		" " + StringUtil::join(outfiles, " ") + "\n");
 	fTargets.push_back(targetFile);
 }
 

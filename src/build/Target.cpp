@@ -133,7 +133,8 @@ void Target::generate(Generator* gen)
 	if (sourceFiles.size() == 0) {
 		throw Exception(Exception::TypeError, "no source files for target '" + name + "'");
 	}
-	gen->addTarget(name + APPLICATION_FILE_EXT, sourceFiles,
+	gen->addTarget("link" + LanguageInfo::getLanguageInfo(languages[0])->genName,
+		name + APPLICATION_FILE_EXT, sourceFiles,
 		StringUtil::join({otherFlags, includesFlags,
 			definitionsFlags, standardsModeFlag}, " "));
 }

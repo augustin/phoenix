@@ -31,6 +31,7 @@ public:
 
 	// Basic info
 	std::string name;
+	std::string genName;
 	std::vector<std::string> sourceExtensions;
 	std::vector<std::string> extraExtensions;
 	std::string compilerEnviron;

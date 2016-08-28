@@ -31,10 +31,12 @@ public:
 		const std::string& descName, const std::vector<std::string>& forExts,
 		const std::string& program, const std::string& outFileExt,
 		const std::string& rule) = 0;
-	virtual void setProgramLinkRule(const std::string& rule,
-		const std::string& ruleDescription) = 0;
+	virtual void addLinkRule(const std::string& ruleName,
+		const std::string& descName, const std::string& program,
+		const std::string& rule) = 0;
 
-	virtual void addTarget(const std::string& outputBinaryName,
+	virtual void addTarget(const std::string& linkRule,
+		const std::string& outputBinaryName,
 		const std::vector<std::string>& inputFiles,
 		const std::string& targetFlags) = 0;
 
