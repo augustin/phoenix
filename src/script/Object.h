@@ -191,7 +191,7 @@ public:
 	Object get_ptr(_inherited::size_type i) { return _inherited::at(i); }
 
 	void set(_inherited::size_type i, const Object obj) { set_ptr(i, CopyObject(obj)); }
-	void set_ptr(_inherited::size_type i, const Object obj) { _inherited::operator[](i) = obj; }
+	void set_ptr(_inherited::size_type i, const Object obj);
 
 	size_type size() const { return _inherited::size(); }
 };

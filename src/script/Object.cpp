@@ -296,4 +296,16 @@ ObjectList& ObjectList::operator=(const ObjectList& other)
 	return *this;
 }
 
+void ObjectList::set_ptr(_inherited::size_type i, const Object obj)
+{
+	if (i >= _inherited::size()) {
+		_inherited::size_type j = _inherited::size() - 1;
+		while (j < i) {
+			_inherited::push_back(UndefinedObject());
+			j++;
+		}
+	}
+	_inherited::operator[](i) = obj;
+}
+
 }
