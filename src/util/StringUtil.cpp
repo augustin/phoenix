@@ -50,6 +50,23 @@ string StringUtil::join(const vector<string>& array, const string& delimiter,
 	return ret;
 }
 
+string StringUtil::trim(const string& str)
+{
+	string::size_type from = 0;
+	for (; from < str.length(); from++) {
+		char c = str[from];
+		if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
+			break;
+	}
+	string::size_type to = str.length() - 1;
+	for (; to > from; to--) {
+		char c = str[to];
+		if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
+			break;
+	}
+	return str.substr(from, (to - from) + 1);
+}
+
 bool StringUtil::startsWith(const string& haystack, const string& needle)
 {
 	size_t haystackLen = haystack.length(), needleLen = needle.length();

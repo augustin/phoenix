@@ -35,6 +35,10 @@ int main(int, char* argv[])
 	t.result(StringUtil::join({"Hello", "world", "it", "is", "I"}, " ") ==
 		"Hello world it is I", "join-2");
 
+	t.result(StringUtil::trim("original string") == "original string", "trim-1");
+	t.result(StringUtil::trim("   lots   \tof     whitespace\t  ") ==
+		"lots   \tof     whitespace", "trim-2");
+
 	t.result(StringUtil::startsWith("Hay stack", "Hay"), "startsWith-1");
 	t.result(StringUtil::startsWith("Haystack", "Hay"), "startsWith-2");
 	t.result(!StringUtil::startsWith("Heystack", "Hay"), "startsWith-3");

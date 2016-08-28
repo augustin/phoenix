@@ -16,6 +16,8 @@ public:
 	static std::string join(const std::vector<std::string>& array,
 		const std::string& delimiter, bool skipEmptyStrings = true);
 
+	static std::string trim(const std::string& str);
+
 	static bool startsWith(const std::string& haystack, const std::string& needle);
 	static bool endsWith(const std::string& haystack, const std::string& needle);
 
