@@ -3,12 +3,13 @@
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "Tester.h"
 
 #include "util/StringUtil.h"
 #include "util/FSUtil.h"
+#include "util/XmlUtil.h"
 
 int main(int, char* argv[])
 {
@@ -124,6 +125,15 @@ int main(int, char* argv[])
 	t.result(FSUtil::isDir("this_directory_now_exists"), "mkdir-1/isDir-5");
 	FSUtil::rmdir("this_directory_now_exists");
 	t.result(!FSUtil::isDir("this_directory_now_exists"), "rmdir-1/isDir-6");
+	t.endGroup();
+
+	t.beginGroup("XmlUtil");
+	XmlGenerator gen("test_tag", {{"bla", "tru"}, {"wat","els"}});
+	gen.beginTag("hello_world");
+	gen.beginTag("thing", {{"ok", "nop!e\"<>"}}, true);
+	t.result(gen.finish() == "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		"<test_tag bla=\"tru\" wat=\"els\">\n\t<hello_world>\n\t\t<thing "
+		"ok=\"nop!e&quot;&lt;&gt;\"/>\n\t</hello_world>\n</test_tag>\n", "xmlgen-1");
 	t.endGroup();
 
 	return t.done();
