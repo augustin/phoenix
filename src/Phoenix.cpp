@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 		} else if (StringUtil::startsWith(arg, "-C:")) {
 			vector<string> item = StringUtil::split(arg, ":");
 			if (item.size() != 3) {
-				cerr << "error: -C passed but did not have the expected -C:<lang>:<compiler> syntax.";
+				PrintUtil::error("-C passed but did not have the expected -C:<lang>:<compiler> syntax.");
 				return 1;
 			}
 			LanguageInfo::sPreferredCompiler.insert({item[1], item[2]});
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
 			else
 				sourceDirectory = arg;
 		} else {
-			cerr << "error: unrecognized option '" << arg << "'.";
+			PrintUtil::error("unrecognized option '" + arg + "'.");
 			return 1;
 		}
 	}
@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 	try {
 		Generator* gen = Generators::create(generator);
 		if (gen == nullptr) {
-			cerr << "error: could not find a generator with name '" << generator << "'";
+			PrintUtil::error("could not find a generator with name '" + generator + "'");
 			FSUtil::rmdir("PhoenixTemp");
 			return 1;
 		}
