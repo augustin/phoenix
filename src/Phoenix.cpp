@@ -54,11 +54,8 @@ void printUsage(string program, bool full)
 		std::endl;
 }
 
-int main(int argc, char* argv[])
+int PhoenixMain(vector<string> arguments)
 {
-	setlocale(LC_ALL, "C"); // Force C locale
-
-	vector<string> arguments(argv, argv + argc);
 	if (arguments.size() < 2) {
 		printUsage(arguments[0], false);
 		cerr << std::endl;
