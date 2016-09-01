@@ -26,13 +26,13 @@ NinjaGenerator::~NinjaGenerator()
 bool NinjaGenerator::check()
 {
 	PrintUtil::checking("if Ninja is installed and working");
-	string ninja = FSUtil::which("ninja");
-	if (ninja.empty()) {
+	fNinjaExecutable = FSUtil::which("ninja");
+	if (fNinjaExecutable.empty()) {
 		PrintUtil::checkFinished("not installed", 0);
 		PrintUtil::error("Ninja is either not installed or not in PATH.");
 		return false;
 	}
-	OSUtil::ExecResult e = OSUtil::exec(ninja, "--version");
+	OSUtil::ExecResult e = OSUtil::exec(fNinjaExecutable, "--version");
 	if (e.exitcode != 0) {
 		PrintUtil::checkFinished("failed to get version", 0);
 		PrintUtil::error("'ninja --version' did not exit with 0, something is very wrong.");
@@ -63,7 +63,7 @@ string NinjaGenerator::escapeString(const string& str)
 	return ret;
 }
 
-void NinjaGenerator::setBuildScriptFiles(string program, const vector<string> files)
+void NinjaGenerator::setBuildScriptFiles(const string& program, const vector<string> files)
 {
 	fRulesLines.push_back("rule RERUN_PHOENIX\n"
 		"  command = " + program + "\n"
@@ -149,6 +149,11 @@ vector<string> NinjaGenerator::outputFiles()
 {
 	return {"build.ninja"};
 }
+string NinjaGenerator::command(const string& target)
+{
+	return fNinjaExecutable + (target.empty() ? "" : " " + target);
+}
+
 void NinjaGenerator::write()
 {
 	FSUtil::putContents("build.ninja",

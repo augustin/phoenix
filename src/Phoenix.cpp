@@ -44,6 +44,10 @@ void printUsage(string program, bool full)
 			cerr << " (default)";
 		cerr << std::endl;
 	}
+	cerr << "\t-S<secondary>\t\tSecondary (IDEs, etc.) generator to use; possibilities:" << std::endl;
+	list = Generators::listSecondary();
+	for (string genName : list)
+		cerr << "\t\t" << genName << std::endl;
 
 	// cerr << "\t-X<target>\tCross-compile to <target>." << std::endl; // TODO
 	cerr << "\t-C:<lang>:<compiler>\tPreferred compiler for <lang> to use." <<
@@ -64,6 +68,7 @@ int main(int argc, char* argv[])
 	}
 
 	string buildDirectory = ".", sourceDirectory, generator;
+	vector<string> secondaryGenerators;
 	for (vector<string>::size_type i = 1; i < arguments.size(); i++) {
 		string arg = arguments[i];
 		if (arg == "--help") {
@@ -78,6 +83,8 @@ int main(int argc, char* argv[])
 			LanguageInfo::sPreferredCompiler.insert({item[1], item[2]});
 		} else if (StringUtil::startsWith(arg, "-G")) {
 			generator = arg.substr(2);
+		} else if (StringUtil::startsWith(arg, "-S")) {
+			secondaryGenerators.push_back(arg.substr(2));
 		} else if (sourceDirectory.empty() || buildDirectory == ".") {
 			// Assume it's a path.
 			if (sourceDirectory.length() > 0)
@@ -107,9 +114,8 @@ int main(int argc, char* argv[])
 	stack->addSuperglobal("Compilers", Script::MapObject(new Script::ObjectMap()));
 
 	try {
-		Generator* gen = Generators::create(generator);
+		Generator* gen = Generators::create(generator, secondaryGenerators);
 		if (gen == nullptr) {
-			PrintUtil::error("could not find a generator with name '" + generator + "'");
 			FSUtil::rmdir("PhoenixTemp");
 			return 1;
 		}
@@ -120,7 +126,10 @@ int main(int argc, char* argv[])
 
 		Script::Run(stack, sourceDirectory);
 
-		std::cout << "generating build files for " << generator << "... ";
+		std::cout << "generating build files for " << generator;
+		for (string gen : secondaryGenerators)
+			std::cout << ", " + gen;
+		std::cout << "... ";
 		gen->setBuildScriptFiles(StringUtil::join(arguments, " "), stack->inputFiles());
 		for (Target* target : Target::targets)
 			target->generate(gen);

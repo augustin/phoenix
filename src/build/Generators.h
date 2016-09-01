@@ -20,7 +20,7 @@ public:
 	virtual bool check() = 0;
 
 	// Generates the rule to regenerate the files when someone modifies a script
-	virtual void setBuildScriptFiles(std::string program,
+	virtual void setBuildScriptFiles(const std::string& program,
 		const std::vector<std::string> files) = 0;
 
 	// Rules
@@ -43,13 +43,20 @@ public:
 		const std::string& targetFlags) = 0;
 
 	virtual std::vector<std::string> outputFiles() = 0;
+	virtual std::string command(const std::string& target = "");
+
 	virtual void write() = 0;
 };
 
 class Generators
 {
 public:
+	// Don't touch unless you know what you're doing.
+	static Generator* primary;
+	static Generator* actual;
+
 	static std::string defaultName();
 	static std::vector<std::string> list();
-	static Generator* create(std::string name);
+	static std::vector<std::string> listSecondary();
+	static Generator* create(std::string name, std::vector<std::string> secondary = {});
 };

@@ -18,7 +18,7 @@ public:
 
 	virtual bool check() override;
 
-	virtual void setBuildScriptFiles(std::string program,
+	virtual void setBuildScriptFiles(const std::string& program,
 		const std::vector<std::string> files) override;
 
 	virtual void addRegularRule(const std::string& ruleName,
@@ -35,11 +35,14 @@ public:
 		const std::string& targetFlags) override;
 
 	virtual std::vector<std::string> outputFiles() override;
+	virtual std::string command(const std::string& target) override;
+
 	virtual void write() override;
 
 private:
 	std::string escapeString(const std::string& str);
 
+	std::string fNinjaExecutable;
 	bool fFeaturePoolConsole;
 	std::string fRequiredVersion;
 
