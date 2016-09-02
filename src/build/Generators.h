@@ -18,6 +18,13 @@ class Target;
 class Generator
 {
 public:
+	// Types/enums
+	enum DependencyFormat {
+		NoDependencies = 0,
+		MakeFormat,
+		StdoutFormat,
+	};
+
 	virtual ~Generator();
 
 	virtual bool check() = 0;
@@ -29,21 +36,21 @@ public:
 	// Rules
 	/*! `rule` must be a command string, and should include the following keywords:
 	 * 	 - `%INPUTFILE%`: The input file name.
-	 * 	 - `%OUTPUTFILE%`: The output file name.
+	 * 	 - `%OUTPUTFILE%`: The output file name. (Makefile-style deps should output with an extra '.d').
 	 *   - `%TARGETFLAGS%`: The place to insert per-target flags.
 	 */
 	virtual void addRegularRule(const std::string& ruleName,
 		const std::string& descName, const std::vector<std::string>& forExts,
-		const std::string& program, const std::string& outFileExt,
-	    const std::string& rule) = 0;
+		const std::string& program, const std::string& outFileExt, DependencyFormat depFormat,
+		const std::string& depPrefix, const std::string& rule) = 0;
 	virtual void addLinkRule(const std::string& ruleName,
 		const std::string& descName, const std::string& program,
 		const std::string& rule) = 0;
 
 	virtual void addTarget(const std::string& linkRule,
 		const std::string& outputBinaryName,
-	    const std::vector<std::string>& inputFiles,
-	    const std::string& targetFlags, const Target* target) = 0;
+		const std::vector<std::string>& inputFiles,
+		const std::string& targetFlags, const Target* target) = 0;
 
 	virtual std::vector<std::string> outputFiles() = 0;
 	virtual std::string command(const std::string& target = "");

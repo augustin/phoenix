@@ -40,6 +40,9 @@ public:
 	std::string compilerName;
 	std::string compilerBinary;
 	std::string compilerDefaultFlags;
+	std::string compilerDependenciesFlag;
+	Generator::DependencyFormat compilerDependencyFormat;
+	std::string compilerDependencyPrefix;
 	std::string compilerCompileFlag;
 	std::string compilerOutputFlag;
 	std::string compilerOutputExtension;

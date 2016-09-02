@@ -24,6 +24,7 @@ public:
 	virtual void addRegularRule(const std::string&,
 		const std::string&, const std::vector<std::string>&,
 		const std::string&, const std::string&,
+		DependencyFormat, const std::string&,
 		const std::string&) override {}
 	virtual void addLinkRule(const std::string&,
 		const std::string&, const std::string&,

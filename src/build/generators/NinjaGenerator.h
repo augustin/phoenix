@@ -24,6 +24,7 @@ public:
 	virtual void addRegularRule(const std::string& ruleName,
 		const std::string& descName, const std::vector<std::string>& forExts,
 		const std::string& program, const std::string& outFileExt,
+		DependencyFormat depFormat, const std::string& depPrefix,
 		const std::string& rule) override;
 	virtual void addLinkRule(const std::string& ruleName,
 		const std::string& descName, const std::string& program,
@@ -52,6 +53,7 @@ private:
 	} RuleForExt;
 	std::map<std::string, RuleForExt> fRulesForExts;
 
+	std::string fDepsPrefix;
 	std::vector<std::string> fRulesLines;
 	std::vector<std::string> fBuildLines;
 	std::vector<std::string> fTargets;

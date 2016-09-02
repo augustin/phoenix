@@ -78,12 +78,21 @@ LanguageInfo::LanguageInfo(string langName, Object info)
 					compilerName = it->first;
 					compilerBinary = compilerBin;
 					compilerDefaultFlags = comp->get("defaultFlags")->asStringRaw();
+					compilerDependenciesFlag = comp->get("dependencies")->asStringRaw();
+					compilerDependencyPrefix = (comp->type() != Type::Undefined) ?
+						comp->get("dependenciesPrefix")->asStringRaw() : "";
 					compilerCompileFlag = comp->get("compile")->asStringRaw();
 					compilerOutputFlag = comp->get("output")->asStringRaw();
 					compilerOutputExtension = comp->get("outputExtension")->asStringRaw();
 					compilerLinkBinaryFlag = comp->get("linkBinary")->asStringRaw();
 					compilerDefinition = comp->get("definition")->asStringRaw();
 					compilerInclude = comp->get("include")->asStringRaw();
+
+					string depformat = comp->get("dependenciesFormat")->asStringRaw();
+					if (depformat == "Makefile")
+						compilerDependencyFormat = Generator::MakeFormat;
+					else if (depformat == "Stdout")
+						compilerDependencyFormat = Generator::StdoutFormat;
 
 					// Update superglobals
 					sStack->addSuperglobal(compilerName, Script::BooleanObject(true));
@@ -178,9 +187,16 @@ void LanguageInfo::generate(Generator* gen)
 	if (fGenerated)
 		return;
 
-	gen->addRegularRule("lang" + genName, name, sourceExtensions, compilerBinary,
-		compilerOutputExtension, compilerCompileFlag + "%INPUTFILE% " +
-		compilerOutputFlag + "%OUTPUTFILE% %TARGETFLAGS%");
+	string rule = compilerCompileFlag + "%INPUTFILE% " +
+		compilerOutputFlag + "%OUTPUTFILE% %TARGETFLAGS%";
+	if (compilerDependencyFormat == Generator::MakeFormat)
+		rule = compilerDependenciesFlag + "%OUTPUTFILE%.d " + rule;
+	else if (compilerDependencyFormat == Generator::StdoutFormat)
+		rule = compilerDependenciesFlag + " " + rule;
+
+	gen->addRegularRule("lang" + genName, name, sourceExtensions,
+		compilerBinary, compilerOutputExtension, compilerDependencyFormat,
+		compilerDependencyPrefix, rule);
 	gen->addLinkRule("link" + genName, "Link" + name, compilerBinary,
 		"%INPUTFILE% " + compilerLinkBinaryFlag + "%OUTPUTFILE% %TARGETFLAGS%");
 

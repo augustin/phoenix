@@ -45,10 +45,13 @@ public:
 	virtual void addRegularRule(const string& ruleName,
 		const string& descName, const vector<string>& forExts,
 		const string& program, const string& outFileExt,
+		DependencyFormat depFormat, const std::string& depPrefix,
 		const string& rule) override {
-		fPrimary->addRegularRule(ruleName, descName, forExts, program, outFileExt, rule);
+		fPrimary->addRegularRule(ruleName, descName, forExts, program,
+			outFileExt, depFormat, depPrefix, rule);
 		for (Generator* gen : fSecondaries)
-			gen->addRegularRule(ruleName, descName, forExts, program, outFileExt, rule);
+			gen->addRegularRule(ruleName, descName, forExts, program,
+				outFileExt, depFormat, depPrefix, rule);
 	}
 	virtual void addLinkRule(const string& ruleName,
 		const string& descName, const string& program,
