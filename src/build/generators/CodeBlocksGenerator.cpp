@@ -40,20 +40,20 @@ void CodeBlocksGenerator::setBuildScriptFiles(const string&, const vector<string
 void CodeBlocksGenerator::addTarget(const string&, const string& outputBinaryName,
 	const vector<string>& inputFiles, const string&, Target* target)
 {
-	// Try to set fCompiler if we haven't already
-	if (fCompiler.empty() && std::find(target->languages.begin(), target->languages.end(),
-			"C++") != target->languages.end()) {
-		fCompiler = LanguageInfo::getLanguageInfo("C++")->compilerName;
-		std::transform(fCompiler.begin(), fCompiler.end(), fCompiler.begin(), ::tolower);
-	} else if (fCompiler.empty() && std::find(target->languages.begin(), target->languages.end(),
-		"C") != target->languages.end()) {
-		fCompiler = LanguageInfo::getLanguageInfo("C")->compilerName;
-		std::transform(fCompiler.begin(), fCompiler.end(), fCompiler.begin(), ::tolower);
-	}
+	// TODO: get rid of hardcoded languages[0]?
+	std::string compiler = LanguageInfo::getLanguageInfo(target->languages[0])->compilerName;
+	std::transform(compiler.begin(), compiler.end(), compiler.begin(), ::tolower); // Do we need this?
+	if (fCompiler.empty())
+		fCompiler = compiler;
 
-	fTargets.push_back(outputBinaryName);
+	CodeBlocksTarget t;
+	t.name = outputBinaryName;
+	t.includeDirs = target->includeDirs;
+	t.compiler = compiler;
+	fTargets.push_back(t);
+
 	for (string file : inputFiles) {
-		_filesmap::iterator it = fFilesAndTargets.find(file);
+		_multimap::iterator it = fFilesAndTargets.find(file);
 		if (it != fFilesAndTargets.end())
 			it->second.push_back(outputBinaryName);
 		else
@@ -72,8 +72,7 @@ void CodeBlocksGenerator::write()
 	gen.beginTag("Project");
 	gen.beginTag("Option", {{"title", "Project"}}, true);
 	gen.beginTag("Option", {{"makefile_is_custom", "1"}}, true);
-	if (!fCompiler.empty())
-		gen.beginTag("Option", {{"compiler", fCompiler}}, true);
+	gen.beginTag("Option", {{"compiler", fCompiler}}, true);
 
 	gen.beginTag("Build");
 		gen.beginTag("Target", {{"title", "all"}});
@@ -90,25 +89,31 @@ void CodeBlocksGenerator::write()
 			gen.endTag("MakeCommands");
 		gen.endTag("Target");
 
-		for (string target : fTargets) {
-			gen.beginTag("Target", {{"title", target}});
-				gen.beginTag("Option", {{"output", target},
+		for (CodeBlocksTarget target : fTargets) {
+			gen.beginTag("Target", {{"title", target.name}});
+				gen.beginTag("Option", {{"output", target.name},
 					{"prefix_auto", "0"}, {"extension_auto", "0"}}, true);
+				gen.beginTag("Option", {{"compiler", target.compiler}}, true);
 
 				gen.beginTag("MakeCommands");
 					gen.beginTag("Build", {{"command",
-						Generators::primary->command(target)}}, true);
+						Generators::primary->command(target.name)}}, true);
 					gen.beginTag("CompileFile", {{"command",
 						Generators::primary->command("\"$file\"")}}, true);
 					gen.beginTag("Clean", {{"command",
 						Generators::primary->command("clean")}}, true);
 					//gen.beginTag("DistClean", {{"command", }}, true); // TODO?
 				gen.endTag("MakeCommands");
+
+				gen.beginTag("Compiler");
+					for (string dir : target.includeDirs)
+						gen.beginTag("Add", {{"directory", dir}}, true);
+				gen.endTag("Compiler");
 			gen.endTag("Target");
 		}
 	gen.endTag("Build");
 
-	for (_filesmap::const_iterator it = fFilesAndTargets.begin(); it != fFilesAndTargets.end(); it++) {
+	for (_multimap::const_iterator it = fFilesAndTargets.begin(); it != fFilesAndTargets.end(); it++) {
 		gen.beginTag("Unit", {{"filename", it->first}}, it->second.empty());
 		for (string target : it->second)
 			gen.beginTag("Option", {{"target", target}}, true);

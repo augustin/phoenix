@@ -40,7 +40,14 @@ public:
 
 private:
 	std::string fCompiler;
-	std::vector<std::string> fTargets;
-	typedef std::map<std::string, std::vector<std::string>> _filesmap;
-	_filesmap fFilesAndTargets;
+
+	typedef struct {
+		std::string name;
+		std::vector<std::string> includeDirs;
+		std::string compiler;
+	} CodeBlocksTarget;
+	std::vector<CodeBlocksTarget> fTargets;
+
+	typedef std::map<std::string, std::vector<std::string>> _multimap;
+	_multimap fFilesAndTargets; /* map: file, target(s) */
 };

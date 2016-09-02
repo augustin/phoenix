@@ -114,14 +114,10 @@ Target::Target(const ObjectMap& params)
 
 	map->set("addIncludeDirectories", FunctionObject([this](Stack* stack,
 			Object, ObjectMap& params) -> Object {
-		// TODO: get rid of hardcoded languages[0]
-		LanguageInfo* info = LanguageInfo::getLanguageInfo(this->languages[0]);
 		NativeFunction_COERCE_OR_THROW("0", dirsList, Type::List);
 
-		for (const Object itm : *dirsList->list) {
-			this->includesFlags.append(" " + info->compilerInclude + "\"" +
-				FSUtil::combinePaths({stack->currentDir(), itm->asStringRaw()}) + "\"");
-		}
+		for (const Object itm : *dirsList->list)
+			includeDirs.push_back(FSUtil::combinePaths({stack->currentDir(), itm->asStringRaw()}));
 		return Script::UndefinedObject();
 	}));
 }
@@ -133,6 +129,14 @@ void Target::generate(Generator* gen)
 	if (sourceFiles.size() == 0) {
 		throw Exception(Exception::TypeError, "no source files for target '" + name + "'");
 	}
+
+	// TODO: get rid of hardcoded languages[0]
+	LanguageInfo* info = LanguageInfo::getLanguageInfo(this->languages[0]);
+
+	std::string includesFlags;
+	for (std::string dir : includeDirs)
+		includesFlags.append(" " + info->compilerInclude + "\"" + dir + "\"");
+
 	gen->addTarget("link" + LanguageInfo::getLanguageInfo(languages[0])->genName,
 		name + APPLICATION_FILE_EXT, sourceFiles,
 		StringUtil::join({otherFlags, includesFlags,

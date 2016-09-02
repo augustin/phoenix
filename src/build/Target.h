@@ -23,7 +23,7 @@ public:
 	std::vector<std::string> languages;
 	std::string standardsModeFlag;
 	std::string definitionsFlags;
-	std::string includesFlags;
+	std::vector<std::string> includeDirs;
 	std::string otherFlags;
 	std::vector<std::string> sourceFiles;
 
