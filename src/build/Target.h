@@ -26,6 +26,7 @@ public:
 	std::vector<std::string> includeDirs;
 	std::string otherFlags;
 	std::vector<std::string> sourceFiles;
+	std::vector<std::string> extraFiles;
 
 	void generate(Generator* gen);
 

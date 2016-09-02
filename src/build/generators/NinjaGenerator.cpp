@@ -118,7 +118,7 @@ void NinjaGenerator::addLinkRule(const string& ruleName,
 }
 
 void NinjaGenerator::addTarget(const string& linkRule, const string& outputBinaryName,
-	const vector<string>& inputFiles, const string& targetFlags, Target*)
+	const vector<string>& inputFiles, const string& targetFlags, const Target*)
 {
 	vector<string> outfiles;
 	string targetflagsvar = "tf_" + StringUtil::split(outputBinaryName, ".")[0];

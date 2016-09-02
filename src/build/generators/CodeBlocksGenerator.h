@@ -30,9 +30,9 @@ public:
 		const std::string&) override {}
 
 	virtual void addTarget(const std::string&,
-		const std::string& outputBinaryName,
+	    const std::string& outputBinaryName,
 	    const std::vector<std::string>& inputFiles, const std::string&,
-	    Target* target) override;
+	    const Target* target) override;
 
 	virtual std::vector<std::string> outputFiles() override;
 

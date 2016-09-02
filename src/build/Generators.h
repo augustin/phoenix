@@ -42,8 +42,8 @@ public:
 
 	virtual void addTarget(const std::string& linkRule,
 		const std::string& outputBinaryName,
-		const std::vector<std::string>& inputFiles,
-	    const std::string& targetFlags, Target* target) = 0;
+	    const std::vector<std::string>& inputFiles,
+	    const std::string& targetFlags, const Target* target) = 0;
 
 	virtual std::vector<std::string> outputFiles() = 0;
 	virtual std::string command(const std::string& target = "");

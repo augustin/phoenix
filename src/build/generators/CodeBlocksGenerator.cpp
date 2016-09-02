@@ -38,7 +38,7 @@ void CodeBlocksGenerator::setBuildScriptFiles(const string&, const vector<string
 }
 
 void CodeBlocksGenerator::addTarget(const string&, const string& outputBinaryName,
-	const vector<string>& inputFiles, const string&, Target* target)
+	const vector<string>& inputFiles, const string&, const Target* target)
 {
 	// TODO: get rid of hardcoded languages[0]?
 	std::string compiler = LanguageInfo::getLanguageInfo(target->languages[0])->compilerName;
@@ -53,6 +53,13 @@ void CodeBlocksGenerator::addTarget(const string&, const string& outputBinaryNam
 	fTargets.push_back(t);
 
 	for (string file : inputFiles) {
+		_multimap::iterator it = fFilesAndTargets.find(file);
+		if (it != fFilesAndTargets.end())
+			it->second.push_back(outputBinaryName);
+		else
+			fFilesAndTargets.insert({file, {outputBinaryName}});
+	}
+	for (string file : target->extraFiles) {
 		_multimap::iterator it = fFilesAndTargets.find(file);
 		if (it != fFilesAndTargets.end())
 			it->second.push_back(outputBinaryName);

@@ -102,13 +102,22 @@ Target::Target(const ObjectMap& params)
 		NativeFunction_COERCE_OR_THROW("0", dirNameObj, Type::String);
 		std::string dirName = FSUtil::combinePaths({stack->currentDir(),
 			dirNameObj->asStringRaw()});
+
 		bool recurse = params.get("recursive")->boolean;
 		vector<std::string> newFiles =
 			FSUtil::searchForFiles(dirName, info->sourceExtensions, recurse);
 		for (vector<std::string>::size_type i = 0; i < newFiles.size(); i++)
 			newFiles[i] = FSUtil::absolutePath(newFiles[i]);
-		this->sourceFiles.insert(this->sourceFiles.end(), newFiles.begin(),
+
+		vector<std::string> newExtraFiles =
+			FSUtil::searchForFiles(dirName, info->extraExtensions, recurse);
+		for (vector<std::string>::size_type i = 0; i < newExtraFiles.size(); i++)
+			newExtraFiles[i] = FSUtil::absolutePath(newExtraFiles[i]);
+
+		sourceFiles.insert(sourceFiles.end(), newFiles.begin(),
 			newFiles.end());
+		extraFiles.insert(extraFiles.end(), newExtraFiles.begin(),
+			newExtraFiles.end());
 		return Script::UndefinedObject();
 	}));
 
