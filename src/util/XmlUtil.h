@@ -15,9 +15,9 @@ class XmlGenerator
 
 public:
 	explicit XmlGenerator(const std::string& rootTagName,
-		std::map<std::string, std::string> rootTagAttrs = {}, bool pretty = true);
+	    std::map<std::string, std::string> rootTagAttrs = _tagmap(), bool pretty = true);
 
-	void beginTag(const std::string& tagName, std::map<std::string, std::string> tagAttrs = {},
+	void beginTag(const std::string& tagName, std::map<std::string, std::string> tagAttrs = _tagmap(),
 		bool oneliner = false);
 	void endTag(const std::string& tagName);
 
