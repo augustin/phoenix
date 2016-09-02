@@ -61,5 +61,5 @@ public:
 	static std::string defaultName();
 	static std::vector<std::string> list();
 	static std::vector<std::string> listSecondary();
-	static Generator* create(std::string name, std::vector<std::string> secondary = {});
+	static Generator* create(std::string name, std::vector<std::string> secondary);
 };
