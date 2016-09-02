@@ -32,7 +32,7 @@ public:
 	virtual void addTarget(const std::string& linkRule,
 		const std::string& outputBinaryName,
 		const std::vector<std::string>& inputFiles,
-		const std::string& targetFlags) override;
+	    const std::string& targetFlags, Target*) override;
 
 	virtual std::vector<std::string> outputFiles() override;
 	virtual std::string command(const std::string& target) override;

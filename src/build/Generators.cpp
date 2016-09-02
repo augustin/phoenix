@@ -60,10 +60,10 @@ public:
 	virtual void addTarget(const string& linkRule,
 		const string& outputBinaryName,
 		const vector<string>& inputFiles,
-		const string& targetFlags) override {
-		fPrimary->addTarget(linkRule, outputBinaryName, inputFiles, targetFlags);
+		const string& targetFlags, Target* target) override {
+		fPrimary->addTarget(linkRule, outputBinaryName, inputFiles, targetFlags, target);
 		for (Generator* gen : fSecondaries)
-			gen->addTarget(linkRule, outputBinaryName, inputFiles, targetFlags);
+			gen->addTarget(linkRule, outputBinaryName, inputFiles, targetFlags, target);
 	}
 	virtual vector<string> outputFiles() override {
 		vector<string> ret = fPrimary->outputFiles();

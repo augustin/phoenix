@@ -4,8 +4,12 @@
  */
 #include "CodeBlocksGenerator.h"
 
+#include <algorithm>
+
 #include "Phoenix.h"
 
+#include "build/Target.h"
+#include "build/LanguageInfo.h"
 #include "util/FSUtil.h"
 #include "util/XmlUtil.h"
 
@@ -34,8 +38,19 @@ void CodeBlocksGenerator::setBuildScriptFiles(const string&, const vector<string
 }
 
 void CodeBlocksGenerator::addTarget(const string&, const string& outputBinaryName,
-	const vector<string>& inputFiles, const string&)
+	const vector<string>& inputFiles, const string&, Target* target)
 {
+	// Try to set fCompiler if we haven't already
+	if (fCompiler.empty() && std::find(target->languages.begin(), target->languages.end(),
+			"C++") != target->languages.end()) {
+		fCompiler = LanguageInfo::getLanguageInfo("C++")->compilerName;
+		std::transform(fCompiler.begin(), fCompiler.end(), fCompiler.begin(), ::tolower);
+	} else if (fCompiler.empty() && std::find(target->languages.begin(), target->languages.end(),
+		"C") != target->languages.end()) {
+		fCompiler = LanguageInfo::getLanguageInfo("C")->compilerName;
+		std::transform(fCompiler.begin(), fCompiler.end(), fCompiler.begin(), ::tolower);
+	}
+
 	fTargets.push_back(outputBinaryName);
 	for (string file : inputFiles) {
 		_filesmap::iterator it = fFilesAndTargets.find(file);
@@ -57,7 +72,8 @@ void CodeBlocksGenerator::write()
 	gen.beginTag("Project");
 	gen.beginTag("Option", {{"title", "Project"}}, true);
 	gen.beginTag("Option", {{"makefile_is_custom", "1"}}, true);
-	// gen.beginTag("Option", {{"compiler", "gcc"}}, true); // TODO?
+	if (!fCompiler.empty())
+		gen.beginTag("Option", {{"compiler", fCompiler}}, true);
 
 	gen.beginTag("Build");
 		gen.beginTag("Target", {{"title", "all"}});

@@ -31,13 +31,15 @@ public:
 
 	virtual void addTarget(const std::string&,
 		const std::string& outputBinaryName,
-		const std::vector<std::string>& inputFiles, const std::string&) override;
+	    const std::vector<std::string>& inputFiles, const std::string&,
+	    Target* target) override;
 
 	virtual std::vector<std::string> outputFiles() override;
 
 	virtual void write() override;
 
 private:
+	std::string fCompiler;
 	std::vector<std::string> fTargets;
 	typedef std::map<std::string, std::vector<std::string>> _filesmap;
 	_filesmap fFilesAndTargets;

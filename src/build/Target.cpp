@@ -136,7 +136,7 @@ void Target::generate(Generator* gen)
 	gen->addTarget("link" + LanguageInfo::getLanguageInfo(languages[0])->genName,
 		name + APPLICATION_FILE_EXT, sourceFiles,
 		StringUtil::join({otherFlags, includesFlags,
-			definitionsFlags, standardsModeFlag}, " "));
+			definitionsFlags, standardsModeFlag}, " "), this);
 }
 
 void Target::addGlobalFunction(Script::Stack* stack)

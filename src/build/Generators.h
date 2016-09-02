@@ -12,6 +12,9 @@
 #  define override
 #endif
 
+// Predefinitions
+class Target;
+
 class Generator
 {
 public:
@@ -32,7 +35,7 @@ public:
 	virtual void addRegularRule(const std::string& ruleName,
 		const std::string& descName, const std::vector<std::string>& forExts,
 		const std::string& program, const std::string& outFileExt,
-		const std::string& rule) = 0;
+	    const std::string& rule) = 0;
 	virtual void addLinkRule(const std::string& ruleName,
 		const std::string& descName, const std::string& program,
 		const std::string& rule) = 0;
@@ -40,7 +43,7 @@ public:
 	virtual void addTarget(const std::string& linkRule,
 		const std::string& outputBinaryName,
 		const std::vector<std::string>& inputFiles,
-		const std::string& targetFlags) = 0;
+	    const std::string& targetFlags, Target* target) = 0;
 
 	virtual std::vector<std::string> outputFiles() = 0;
 	virtual std::string command(const std::string& target = "");
