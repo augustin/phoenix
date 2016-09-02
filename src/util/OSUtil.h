@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 class OSUtil
 {
@@ -16,7 +17,8 @@ public:
 		std::string output;
 		int exitcode;
 	};
-	static ExecResult exec(const std::string& program, const std::string& args);
+	static ExecResult exec(const std::string& program, const std::string& args,
+		bool forwardOutput = false);
 
 	static std::string getEnv(const std::string& env);
 };

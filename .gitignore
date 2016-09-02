@@ -1,3 +1,4 @@
 # Build stuff
 *build-*
 phoenix_bootstrapped*
+*.user*

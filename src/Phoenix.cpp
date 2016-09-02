@@ -84,7 +84,7 @@ int PhoenixMain(vector<string> arguments)
 			secondaryGenerators.push_back(arg.substr(2));
 		} else if (sourceDirectory.empty() || buildDirectory == ".") {
 			// Assume it's a path.
-			if (sourceDirectory.length() > 0)
+			if (!sourceDirectory.empty())
 				buildDirectory = arg;
 			else
 				sourceDirectory = arg;
@@ -95,7 +95,7 @@ int PhoenixMain(vector<string> arguments)
 	}
 
 	if (sourceDirectory.empty() || buildDirectory.empty()) {
-		cerr << "No source directory specified!";
+		PrintUtil::error("no source directory specified");
 		return 1;
 	}
 	if (generator.empty())

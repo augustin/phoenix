@@ -4,8 +4,9 @@
  */
 #include "OSUtil.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
+#include <iostream>
 
 using std::string;
 
@@ -43,15 +44,21 @@ bool OSUtil::isFamilyUnix()
 #endif
 }
 
-OSUtil::ExecResult OSUtil::exec(const string& program, const string& args)
+OSUtil::ExecResult OSUtil::exec(const string& program, const string& args, bool forwardOutput)
 {
 	string cmd = "\"" + program + "\"" + " " + args + " 2>&1";
+#ifdef _WIN32
+	cmd = "\"" + cmd + "\"";
+#endif
 
 	ExecResult ret;
 	FILE* proc = ::popen(cmd.c_str(), "r");
 	char buf[256];
-	while (fgets(buf, sizeof(buf), proc) != 0)
+	while (fgets(buf, sizeof(buf), proc) != 0) {
 		ret.output.append(buf);
+		if (forwardOutput)
+			std::cout << buf << std::flush;
+	}
 	ret.exitcode = ::pclose(proc);
 	return ret;
 }
