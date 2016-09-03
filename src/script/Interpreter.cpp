@@ -424,9 +424,9 @@ Break::~Break() noexcept {}
 
 string::size_type LocateEndOfScope(Stack*, const string& code, uint32_t&, const string::size_type& i)
 {
-	std::string scope;
-	if (code[i] == '{')
-		scope = "{";
+	string scope;
+	if (code[i] == '{' || code[i] == '(')
+		scope.append(&code[i], 1);
 	else
 		scope = "_"; // Must be a one-liner
 	string::size_type ret = i;
@@ -468,6 +468,15 @@ string::size_type LocateEndOfScope(Stack*, const string& code, uint32_t&, const 
 	}
 	return ret;
 }
+inline void JumpToPosition(const string::size_type& pos, Stack*, const string& code, uint32_t& line,
+	string::size_type& i)
+{
+	while (i < pos) {
+		if (code[i] == '\n')
+			line++;
+		i++;
+	}
+}
 
 void ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* stack,
 	const string& code, uint32_t& line, string::size_type& i)
@@ -480,9 +489,12 @@ void ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* s
 		throw UNEXPECTED_TOKEN_EXPECTED("(");
 	string::size_type endOfBlock = string::npos;
 
-	auto CBH_Inner = [&]() -> bool {
-		bool exec = ParseAndEvalExpression(PARSER_PARAMS)->coerceToBoolean();
-		i++;
+	auto CBH_Inner = [&](bool noExpression = false) -> bool {
+		bool exec = true;
+		if (!noExpression) {
+			exec = ParseAndEvalExpression(PARSER_PARAMS)->coerceToBoolean();
+			i++;
+		}
 		IgnoreWhitespace(PARSER_PARAMS);
 		if (endOfBlock == string::npos)
 			endOfBlock = LocateEndOfScope(PARSER_PARAMS);
@@ -501,11 +513,7 @@ void ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* s
 			stack->pop();
 		} else {
 			// Skip the block.
-			while (i < endOfBlock) {
-				if (code[i] == '\n')
-					line++;
-				i++;
-			}
+			JumpToPosition(endOfBlock, PARSER_PARAMS);
 		}
 		return exec;
 	};
@@ -520,14 +528,46 @@ void ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* s
 			}
 		} catch (Break) {
 			// Skip the rest of the block.
-			while (i < endOfBlock) {
-				if (code[i] == '\n')
-					line++;
+			JumpToPosition(endOfBlock, PARSER_PARAMS);
+		}
+	} else if (thing == "if") {
+		bool done = false, didExec = false;
+		while (!done) {
+			endOfBlock = string::npos;
+			if (!didExec)
+				didExec = CBH_Inner();
+
+			const uint32_t oldLine = line;
+			const string::size_type oldI = i;
+			if (code[i] == ';' || code[i] == '}')
 				i++;
+			IgnoreWhitespace(PARSER_PARAMS);
+			if (code.substr(i, 4) == "else") {
+				i += 4;
+				IgnoreWhitespace(PARSER_PARAMS);
+				if (code.substr(i, 2) == "if" && !didExec) {
+					i += 2;
+					continue;
+				} else if (!didExec) {
+					didExec = CBH_Inner(true);
+					continue;
+				} else {
+					if (code.substr(i, 2) == "if") {
+						i += 2;
+						IgnoreWhitespace(PARSER_PARAMS);
+						JumpToPosition(LocateEndOfScope(PARSER_PARAMS), PARSER_PARAMS);
+						i++;
+					}
+					IgnoreWhitespace(PARSER_PARAMS);
+					JumpToPosition(LocateEndOfScope(PARSER_PARAMS), PARSER_PARAMS);
+				}
+			} else {
+				line = oldLine;
+				i = oldI;
+				done = true;
 			}
 		}
-	} else if (thing == "if")
-		CBH_Inner();
+	}
 }
 
 Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
@@ -535,9 +575,10 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	// Parse
 	vector<AstNode> expression;
 	bool atEOE = false, isReturn = false;
-	string::size_type start = i;
 
 	IgnoreWhitespace(PARSER_PARAMS);
+	string::size_type start = i;
+
 	while (!atEOE && i < code.length()) {
 		switch (code[i]) {
 		case '(':
