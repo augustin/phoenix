@@ -18,6 +18,8 @@ public:
 
 	virtual bool check() override;
 
+	virtual void setProjectName(const std::string& name) override;
+
 	virtual void setBuildScriptFiles(const std::string&,
 		const std::vector<std::string> files) override;
 
@@ -40,6 +42,7 @@ public:
 	virtual void write() override;
 
 private:
+	std::string fName;
 	std::string fCompiler;
 
 	typedef struct {

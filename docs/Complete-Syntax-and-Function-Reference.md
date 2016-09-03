@@ -85,6 +85,15 @@ exit reason.
 Parses the first argument as an integer and returns the result. If it cannot
 be parsed as such, it returns `undefined`.
 
+------
+
+### `Project(0: string, [languages: list | language: string])`
+Sets the name of the project to `0`, loads the language definition files for the
+languages specified in `languages` or `language`, and locates working compilers
+for all of them. Note that if no languages are specified here, then the
+language definition files and compilers will be located when `CreateTarget`
+is called.
+
 ### `CreateTarget(0: string, language: string)`
 Creates a new build target with the name `0`, written in the programming language
 `language`. The returned Target object will have the following members:

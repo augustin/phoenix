@@ -154,6 +154,22 @@ void Target::generate(Generator* gen)
 
 void Target::addGlobalFunction(Script::Stack* stack)
 {
+	stack->GlobalFunctions.insert({"Project", Function([](Stack*, Object, ObjectMap& params)
+		-> Script::Object {
+		NativeFunction_COERCE_OR_THROW("0", zero, Type::String);
+		// TODO: Do not let this get called for subprojects.
+		Generators::actual->setProjectName(zero->string);
+		Object langs = params.get("languages");
+		if (langs->type() == Type::List) {
+			for (Object itm : *langs->list)
+				LanguageInfo::getLanguageInfo(itm->asStringRaw());
+		}
+		Object lang = params.get("language");
+		if (lang->type() == Type::String) {
+			LanguageInfo::getLanguageInfo(lang->string);
+		}
+		return Script::UndefinedObject();
+	})});
 	stack->GlobalFunctions.insert({"CreateTarget", Function([](Stack*, Object, ObjectMap& params)
 		-> Script::Object {
 		return Script::MapObject((new Target(params))->fMapObject);

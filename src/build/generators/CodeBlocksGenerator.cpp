@@ -17,6 +17,8 @@ using std::string;
 using std::vector;
 
 CodeBlocksGenerator::CodeBlocksGenerator()
+	:
+	fName("Project")
 {
 }
 CodeBlocksGenerator::~CodeBlocksGenerator()
@@ -29,6 +31,11 @@ bool CodeBlocksGenerator::check()
 	// files for something else altogether (e.g. Qt Creator), so just
 	// return true reguardeless.
 	return true;
+}
+
+void CodeBlocksGenerator::setProjectName(const string& name)
+{
+	fName = name;
 }
 
 void CodeBlocksGenerator::setBuildScriptFiles(const string&, const vector<string> files)
@@ -70,14 +77,14 @@ void CodeBlocksGenerator::addTarget(const string&, const string& outputBinaryNam
 
 vector<string> CodeBlocksGenerator::outputFiles()
 {
-	return {"Project.cbp"};
+	return {fName + ".cbp"};
 }
 void CodeBlocksGenerator::write()
 {
 	XmlGenerator gen("CodeBlocks_project_file");
 	gen.beginTag("FileVersion", {{"major", "1"}, {"minor", "6"}}, true);
 	gen.beginTag("Project");
-	gen.beginTag("Option", {{"title", "Project"}}, true);
+	gen.beginTag("Option", {{"title", fName}}, true);
 	gen.beginTag("Option", {{"makefile_is_custom", "1"}}, true);
 	gen.beginTag("Option", {{"compiler", fCompiler}}, true);
 
@@ -127,5 +134,5 @@ void CodeBlocksGenerator::write()
 		if (!it->second.empty())
 			gen.endTag("Unit");
 	}
-	FSUtil::putContents("Project.cbp", gen.finish());
+	FSUtil::putContents(fName + ".cbp", gen.finish());
 }

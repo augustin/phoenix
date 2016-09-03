@@ -2,6 +2,7 @@
 ### Project Setup
 ############
 $$Phoenix.checkVersion(minimum: "0.0.1");
+Project("Phoenix", language: "C++");
 #TODO# $$Phoenix.setPolicy("OutOfTreeBuild", required);
 
 ######

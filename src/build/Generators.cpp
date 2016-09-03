@@ -30,11 +30,17 @@ public:
 			delete gen;
 	}
 	void add(Generator* gen) { fSecondaries.push_back(gen); }
+
 	virtual bool check() override {
 		bool ok = fPrimary->check();
 		for (Generator* gen : fSecondaries)
 			ok = ok && gen->check();
 		return ok;
+	}
+	virtual void setProjectName(const string& name) {
+		fPrimary->setProjectName(name);
+		for (Generator* gen : fSecondaries)
+			gen->setProjectName(name);
 	}
 	virtual void setBuildScriptFiles(const string& program,
 		const vector<string> files) override {

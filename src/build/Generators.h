@@ -29,6 +29,8 @@ public:
 
 	virtual bool check() = 0;
 
+	virtual void setProjectName(const std::string& name) = 0;
+
 	// Generates the rule to regenerate the files when someone modifies a script
 	virtual void setBuildScriptFiles(const std::string& program,
 		const std::vector<std::string> files) = 0;
