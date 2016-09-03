@@ -83,7 +83,6 @@ void CodeBlocksGenerator::write()
 
 	gen.beginTag("Build");
 		gen.beginTag("Target", {{"title", "all"}});
-			//gen.beginTag("Option", {{"working_dir", "..."}}, true); // TODO?
 			gen.beginTag("Option", {{"type", "4"}}, true);
 			gen.beginTag("MakeCommands");
 				gen.beginTag("Build", {{"command",
@@ -98,7 +97,8 @@ void CodeBlocksGenerator::write()
 
 		for (CodeBlocksTarget target : fTargets) {
 			gen.beginTag("Target", {{"title", target.name}});
-				gen.beginTag("Option", {{"output", target.name},
+				// TODO: runtime_output_dir
+				gen.beginTag("Option", {{"output", FSUtil::absolutePath(target.name)},
 					{"prefix_auto", "0"}, {"extension_auto", "0"}}, true);
 				gen.beginTag("Option", {{"compiler", target.compiler}}, true);
 
