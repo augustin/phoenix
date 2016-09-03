@@ -78,6 +78,7 @@ public:
 	// Operators
 	static Object op_div(const Object left, const Object right);
 	static Object op_mult(const Object left, const Object right);
+	static Object op_modulo(const Object left, const Object right);
 	static Object op_subt(const Object left, const Object right);
 	static Object op_add(const Object left, const Object right);
 	static Object op_eq(const Object left, const Object right);

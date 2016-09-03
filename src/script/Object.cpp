@@ -199,6 +199,12 @@ Object CObject::op_mult(const Object left, const Object right)
 	CoerceOrThrow("right-hand side of '*'", right, Type::Integer);
 	return IntegerObject(left->integer * right->integer);
 }
+Object CObject::op_modulo(const Object left, const Object right)
+{
+	CoerceOrThrow("left-hand side of '%'", left, Type::Integer);
+	CoerceOrThrow("right-hand side of '%'", right, Type::Integer);
+	return IntegerObject(left->integer % right->integer);
+}
 Object CObject::op_subt(const Object left, const Object right)
 {
 	CoerceOrThrow("left-hand side of '-'", left, Type::Integer);
