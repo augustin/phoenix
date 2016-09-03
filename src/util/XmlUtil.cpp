@@ -26,8 +26,8 @@ void XmlGenerator::beginTag(const string& tagName, std::map<string, string> tagA
 		return; // TODO: error reporting
 	}
 
-	fHierarchy.push_back(tagName);
 	indents();
+	fHierarchy.push_back(tagName);
 	fBuffer += "<" + tagName;
 	for (_tagmap::const_iterator it = tagAttrs.begin(); it != tagAttrs.end(); it++) {
 		fBuffer += " " + it->first + "=\"" + escape(it->second) + "\"";
@@ -44,9 +44,9 @@ void XmlGenerator::endTag(const string& tagName)
 {
 	if (fHierarchy[fHierarchy.size() - 1] != tagName)
 		return; // TODO: error reporting
+	fHierarchy.pop_back();
 	indents();
 	fBuffer += "</" + tagName + ">";
-	fHierarchy.pop_back();
 	newline();
 }
 
@@ -71,6 +71,6 @@ void XmlGenerator::indents()
 {
 	if (!fPretty || fHierarchy.empty())
 		return;
-	for (uint32_t i = 0; i < (fHierarchy.size() - 1); i++)
+	for (uint32_t i = 0; i < fHierarchy.size(); i++)
 		fBuffer += "\t";
 }
