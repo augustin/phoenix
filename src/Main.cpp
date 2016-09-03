@@ -44,6 +44,13 @@ int main(int argc, char* argv[])
 				std::cout << "...except that this isn't CMake, it's "
 					"Phoenix in Fake CMake Mode." << std::endl;
 				return r.exitcode;
+			} else if (arg == "--command") {
+				string cmd = args[i + 1],
+					cmdArgs = cmd.substr(cmd.find(" ") + 1);
+				if (cmd.find(" ") == string::npos)
+					cmdArgs = "";
+				cmd = cmd.substr(0, cmd.find(" "));
+				return OSUtil::exec(cmd, cmdArgs, true).exitcode;
 			} else if (StringUtil::startsWith(arg, "-G")) {
 				// Convert CMake -G syntax to Phoenix -G syntax
 				arg = arg.substr(2);
@@ -73,7 +80,7 @@ int main(int argc, char* argv[])
 					sourceDirectory = arg;
 			} else {
 				isRealCMake = true;
-				break;
+				// Don't break in case we get a --command.
 			}
 		}
 
