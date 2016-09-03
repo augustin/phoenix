@@ -18,7 +18,7 @@ public:
 
 	virtual bool check() override;
 
-	virtual void setProjectName(const std::string& name) override {}
+	virtual void setProjectName(const std::string&) override {}
 
 	virtual void setBuildScriptFiles(const std::string& program,
 		const std::vector<std::string> files) override;

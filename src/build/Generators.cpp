@@ -15,7 +15,7 @@ using std::vector;
 Generator::~Generator()
 {
 }
-string Generator::command(const string& target)
+string Generator::command(const string&)
 {
 	return "";
 }
