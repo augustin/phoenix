@@ -15,7 +15,7 @@ The basics:
    their C/C++/JS counterparts.
  - **Setting a first variable to a second variable *copies* the contents of the**
    **second variable overtop of the first,** unlike JavaScript, where only primitive
-   types (strings, integers) behave this way.
+   types (strings, integers, etc.) behave this way.
  - All references to variables must begin with `$`, e.g. `$a = 5; $b = $a;`.
  - Variables may be referenced by name by placing `[]`s immediately following
    the `$`; e.g. `$['a'] = 5;` and `$a = 5;` are functionally identical code,
@@ -51,13 +51,13 @@ Members:
    is not. `minimum` must be a string in the format `0`, `0.0`, or `0.0.0`.
 
 ### `$$Compilers: map`
-Contains a map of programming languages to compilers (e.g. `$$Compilers['C']` might equal `"GNU"`).
-Note that **if a specific programming language has not yet been used by any target, its**
-**`$$Compilers` entry will be undefined**, as Phoenix only detects compilers when it needs to.
+Contains a map of programming languages to compilers (e.g. `$$Compilers['C']` might
+equal `"GNU"`). **NOTE** that if a specific programming language has not yet been used
+by any target nor specified in a call to `Project()`, its `$$Compilers` entry will be
+undefined, as Phoenix only detects compilers when it needs to.
 
 Additionally, for all the values specified inside `$$Compilers`, they are also added to superglobal
-namespace as a true boolean (e.g., so if `$$Compilers['C']` is `"Clang"`, then `$$Clang` will be `true`,
-a useful shorthand).
+namespace as a true boolean (e.g., so if `$$Compilers['C']` is `"Clang"`, then `$$Clang` will be `true`).
 
 ### `$$OS: string`
 Contains the user-friendly name of the operating system that the software is
@@ -65,7 +65,7 @@ being built for. Possible values are: `"Windows"`, `"Linux"`, `"FreeBSD"`,
 `"Haiku"`, or `"Apple"`.
 
 Additionally, the OS' "raw" name will be added to the superglobals as a true
-boolean, one of `$$WIN32`, `$$LINUX`, `$$FREEBSD`, `$$HAIKU`, or `$$APPLE`.
+boolean (one of `$$WIN32`, `$$LINUX`, `$$FREEBSD`, `$$HAIKU`, or `$$APPLE`).
 And on UNIX (POSIX) systems, `$$UNIX` will also be set to `true`.
 
 Functions
