@@ -702,11 +702,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				break;
 				}
 			}
-			if (oper == "++" || oper == "--") {
-				expression.push_back(AstNode(AstNode::Operator, string(&oper[0], 1).append("=")));
-				expression.push_back(AstNode(AstNode::Literal, IntegerObject(1)));
-			} else
-				expression.push_back(AstNode(AstNode::Operator, oper));
+			expression.push_back(AstNode(AstNode::Operator, oper));
 		} break;
 
 		default:
@@ -725,8 +721,6 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	if (expression.size() == 1) {
 		RETURN(expression[0].toObject(stack));
 	}
-	if (expression[expression.size() - 1].type == AstNode::Operator)
-		throw Exception(Exception::SyntaxError, string("incorrectly placed operator"));
 
 	// Evaluate
 #define GET_OPERATOR_OR_CONTINUE \
@@ -751,7 +745,32 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	expression[j] = AstNode(AstNode::Literal, result); \
 	expression.erase(expression.begin() + j + 1, expression.begin() + j + 3); }
 
-	// Pass 1: /, *, %
+	// Pass 1: !, !!, ++, -- (no macro, they only affect one side)
+	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+		GET_OPERATOR_OR_CONTINUE;
+		if (oper == "!") {
+			Object result = BooleanObject(!(expression[j + 1].toObject(stack)->coerceToBoolean()));
+			expression[j] = AstNode(AstNode::Literal, result);
+			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
+		} else if (oper == "!!") {
+			Object result = BooleanObject(expression[j + 1].toObject(stack)->coerceToBoolean());
+			expression[j] = AstNode(AstNode::Literal, result);
+			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
+		} else if (oper == "++") {
+			j--;
+			Object result = expression[j].toObject(stack);
+			result->integer++;
+			expression[j] = AstNode(AstNode::Literal, result);
+			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
+		} else if (oper == "--") {
+			j--;
+			Object result = expression[j].toObject(stack);
+			result->integer--;
+			expression[j] = AstNode(AstNode::Literal, result);
+			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
+		}
+	}
+	// Pass 2: /, *, %
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "/")
@@ -767,7 +786,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* token */ 	       %,
 							   /* "TOKEN="? */     false)
 	}
-	// Pass 2: +, -
+	// Pass 3: +, -
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "-")
@@ -778,19 +797,6 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			IMPLEMENT_OPERATOR(/* operator name */ add,
 							   /* token */ 	       +,
 							   /* "TOKEN="? */     false)
-	}
-	// Pass 3: !, !! (no macro, they only affect right-hand side)
-	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
-		GET_OPERATOR_OR_CONTINUE;
-		if (oper == "!") {
-			Object result = BooleanObject(!(expression[j + 1].toObject(stack)->coerceToBoolean()));
-			expression[j] = AstNode(AstNode::Literal, result);
-			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
-		} else if (oper == "!!") {
-			Object result = BooleanObject(expression[j + 1].toObject(stack)->coerceToBoolean());
-			expression[j] = AstNode(AstNode::Literal, result);
-			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
-		}
 	}
 	// Pass 4: ==, !=, <, >, <=, >=
 	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
