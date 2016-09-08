@@ -12,8 +12,7 @@
 
 namespace Script {
 
-// AST
-class AstNode
+class ExprNode
 {
 public:
 	enum Type {
@@ -23,13 +22,13 @@ public:
 		Operator,
 	};
 
-	inline AstNode(Type t)
+	inline ExprNode(Type t)
 		: type(t) {}
-	inline AstNode(Type t, const Object& obj)
+	inline ExprNode(Type t, const Object& obj)
 		: type(t), literal(obj) {}
-	inline AstNode(Type t, const std::string& str)
+	inline ExprNode(Type t, const std::string& str)
 		: type(t), string(str) {}
-	inline AstNode(Type t, const std::vector<std::string>& var)
+	inline ExprNode(Type t, const std::vector<std::string>& var)
 		: type(t), variable(var) {}
 
 	Object toObject(Stack* stack);
@@ -40,7 +39,7 @@ public:
 	std::vector<std::string> variable;
 };
 
-AstNode EvalVariableName(Stack* stack, const std::string& code, uint32_t& line, std::string::size_type& i);
+ExprNode EvalVariableName(Stack* stack, const std::string& code, uint32_t& line, std::string::size_type& i);
 Object EvalString(Stack* stack, const std::string& code, std::string fromPath, const uint32_t fromLine = 1,
 	bool popDirs = false);
 Object Run(Stack* stack, std::string path);

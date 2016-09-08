@@ -17,8 +17,7 @@ using std::vector;
 
 namespace Script {
 
-// AST
-Object AstNode::toObject(Stack* stack)
+Object ExprNode::toObject(Stack* stack)
 {
 	if (type == Literal)
 		return literal;
@@ -66,7 +65,7 @@ Object AstNode::toObject(Stack* stack)
 		return StringObject(str);
 	}
 	throw Exception(Exception::InternalError,
-		std::string("illegal conversion from AstNode to Object, please file a bug!"));
+		std::string("illegal conversion from ExprNode to Object, please file a bug!"));
 }
 
 // Parser
@@ -132,12 +131,12 @@ bool IgnoreWhitespace(Stack*, const string& code, uint32_t& line, string::size_t
 	return oldi < i;
 }
 
-AstNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
+ExprNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
 {
 	assert(code[i] == '$');
 	i++;
 
-	AstNode realRet(AstNode::Variable);
+	ExprNode realRet(ExprNode::Variable);
 	std::string ret = "";
 	if (code[i] == '$') { // superglobal reference
 		ret += '$';
@@ -189,7 +188,7 @@ AstNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, strin
 	return realRet;
 }
 
-AstNode ParseString(Stack*, const string& code, uint32_t& line, string::size_type& i,
+ExprNode ParseString(Stack*, const string& code, uint32_t& line, string::size_type& i,
 	char endChar)
 {
 	string ret = "";
@@ -228,8 +227,8 @@ AstNode ParseString(Stack*, const string& code, uint32_t& line, string::size_typ
 
 	needs_dereferencing = needs_dereferencing && endChar != '\'';
 	if (needs_dereferencing)
-		return AstNode(AstNode::RawString, ret);
-	return AstNode(AstNode::Literal, StringObject(ret));
+		return ExprNode(ExprNode::RawString, ret);
+	return ExprNode(ExprNode::Literal, StringObject(ret));
 }
 
 Object ParseNumber(Stack*, const string& code, uint32_t&, string::size_type& i)
@@ -478,7 +477,7 @@ inline void JumpToPosition(const string::size_type& pos, Stack*, const string& c
 	}
 }
 
-void ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* stack,
+void ConditionalBranchHandler(vector<ExprNode> expression, string thing, Stack* stack,
 	const string& code, uint32_t& line, string::size_type& i)
 {
 	if (expression.size() != 0)
@@ -573,7 +572,7 @@ void ConditionalBranchHandler(vector<AstNode> expression, string thing, Stack* s
 Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, string::size_type& i)
 {
 	// Parse
-	vector<AstNode> expression;
+	vector<ExprNode> expression;
 	bool atEOE = false, isReturn = false;
 
 	IgnoreWhitespace(PARSER_PARAMS);
@@ -584,17 +583,17 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 		case '(':
 			if (i == start)
 				break;
-			if (expression.size() > 0 && expression[expression.size() - 1].type == AstNode::Variable) {
+			if (expression.size() > 0 && expression[expression.size() - 1].type == ExprNode::Variable) {
 				expression[expression.size() - 1] =
-					AstNode(AstNode::Literal, ParseCallAndEval(PARSER_PARAMS,
+					ExprNode(ExprNode::Literal, ParseCallAndEval(PARSER_PARAMS,
 						expression[expression.size() - 1].variable, true));
 			} else {
-				expression.push_back(AstNode(AstNode::Literal, ParseAndEvalExpression(PARSER_PARAMS)));
+				expression.push_back(ExprNode(ExprNode::Literal, ParseAndEvalExpression(PARSER_PARAMS)));
 			}
 		break;
 		case '[':
 			// Assume list
-			expression.push_back(AstNode(AstNode::Literal, ParseList(PARSER_PARAMS)));
+			expression.push_back(ExprNode(ExprNode::Literal, ParseList(PARSER_PARAMS)));
 		break;
 		case ',':
 		case ';':
@@ -614,7 +613,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			expression.push_back(ParseString(PARSER_PARAMS, '\''));
 		break;
 		case NUMERIC_CASES: // Number
-			expression.push_back(AstNode(AstNode::Literal, ParseNumber(PARSER_PARAMS)));
+			expression.push_back(ExprNode(ExprNode::Literal, ParseNumber(PARSER_PARAMS)));
 		break;
 		case ALPHABET_CASES: { // something else
 			string thing;
@@ -636,11 +635,11 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			i--;
 			i--; // to get us back to last character of thing
 			if (thing == "true")
-				expression.push_back(AstNode(AstNode::Literal, BooleanObject(true)));
+				expression.push_back(ExprNode(ExprNode::Literal, BooleanObject(true)));
 			else if (thing == "false")
-				expression.push_back(AstNode(AstNode::Literal, BooleanObject(false)));
+				expression.push_back(ExprNode(ExprNode::Literal, BooleanObject(false)));
 			else if (thing == "undefined")
-				expression.push_back(AstNode(AstNode::Literal, UndefinedObject()));
+				expression.push_back(ExprNode(ExprNode::Literal, UndefinedObject()));
 			else if (thing == "return") {
 				if (expression.size() != 0)
 					throw Exception(Exception::SyntaxError, string("incorrectly placed 'return'"));
@@ -672,7 +671,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				string::size_type funcEnd = LocateEndOfScope(PARSER_PARAMS);
 				i++;
 				string func = code.substr(i, funcEnd - i);
-				expression.push_back(AstNode(AstNode::Literal,
+				expression.push_back(ExprNode(ExprNode::Literal,
 					FunctionObject(new Function(func, stack->currentInputFile(), line))));
 				i = funcEnd;
 			} else { // This better be a function call
@@ -682,7 +681,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 					throw Exception(Exception::SyntaxError,
 						string("unrecognized keyword '").append(thing).append("'"));
 				}
-				expression.push_back(AstNode(AstNode::Literal, ParseCallAndEval(PARSER_PARAMS, {thing})));
+				expression.push_back(ExprNode(ExprNode::Literal, ParseCallAndEval(PARSER_PARAMS, {thing})));
 			}
 		} break;
 
@@ -702,7 +701,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				break;
 				}
 			}
-			expression.push_back(AstNode(AstNode::Operator, oper));
+			expression.push_back(ExprNode(ExprNode::Operator, oper));
 		} break;
 
 		default:
@@ -724,8 +723,8 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 
 	// Evaluate
 #define GET_OPERATOR_OR_CONTINUE \
-	const AstNode& node = expression[j]; \
-	if (node.type != AstNode::Operator) \
+	const ExprNode& node = expression[j]; \
+	if (node.type != ExprNode::Operator) \
 		continue; \
 	const string& oper = node.string
 #define UNKNOWN_OPERATOR \
@@ -736,42 +735,42 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 	Object result = CObject::op_##OP_NAME(expression[j].toObject(stack), \
 		expression[j + 2].toObject(stack)); \
 	if (DOING_TOKEQ && oper == (#TOKEN "=")) { \
-		if (expression[j].type != AstNode::Variable) \
+		if (expression[j].type != ExprNode::Variable) \
 			throw Exception(Exception::TypeError, string("the left-hand side of '" #TOKEN \
 				"=' must be a variable")); \
 		stack->set(expression[j].variable, result); \
 	} \
 	/* Now update the expression vector */  \
-	expression[j] = AstNode(AstNode::Literal, result); \
+	expression[j] = ExprNode(ExprNode::Literal, result); \
 	expression.erase(expression.begin() + j + 1, expression.begin() + j + 3); }
 
 	// Pass 1: !, !!, ++, -- (no macro, they only affect one side)
-	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+	for (vector<ExprNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "!") {
 			Object result = BooleanObject(!(expression[j + 1].toObject(stack)->coerceToBoolean()));
-			expression[j] = AstNode(AstNode::Literal, result);
+			expression[j] = ExprNode(ExprNode::Literal, result);
 			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
 		} else if (oper == "!!") {
 			Object result = BooleanObject(expression[j + 1].toObject(stack)->coerceToBoolean());
-			expression[j] = AstNode(AstNode::Literal, result);
+			expression[j] = ExprNode(ExprNode::Literal, result);
 			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
 		} else if (oper == "++") {
 			j--;
 			Object result = expression[j].toObject(stack);
 			result->integer++;
-			expression[j] = AstNode(AstNode::Literal, result);
+			expression[j] = ExprNode(ExprNode::Literal, result);
 			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
 		} else if (oper == "--") {
 			j--;
 			Object result = expression[j].toObject(stack);
 			result->integer--;
-			expression[j] = AstNode(AstNode::Literal, result);
+			expression[j] = ExprNode(ExprNode::Literal, result);
 			expression.erase(expression.begin() + j + 1, expression.begin() + j + 2);
 		}
 	}
 	// Pass 2: /, *, %
-	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+	for (vector<ExprNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "/")
 			IMPLEMENT_OPERATOR(/* operator name */ div,
@@ -787,7 +786,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* "TOKEN="? */     false)
 	}
 	// Pass 3: +, -
-	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+	for (vector<ExprNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "-")
 			IMPLEMENT_OPERATOR(/* operator name */ subt,
@@ -799,7 +798,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* "TOKEN="? */     false)
 	}
 	// Pass 4: ==, !=, <, >, <=, >=
-	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+	for (vector<ExprNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "==")
 			IMPLEMENT_OPERATOR(/* operator name */ eq,
@@ -827,7 +826,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* "TOKEN="? */     false)
 	}
 	// Pass 5: /=, *=
-	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+	for (vector<ExprNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "/=")
 			IMPLEMENT_OPERATOR(/* operator name */ div,
@@ -839,7 +838,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* "TOKEN="? */     true)
 	}
 	// Pass 6: +=, -=
-	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+	for (vector<ExprNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "-=")
 			IMPLEMENT_OPERATOR(/* operator name */ subt,
@@ -851,26 +850,26 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* "TOKEN="? */     true)
 	}
 	// Pass 7: =
-	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+	for (vector<ExprNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "=") {
 			j--;
-			if (expression[j].type != AstNode::Variable)
+			if (expression[j].type != ExprNode::Variable)
 				throw Exception(Exception::TypeError,
 					string("the left-hand side of '=' must be a variable"));
-			if (expression[j + 2].type == AstNode::Variable &&
+			if (expression[j + 2].type == ExprNode::Variable &&
 				expression[j + 2].variable[0][0] == '$')
 				throw Exception(Exception::TypeError,
 					string("superglobals cannot be copied"));
 			Object result = expression[j + 2].toObject(stack);
 			stack->set(expression[j].variable, result);
 			/* Now update the expression vector */
-			expression[j] = AstNode(AstNode::Literal, result);
+			expression[j] = ExprNode(ExprNode::Literal, result);
 			expression.erase(expression.begin() + j + 1, expression.begin() + j + 3);
 		}
 	}
 	// Pass 8: &&, ||
-	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+	for (vector<ExprNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		if (oper == "&&")
 			IMPLEMENT_OPERATOR(/* operator name */ and,
@@ -882,7 +881,7 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 							   /* "TOKEN="? */     false)
 	}
 	// Pass 9: throw if there are remaining operators
-	for (vector<AstNode>::size_type j = 0; j < expression.size(); j++) {
+	for (vector<ExprNode>::size_type j = 0; j < expression.size(); j++) {
 		GET_OPERATOR_OR_CONTINUE;
 		throw UNKNOWN_OPERATOR;
 	}
