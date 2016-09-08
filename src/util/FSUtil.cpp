@@ -30,6 +30,9 @@
 using std::string;
 using std::vector;
 
+// Static member variables
+vector<string> FSUtil::fPATHs;
+
 bool FSUtil::exists(const string& path)
 {
 	string filename = path;
@@ -204,16 +207,17 @@ string FSUtil::which(const string& prog)
 #endif
 	}
 
-	vector<string> PATHs =
+	if (fPATHs.empty()) {
 #ifdef _WIN32
-		StringUtil::split(OSUtil::getEnv("PATH"), ";");
+		fPATHs = StringUtil::split(OSUtil::getEnv("PATH"), ";");
 #else
-		StringUtil::split(OSUtil::getEnv("PATH"), ":");
+		fPATHs = StringUtil::split(OSUtil::getEnv("PATH"), ":");
 #endif
+	}
 
-	if (PATHs.empty())
+	if (fPATHs.empty())
 		return "";
-	for (string path : PATHs) {
+	for (string path : fPATHs) {
 		string fullPath =
 #ifdef _WIN32
 			permutePathExt(combinePaths({path, program}));

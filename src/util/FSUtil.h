@@ -31,4 +31,7 @@ public:
 
 	static void mkdir(const std::string& dirname);
 	static void rmdir(const std::string& dirname);
+
+private:
+	static std::vector<std::string> fPATHs;
 };
