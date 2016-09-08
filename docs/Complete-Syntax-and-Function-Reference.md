@@ -21,12 +21,18 @@ The basics:
    the `$`; e.g. `$['a'] = 5;` and `$a = 5;` are functionally identical code,
    as is `$var = "a"; $[$var] = 5;`.
  - Referencing child objects can be done using the `.` or `[]` tokens.
- - **All parameters to functions must be named** except for the first, which
+ - Functions are defined using `function () { ... }`.
+  - Nothing ever goes between the `function` and the `()` in the declaration. Functions may be
+   assigned to variables the same way as any other type.
+  - **All parameters to functions must be named** except for the first, which
    may be left unnamed (e.g. `func("this is the first argument", secondarg: 5, whatever: $a)`).
-  - Since they are named, order is irrelevant, and so they may be specified in any order.
+  - Since parameters are named, order is irrelevant, and so they may be specified in any order.
   - Any parameter that does not have a specified value (meaning, the `:` and statement
     following it are left out) will be assumed to be a true boolean
     (e.g. `func("thing", recursive)` is equivalent to `func("thing", recursive: true)`).
+  - All function parameters are passed in to the function as locals, e.g. for the above example,
+   `$recursive` will be `true` inside the function body. Additionally, all the arguments to the
+   function are also present in map form in a local that can be accessed using `$__arguments`.
  - Strings enclosed by double-quotes (`"`) are normal strings, and strings enclosed by
    single-quotes (`'`) are literal strings.
    - (e.g. if the two characters `\` and `n` occur one after another, they will be treated

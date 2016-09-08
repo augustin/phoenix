@@ -1,3 +1,3 @@
 #EXPECT: <String:"Bla& extra stuffs">
 
-$THINGY = '';$funky =function(){$THINGY += $_args.arg1; $THINGY += "& extra stuffs";};$funky(arg1: "Bla");return $THINGY;
+$THINGY = '';$funky =function(){$THINGY += $__arguments.arg1; $THINGY += "& extra stuffs";};$funky(arg1: "Bla");return $THINGY;

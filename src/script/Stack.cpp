@@ -75,12 +75,15 @@ Object Stack::get_ptr(const vector<string> variable)
 	return ret;
 }
 
-void Stack::set_ptr(vector<string> variable, Object value)
+void Stack::set_ptr(vector<string> variable, Object value, bool forceLocal)
 {
 	if (variable[0][0] == '$') {
 		// it's a superglobal
 		throw Exception(Exception::AccessViolation, "superglobals are read-only");
 	}
+	if (forceLocal)
+		fStack[fStack.size() - 1].set_ptr(variable[0], value);
+
 	vector<ObjectMap>::size_type loc = getPos(variable[0]);
 	if (variable.size() == 1) {
 		fStack[loc].set_ptr(variable[0], value);

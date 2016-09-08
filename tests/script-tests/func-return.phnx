@@ -1,3 +1,4 @@
-#EXPECT: <String:"stuff but longer">
+#EXPECT: <List:[<String:"stuff but longer">, <String:"Some other arg1">]>
 
-$funky =function(){return ($_args.arg1 + " but longer")};return $funky(arg1: "stuff");
+$arg1 = "Some other arg1";
+$funky =function(){return ($arg1 + " but longer")};return [$funky(arg1: "stuff"), $arg1];

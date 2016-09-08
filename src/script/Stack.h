@@ -29,7 +29,7 @@ public:
 	inline Object get(const std::string variable0) {
 		std::vector<std::string> variable = {variable0};
 		return get(variable); }
-	void set_ptr(std::vector<std::string> variable, Object value);
+	void set_ptr(std::vector<std::string> variable, Object value, bool forceLocal = false);
 	inline void set(std::vector<std::string> variable, Object value) { set_ptr(variable, CopyObject(value)); }
 
 	void addSuperglobal(std::string variableName, Object value);

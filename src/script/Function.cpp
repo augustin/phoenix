@@ -39,7 +39,9 @@ Object Function::call(Stack* stack, Object context, ObjectMap& args)
 	stack->push();
 	if (context != nullptr)
 		stack->set_ptr({"this"}, context);
-	stack->set({"_args"}, MapObject(new ObjectMap(args)));
+	stack->set_ptr({"__arguments"}, MapObject(new ObjectMap(args)), true);
+	for (ObjectMap::const_iterator it = args.begin(); it != args.end(); it++)
+		stack->set_ptr({it->first}, it->second, true);
 	Object ret = EvalString(stack, fFunction, fFunctionFile, fFunctionLine, false);
 	stack->pop();
 	return ret;
