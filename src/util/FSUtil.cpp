@@ -12,19 +12,19 @@
 #include <vector>
 
 #include <ctype.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #ifndef _MSC_VER
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <cstring>
+#  include <sys/types.h>
+#  include <sys/stat.h>
+#  include <unistd.h>
+#  include <dirent.h>
+#  include <cstring>
 #else /* _MSC_VER */
-#define WIN32_LEAN_AND_MEAN
-#include <direct.h>
-#include <windows.h>
-#define PATH_MAX MAX_PATH
+#  define WIN32_LEAN_AND_MEAN
+#  include <direct.h>
+#  include <windows.h>
+#  define PATH_MAX MAX_PATH
 #endif
 
 using std::string;
@@ -74,7 +74,7 @@ bool FSUtil::isExec(const string& path)
 #endif
 }
 
-std::string FSUtil::getContents(const string& file)
+string FSUtil::getContents(const string& file)
 {
 	std::ifstream filestream(file);
 	// extra ()s here are mandatory
@@ -82,13 +82,13 @@ std::string FSUtil::getContents(const string& file)
 		std::istreambuf_iterator<char>());
 }
 
-void FSUtil::putContents(const std::string& file, const std::string& contents)
+void FSUtil::putContents(const string& file, const string& contents)
 {
 	std::ofstream filestream(file);
 	filestream << contents;
 }
 
-void FSUtil::deleteFile(const std::string& file)
+void FSUtil::deleteFile(const string& file)
 {
 	::remove(file.c_str());
 }
@@ -107,7 +107,7 @@ void FSUtil_fileSearchHelper(vector<string>& ret, const string& dir,
 	while ((entry = ::readdir(dp)) != nullptr) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
-		std::string fullPath = FSUtil::combinePaths({dir, entry->d_name});
+		string fullPath = FSUtil::combinePaths({dir, entry->d_name});
 		if (recursive && FSUtil::isDir(fullPath))
 			FSUtil_fileSearchHelper(ret, fullPath, exts, recursive);
 		else {
@@ -127,7 +127,7 @@ void FSUtil_fileSearchHelper(vector<string>& ret, const string& dir,
 	const vector<string>& exts, bool recursive)
 {
 	// Specify a file mask.
-	std::string path = dir + "\\*";
+	string path = dir + "\\*";
 
 	WIN32_FIND_DATAA file;
 	HANDLE findHndl = nullptr;

@@ -50,7 +50,7 @@ void XmlGenerator::endTag(const string& tagName)
 	newline();
 }
 
-std::string XmlGenerator::finish()
+string XmlGenerator::finish()
 {
 	while (!fHierarchy.empty())
 		endTag(string(fHierarchy[fHierarchy.size() - 1]));
