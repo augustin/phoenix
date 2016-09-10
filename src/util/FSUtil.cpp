@@ -11,7 +11,7 @@
 #include <fstream>
 #include <vector>
 
-#include <ctype.h>
+#include <cctype>
 #include <cstdlib>
 
 #ifndef _MSC_VER
@@ -89,7 +89,7 @@ bool FSUtil::isPathAbsolute(const string& path)
 string FSUtil::getContents(const string& file)
 {
 	std::ifstream filestream(file);
-	// extra ()s here are mandatory
+	// extra ()s here are supposedly mandatory?
 	return string((std::istreambuf_iterator<char>(filestream)),
 		std::istreambuf_iterator<char>());
 }
