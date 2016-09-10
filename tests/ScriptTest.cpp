@@ -34,34 +34,18 @@ int main(int argc, char* argv[])
 
 		Script::Stack stack;
 		stack.addSuperglobal("Phoenix", std::make_shared<Script::GlobalLanguageObject>(&stack));
-		Script::Object result;
-		bool threwException = false;
-		Script::Exception exceptionResult(Script::Exception::InternalError, "");
+		string result;
 		try {
-			result = Script::Run(&stack, i);
+			result = Script::Run(&stack, i)->asStringPretty();
 		} catch (Script::Exception e) {
-			threwException = true;
-			exceptionResult = e;
+			if (expect[0] != 'E')
+				e.print();
+			result = "E";
+			result += e.what();
 		}
 
-		if (threwException) {
-			if (expect[0] != 'E') {
-				t.result(false, name + " (unexpected exception)");
-				exceptionResult.print();
-			} else {
-				bool result = (exceptionResult.what() == expect.substr(1, string::npos));
-				t.result(result, name +
-					(result ? "" : " (expected '" + expect.substr(1, string::npos) + "', got '" +
-						exceptionResult.what() + "')"));
-			}
-			continue;
-		} else {
-			bool res = (result->asStringPretty() == expect);
-			if (res)
-				t.result(true, name);
-			else
-				t.result(false, name + " (got " + result->asStringPretty() + ", expected " + expect + ")");
-		}
+		bool res = (result == expect);
+		t.result(res, name + (res ? "" : " (got " + result + ", expected " + expect + ")"));
 	}
 	return t.done();
 }
