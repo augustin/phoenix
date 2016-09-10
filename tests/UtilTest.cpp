@@ -80,6 +80,14 @@ int main(int, char* argv[])
 	t.result(FSUtil::isFile("this_file_exists.txt"), "putContents-1/isFile-4");
 	t.result(FSUtil::exists("this_file_exists.txt"), "putContents-2");
 
+	t.result(FSUtil::isPathAbsolute("/Nc/this/is/not/path.txt"), "isPathAbsolute-1");
+	t.result(!FSUtil::isPathAbsolute("not/absolute/path"), "isPathAbsolute-2");
+#ifdef _WIN32
+	t.result(FSUtil::isPathAbsolute("C:/what/ever/this/is/anyway/"), "isPathAbsolute-win_1");
+#else
+	t.result(!FSUtil::isPathAbsolute("C:/what/ever/this/is/anyway/"), "isPathAbsolute-!win_1");
+#endif
+
 	t.result(FSUtil::getContents("this_file_exists.txt") == "These are the contents of this file.",
 		"getContents-1");
 	t.result(FSUtil::getContents("this_file_does_not_exist.txt") == "", "getContents-2");

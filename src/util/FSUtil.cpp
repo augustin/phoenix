@@ -77,6 +77,15 @@ bool FSUtil::isExec(const string& path)
 #endif
 }
 
+bool FSUtil::isPathAbsolute(const string& path)
+{
+	return (path[0] == '/'
+#ifdef _WIN32
+		|| (path.length() > 2 && path[1] == ':' && path[2] == '/') // "C:/" or the like
+#endif
+		);
+}
+
 string FSUtil::getContents(const string& file)
 {
 	std::ifstream filestream(file);
@@ -175,11 +184,7 @@ string FSUtil::which(const string& prog)
 		return prog;
 
 	const string program = normalizePath(prog);
-	if (program[0] == '/'
-#ifdef _WIN32
-		|| (program.length() > 2 && program[1] == ':' && program[2] == '/') // "C:/"
-#endif
-		)
+	if (isPathAbsolute(program))
 		return program; // already an absolute path
 
 #ifdef _WIN32
@@ -263,7 +268,7 @@ string FSUtil::normalizePath(const string& path)
 #ifdef _WIN32
 	// Turn Cygwin/MSYS-style paths (e.g. '/c/Windows/') into drive+path format
 	// (e.g. "C:/Windows/").
-	if (ret[0] == '/' && ret[2] == '/') {
+	if (ret.length() > 2 && ret[0] == '/' && ret[2] == '/') {
 		ret[0] = ::toupper(ret[1]);
 		ret[1] = ':';
 	}
