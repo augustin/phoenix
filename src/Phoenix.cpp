@@ -11,7 +11,6 @@
 #include "build/LanguageInfo.h"
 #include "build/Target.h"
 
-#include "script/GlobalLanguageObject.h"
 #include "script/Interpreter.h"
 #include "script/Stack.h"
 
@@ -105,7 +104,6 @@ int PhoenixMain(vector<string> arguments)
 	FSUtil::mkdir("PhoenixTemp");
 
 	Script::Stack* stack = new Script::Stack();
-	stack->addSuperglobal("Phoenix", std::make_shared<Script::GlobalLanguageObject>(stack));
 	Target::addGlobalFunction(stack);
 	LanguageInfo::sStack = stack;
 	stack->addSuperglobal("Compilers", Script::MapObject(new Script::ObjectMap()));

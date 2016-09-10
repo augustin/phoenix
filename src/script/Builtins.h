@@ -11,10 +11,10 @@ namespace Script {
 // Predefinitions
 class Stack;
 
-class GlobalLanguageObject : public CObject
+class GlobalPhoenixObject : public CObject
 {
 public:
-	GlobalLanguageObject(Stack* stack);
+	GlobalPhoenixObject(Stack* stack);
 };
 
 }

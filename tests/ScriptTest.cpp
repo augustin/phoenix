@@ -6,7 +6,6 @@
 #include "Tester.h"
 
 #include "script/Interpreter.h"
-#include "script/GlobalLanguageObject.h"
 
 #include "util/FSUtil.h"
 #include "util/StringUtil.h"
@@ -33,7 +32,6 @@ int main(int argc, char* argv[])
 		string expect = test.substr(openerLen, test.find_first_of("\n") - openerLen);
 
 		Script::Stack stack;
-		stack.addSuperglobal("Phoenix", std::make_shared<Script::GlobalLanguageObject>(&stack));
 		string result;
 		try {
 			result = Script::Run(&stack, i)->asStringPretty();

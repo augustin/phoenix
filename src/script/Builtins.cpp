@@ -2,7 +2,7 @@
  * (C) 2015-2016 Augustin Cavalier
  * All rights reserved. Distributed under the terms of the MIT license.
  */
-#include "GlobalLanguageObject.h"
+#include "Builtins.h"
 
 #include <vector>
 
@@ -20,7 +20,7 @@ using std::vector;
 
 namespace Script {
 
-GlobalLanguageObject::GlobalLanguageObject(Stack* stack)
+GlobalPhoenixObject::GlobalPhoenixObject(Stack* stack)
 	:
 	CObject(Type::Map)
 {

@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+#include "script/Builtins.h"
 #include "util/StringUtil.h"
 
 using std::cout;
@@ -17,6 +18,7 @@ namespace Script {
 Stack::Stack()
 {
 	push();
+	addSuperglobal("Phoenix", std::make_shared<Script::GlobalPhoenixObject>(this));
 }
 
 void Stack::push()
