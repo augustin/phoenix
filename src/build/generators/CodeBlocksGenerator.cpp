@@ -134,5 +134,5 @@ void CodeBlocksGenerator::write()
 		if (!it->second.empty())
 			gen.endTag("Unit");
 	}
-	FSUtil::putContents(fName + ".cbp", gen.finish());
+	FSUtil::setContents(fName + ".cbp", gen.finish());
 }

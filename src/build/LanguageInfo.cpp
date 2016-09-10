@@ -207,7 +207,7 @@ OSUtil::ExecResult LanguageInfo::checkIfCompiles(const string& testName,
 	const string& testContents, const string& extraFlags)
 {
 	string testFileBase = "PhoenixTemp/" + testName;
-	FSUtil::putContents(testFileBase + sourceExtensions[0], testContents);
+	FSUtil::setContents(testFileBase + sourceExtensions[0], testContents);
 	OSUtil::ExecResult res = OSUtil::exec(compilerBinary,
 		extraFlags + " " + testFileBase + sourceExtensions[0] + " " +
 		compilerLinkBinaryFlag + testFileBase + APPLICATION_FILE_EXT);

@@ -17,7 +17,7 @@ public:
 	static bool isPathAbsolute(const std::string& path);
 
 	static std::string getContents(const std::string& file);
-	static void putContents(const std::string& file, const std::string& contents);
+	static void setContents(const std::string& file, const std::string& contents);
 	static void deleteFile(const std::string& file);
 
 	static std::vector<std::string> searchForFiles(const std::string& dir,

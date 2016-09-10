@@ -76,7 +76,7 @@ int main(int, char* argv[])
 	t.result(!FSUtil::isExec("this_file_does_not_exist.txt"), "isExec-2");
 	t.result(!FSUtil::isExec("."), "isExec-3");
 
-	FSUtil::putContents("this_file_exists.txt", "These are the contents of this file.");
+	FSUtil::setContents("this_file_exists.txt", "These are the contents of this file.");
 	t.result(FSUtil::isFile("this_file_exists.txt"), "putContents-1/isFile-4");
 	t.result(FSUtil::exists("this_file_exists.txt"), "putContents-2");
 
@@ -91,7 +91,7 @@ int main(int, char* argv[])
 	t.result(FSUtil::getContents("this_file_exists.txt") == "These are the contents of this file.",
 		"getContents-1");
 	t.result(FSUtil::getContents("this_file_does_not_exist.txt") == "", "getContents-2");
-	FSUtil::putContents("this_file_exists.txt", "These are the modified contents of this file.");
+	FSUtil::setContents("this_file_exists.txt", "These are the modified contents of this file.");
 	t.result(FSUtil::getContents("this_file_exists.txt") == "These are the modified contents of this file.",
 		"getContents-3/putContents-3");
 

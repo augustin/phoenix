@@ -94,7 +94,7 @@ string FSUtil::getContents(const string& file)
 		std::istreambuf_iterator<char>());
 }
 
-void FSUtil::putContents(const string& file, const string& contents)
+void FSUtil::setContents(const string& file, const string& contents)
 {
 	std::ofstream filestream(file);
 	filestream << contents;

@@ -32,7 +32,7 @@ FileBuiltin::FileBuiltin(const string& file)
 	}));
 	fMap->set("setContents", FunctionObject([this](Stack*, Object, ObjectMap& params) -> Object {
 		NativeFunction_COERCE_OR_THROW("0", zero, Type::String);
-		FSUtil::putContents(fFile, zero->string);
+		FSUtil::setContents(fFile, zero->string);
 		return UndefinedObject(); // TODO: Return false on failure
 	}));
 	fMap->set("getContents", FunctionObject([this](Stack*, Object, ObjectMap&) -> Object {
