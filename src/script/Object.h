@@ -71,6 +71,7 @@ public:
 	std::string asStringPretty() const;
 	std::string asStringRaw() const;
 
+	Object primitiveMember(const std::string& member);
 	inline Object get(const char* key) const;
 
 	// Helpers

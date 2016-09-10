@@ -9,8 +9,6 @@
 #include "util/PrintUtil.h"
 #include "util/StringUtil.h"
 
-using std::string;
-
 namespace Script {
 
 Exception::~Exception() noexcept
@@ -19,7 +17,7 @@ Exception::~Exception() noexcept
 
 void Exception::print()
 {
-	string error;
+	std::string error;
 	switch (fType) {
 	case FileDoesNotExist:
 		// 'fWhat' is the file(path)
@@ -91,7 +89,7 @@ CObject::~CObject()
 	delete map;
 }
 
-string CObject::typeName(Type type)
+std::string CObject::typeName(Type type)
 {
 	switch (type) {
 	case Type::Undefined:	return "Undefined";
@@ -104,12 +102,12 @@ string CObject::typeName(Type type)
 	}
 	return "UNKNOWN";
 }
-string CObject::typeName() const
+std::string CObject::typeName() const
 {
 	return typeName(fType);
 }
 
-string CObject::asStringPretty() const
+std::string CObject::asStringPretty() const
 {
 	// Modify asStringRaw() below simultaneously with this one!
 	switch (fType) {
@@ -144,7 +142,7 @@ string CObject::asStringPretty() const
 	}
 	return "UNKNOWN";
 }
-string CObject::asStringRaw() const
+std::string CObject::asStringRaw() const
 {
 	// Modify asStringPretty() above simultaneously with this one!
 	switch (fType) {
@@ -176,6 +174,19 @@ string CObject::asStringRaw() const
 	}
 	}
 	return "UNKNOWN";
+}
+
+Object CObject::primitiveMember(const std::string& member)
+{
+	if (fType == Type::String) {
+
+	} else if (fType == Type::List) {
+		if (member == "length")
+			return IntegerObject(list->size());
+	} else if (fType == Type::Map) {
+
+	}
+	return UndefinedObject();
 }
 
 bool CObject::coerceToBoolean() const

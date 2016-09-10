@@ -54,20 +54,19 @@ Object Stack::get_ptr(const vector<string> variable)
 	for (vector<string>::size_type i = 1; i < variable.size(); i++) {
 		if (ret == nullptr)
 			return UndefinedObject();
-		if (ret->type() == Type::Map)
+
+		Object primMember;
+		if ((ret->type() == Type::Map || ret->type() == Type::List) &&
+			(primMember = ret->primitiveMember(variable[i]))->type() != Type::Undefined) {
+			return primMember;
+		} else if (ret->type() == Type::Map)
 			ret = ret->map->get_ptr(variable[i]);
 		else if (ret->type() == Type::List) {
-			if (variable[i] == "length") {
-				Object newRet = IntegerObject(0);
-				newRet->integer = ret->list->size();
-				ret = newRet;
-			} else {
-				try {
-					ret = ret->list->get_ptr(std::stoi(variable[i], nullptr, 10));
-				} catch (...) {
-					throw Exception(Exception::SyntaxError,
-						string("expected integer, got '").append(variable[i]).append("'"));
-				}
+			try {
+				ret = ret->list->get_ptr(std::stoi(variable[i], nullptr, 10));
+			} catch (...) {
+				throw Exception(Exception::SyntaxError,
+					string("expected integer, got '").append(variable[i]).append("'"));
 			}
 		} else
 			throw Exception(Exception::TypeError, "'" + variable[i - 1] + "' should be either 'List' or 'Map' "
