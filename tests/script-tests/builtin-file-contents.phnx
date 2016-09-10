@@ -1,0 +1,8 @@
+#EXPECT: <String:"this_is_a_temp_file\n\n42">
+
+$int = 42;
+$file = File("temp_file.txt");
+$file.setContents("this_is_a_temp_file\n\n${int}");
+$ret = $file.getContents();
+$file.remove();
+return $ret;

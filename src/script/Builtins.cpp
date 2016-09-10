@@ -14,11 +14,35 @@
 
 #include "util/PrintUtil.h"
 #include "util/StringUtil.h"
+#include "util/FSUtil.h"
 #include "util/OSUtil.h"
 
+using std::string;
 using std::vector;
 
 namespace Script {
+
+FileBuiltin::FileBuiltin(const string& file)
+	: fFile(file)
+{
+	fMap = new ObjectMap;
+
+	fMap->set("exists", FunctionObject([this](Stack*, Object, ObjectMap&) -> Object {
+		return BooleanObject(FSUtil::isFile(fFile));
+	}));
+	fMap->set("setContents", FunctionObject([this](Stack*, Object, ObjectMap& params) -> Object {
+		NativeFunction_COERCE_OR_THROW("0", zero, Type::String);
+		FSUtil::putContents(fFile, zero->string);
+		return UndefinedObject(); // TODO: Return false on failure
+	}));
+	fMap->set("getContents", FunctionObject([this](Stack*, Object, ObjectMap&) -> Object {
+		return StringObject(FSUtil::getContents(fFile));
+	}));
+	fMap->set("remove", FunctionObject([this](Stack*, Object, ObjectMap&) -> Object {
+		FSUtil::deleteFile(fFile);
+		return UndefinedObject(); // TODO: Return false on failure
+	}));
+}
 
 GlobalPhoenixObject::GlobalPhoenixObject(Stack* stack)
 	:
@@ -84,6 +108,14 @@ GlobalPhoenixObject::GlobalPhoenixObject(Stack* stack)
 		} catch (...) {
 			return UndefinedObject();
 		}
+	})});
+
+	stack->GlobalFunctions.insert({"File", Function([](Stack* stack, Object, ObjectMap& params) -> Object {
+		NativeFunction_COERCE_OR_THROW("0", zero, Type::String);
+		std::string file = FSUtil::normalizePath(zero->string);
+		if (!FSUtil::isPathAbsolute(file))
+			file = FSUtil::combinePaths({stack->currentDir(), file});
+		return Script::MapObject((new FileBuiltin(file))->fMap);
 	})});
 }
 

@@ -9,7 +9,20 @@
 namespace Script {
 
 // Predefinitions
+class GlobalPhoenixObject;
 class Stack;
+
+class FileBuiltin
+{
+public:
+	FileBuiltin(const std::string& file);
+
+private:
+	friend class GlobalPhoenixObject;
+
+	Script::ObjectMap* fMap;
+	std::string fFile;
+};
 
 class GlobalPhoenixObject : public CObject
 {

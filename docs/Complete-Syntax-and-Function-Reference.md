@@ -91,6 +91,18 @@ exit reason.
 Parses the first argument as an integer and returns the result. If it cannot
 be parsed as such, it returns `undefined`.
 
+### `File(0: string)`
+Creates a new `File` object. Members:
+ - `exists: function()`
+   - Returns whether or not the file presently exists and is actually a file.
+     (If it is a directory, this function will return false).
+ - `getContents: function()`
+   - Returns the file's contents as a string.
+ - `setContents: function(0: string)`
+   - Sets the file's contents to `0`.
+ - `remove: function(0: string)`
+   - Permanently deletes the file.
+
 ------
 
 ### `Project(0: string, [languages: list | language: string])`

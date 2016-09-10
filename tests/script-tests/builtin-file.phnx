@@ -1,0 +1,4 @@
+#EXPECT: <Boolean:true>
+
+$file = File("builtin-file.phnx"));
+return $file.exists();
