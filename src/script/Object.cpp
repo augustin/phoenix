@@ -179,10 +179,13 @@ std::string CObject::asStringRaw() const
 Object CObject::primitiveMember(const std::string& member)
 {
 	if (fType == Type::String) {
-
+		if (member == "length") {
+			return IntegerObject(string.size());
+		}
 	} else if (fType == Type::List) {
-		if (member == "length")
+		if (member == "length") {
 			return IntegerObject(list->size());
+		}
 	} else if (fType == Type::Map) {
 
 	}

@@ -46,11 +46,20 @@ The basics:
  - Superglobals are denoted by an extra `$` (e.g. `$$Phoenix`). They are created by Phoenix
    itself, and can *only* be accessed, not created, destroyed, modified, or copied.
 
+Primitive Types
+---------------------------------------
+### `string`
+ - `length: integer`
+   - Returns the length of the string.
+
+### `list`
+ - `length: integer`
+   - Returns the number of items in the list.
+
 Superglobals
 ---------------------------------------
 ### `$$Phoenix: map`
 The "Phoenix" superglobal. Contains various information about this Phoenix instance.
-Members:
  - `checkVersion: function(minimum: string)`
    This should be the first call at the top of any root Phoenixfile. It ensures that
    the running version of Phoenix is at least `minimum`, and exits immediately if it

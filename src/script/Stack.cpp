@@ -56,7 +56,7 @@ Object Stack::get_ptr(const vector<string> variable)
 			return UndefinedObject();
 
 		Object primMember;
-		if ((ret->type() == Type::Map || ret->type() == Type::List) &&
+		if ((ret->type() == Type::Map || ret->type() == Type::List || ret->type() == Type::String) &&
 			(primMember = ret->primitiveMember(variable[i]))->type() != Type::Undefined) {
 			return primMember;
 		} else if (ret->type() == Type::Map)
