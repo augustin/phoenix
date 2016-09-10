@@ -7,6 +7,7 @@
 #include "Function.h"
 
 #include "util/PrintUtil.h"
+#include "util/StringUtil.h"
 
 using std::string;
 
@@ -118,8 +119,12 @@ string CObject::asStringPretty() const
 		return std::string("<Boolean:").append(boolean ? "true>" : "false>");
 	case Type::Integer:
 		return std::string("<Integer:").append(std::to_string(integer)).append(">");
-	case Type::String:
-		return std::string("<String:\"").append(string).append("\">");
+	case Type::String: {
+		std::string fixedStr = string;
+		StringUtil::replaceAll(fixedStr, "\\n", "\\\\n");
+		StringUtil::replaceAll(fixedStr, "\n", "\\n");
+		return std::string("<String:\"").append(fixedStr).append("\">");
+	}
 	case Type::Function:
 		return std::string("<Function>");
 	case Type::List: {
