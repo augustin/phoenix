@@ -61,9 +61,9 @@ Superglobals
 ### `$$Phoenix: map`
 The "Phoenix" superglobal. Contains various information about this Phoenix instance.
  - `checkVersion: function(minimum: string)`
-   This should be the first call at the top of any root Phoenixfile. It ensures that
-   the running version of Phoenix is at least `minimum`, and exits immediately if it
-   is not. `minimum` must be a string in the format `0`, `0.0`, or `0.0.0`.
+  - This should be the first call at the top of any root Phoenixfile. It ensures that
+    the running version of Phoenix is at least `minimum`, and exits immediately if it
+    is not. `minimum` must be a string in the format `0`, `0.0`, or `0.0.0`.
 
 ### `$$Compilers: map`
 Contains a map of programming languages to compilers (e.g. `$$Compilers['C']` might
