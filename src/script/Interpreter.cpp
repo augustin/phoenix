@@ -405,21 +405,25 @@ class ReturnValue : public std::exception
 {
 public:
 	ReturnValue(Object val) : value(val) {}
-	virtual ~ReturnValue() noexcept;
+	virtual ~ReturnValue() noexcept {}
 	virtual const char* what() const noexcept { return "ReturnValue"; }
 
 	Object value;
 };
-ReturnValue::~ReturnValue() noexcept {}
-
-class Break : public std::exception
+class BreakStatement : public std::exception
 {
 public:
-	Break() {}
-	virtual ~Break() noexcept;
+	BreakStatement() {}
+	virtual ~BreakStatement() noexcept {}
 	virtual const char* what() const noexcept { return "Break"; }
 };
-Break::~Break() noexcept {}
+class ContinueStatement : public std::exception
+{
+public:
+	ContinueStatement() {}
+	virtual ~ContinueStatement() noexcept {}
+	virtual const char* what() const noexcept { return "Continue"; }
+};
 
 string::size_type LocateEndOfScope(Stack*, const string& code, uint32_t&, const string::size_type& i)
 {
@@ -521,11 +525,17 @@ void ConditionalBranchHandler(vector<ExprNode> expression, string thing, Stack* 
 		uint32_t old_line = line;
 		string::size_type old_i = i;
 		try {
-			while (CBH_Inner()) {
+			bool result = true;
+			while (result) {
 				line = old_line;
 				i = old_i;
+				try {
+					result = CBH_Inner();
+				} catch (ContinueStatement) {
+					result = true;
+				}
 			}
-		} catch (Break) {
+		} catch (BreakStatement) {
 			// Skip the rest of the block.
 			JumpToPosition(endOfBlock, PARSER_PARAMS);
 		}
@@ -647,7 +657,11 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			} else if (thing == "break") {
 				if (expression.size() != 0)
 					throw Exception(Exception::SyntaxError, string("incorrectly placed 'break'"));
-				throw Break();
+				throw BreakStatement();
+			} else if (thing == "continue") {
+				if (expression.size() != 0)
+					throw Exception(Exception::SyntaxError, string("incorrectly placed 'continue'"));
+				throw ContinueStatement();
 			} else if (thing == "if" || thing == "while") {
 				ConditionalBranchHandler(expression, thing, PARSER_PARAMS);
 				atEOE = true;
@@ -907,10 +921,14 @@ Object EvalString(Stack* stack, const string& code, string fromPath, const uint3
 		if (popDirs)
 			stack->popDir();
 		return e.value;
-	} catch (Break) {
+	} catch (BreakStatement) {
 		if (popDirs)
 			stack->popDir();
 	   throw Exception(Exception::SyntaxError, "unexpected 'break'", fromPath, line);
+	} catch (ContinueStatement) {
+		if (popDirs)
+			stack->popDir();
+	   throw Exception(Exception::SyntaxError, "unexpected 'continue'", fromPath, line);
 	} catch (Exception& e) {
 		if (popDirs)
 			stack->popDir();
