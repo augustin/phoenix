@@ -4,6 +4,7 @@
  */
 
 #include <cstdlib>
+#include <algorithm>
 
 #include "Tester.h"
 
@@ -98,7 +99,16 @@ int main(int, char* argv[])
 	FSUtil::deleteFile("this_file_exists.txt");
 	t.result(!FSUtil::exists("this_file_exists.txt"), "deleteFile-1/exists-3");
 
-	// TODO: searchForFiles, which
+	std::string dir = FSUtil::parentDirectory(__FILE__);
+	std::vector<std::string> files = FSUtil::searchForFiles(dir, {".cpp"}, false);
+	bool pass = files.size() == 3 &&
+		std::find(files.begin(), files.end(), FSUtil::combinePaths({dir, "ScriptTest.cpp"})) != files.end() &&
+		std::find(files.begin(), files.end(), FSUtil::combinePaths({dir, "Tester.cpp"})) != files.end() &&
+		std::find(files.begin(), files.end(), FSUtil::combinePaths({dir, "UtilTest.cpp"})) != files.end();
+	t.result(pass, "searchForFiles-1");
+
+	// We can't really do much here besides test that it actually finds something.
+	t.result(!FSUtil::which("find").empty(), "which-1");
 
 	t.result(FSUtil::normalizePath("/whatever/this//is//../././../whatever/dir2/dir9/apathto.txt") ==
 		"/whatever/whatever/dir2/dir9/apathto.txt", "normalizePath-1");
