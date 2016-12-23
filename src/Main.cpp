@@ -34,10 +34,11 @@ int main(int argc, char* argv[])
 		for (vector<string>::size_type i = 1; i < args.size(); i++) {
 			string arg = args[i];
 			if (arg == "--version") {
-				std::cout << OSUtil::exec(FSUtil::which("cmake"), "--version").output;
+				OSUtil::ExecResult r = OSUtil::exec(FSUtil::which("cmake"), "--version");
+				std::cout << r.output;
 				std::cout << "...except that this isn't CMake, it's "
 					"Phoenix in Fake CMake Mode." << std::endl;
-				return 0;
+				return r.exitcode;
 			} else if (arg == "--help") {
 				OSUtil::ExecResult r = OSUtil::exec(FSUtil::which("cmake"), "--help");
 				std::cout << r.output;
