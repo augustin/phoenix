@@ -22,17 +22,17 @@ The basics:
    as is `$var = "a"; $[$var] = 5;`.
  - Referencing child objects can be done using the `.` or `[]` tokens.
  - Functions are defined using `function () { ... }`.
-  - Nothing ever goes between the `function` and the `()` in the declaration. Functions may be
+  - Nothing ever goes between the `function` and the `()` in the declaration. Functions must be
    assigned to variables the same way as any other type.
-  - **All parameters to functions must be named** except for the first, which
-   may be left unnamed (e.g. `func("this is the first argument", secondarg: 5, whatever: $a)`).
+  - **All parameters to functions must be named** except for the first, which is allowed to be
+    left unnamed (e.g. `func("this is the first argument", secondarg: 5, whatever: $a)`).
   - Since parameters are named, order is irrelevant, and so they may be specified in any order.
   - Any parameter that does not have a specified value (meaning, the `:` and statement
     following it are left out) will be assumed to be a true boolean
     (e.g. `func("thing", recursive)` is equivalent to `func("thing", recursive: true)`).
   - All function parameters are passed in to the function as locals, e.g. for the above example,
-   `$recursive` will be `true` inside the function body. Additionally, all the arguments to the
-   function are also present in map form in a local that can be accessed using `$__arguments`.
+    `$recursive` will be `true` inside the function body. Additionally, all the arguments to the
+    function are also present in map form in a local that can be accessed using `$__arguments`.
  - Strings enclosed by double-quotes (`"`) are normal strings, and strings enclosed by
    single-quotes (`'`) are literal strings.
    - (e.g. if the two characters `\` and `n` occur one after another, they will be treated
@@ -50,11 +50,11 @@ Primitive Types
 ---------------------------------------
 ### `string`
  - `length: integer`
-   - Returns the length of the string.
+   - Contains the length of the string.
 
 ### `list`
  - `length: integer`
-   - Returns the number of items in the list.
+   - Contains the number of items in the list.
 
 Superglobals
 ---------------------------------------
@@ -108,9 +108,9 @@ Creates a new `File` object. Members:
  - `getContents: function()`
    - Returns the file's contents as a string.
  - `setContents: function(0: string)`
-   - Sets the file's contents to `0`.
+   - Sets the file's contents to `0`. Returns `false` upon failure.
  - `remove: function(0: string)`
-   - Permanently deletes the file.
+   - Permanently deletes the file. Returns `false` upon failure.
 
 ------
 

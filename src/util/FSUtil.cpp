@@ -94,15 +94,17 @@ string FSUtil::getContents(const string& file)
 		std::istreambuf_iterator<char>());
 }
 
-void FSUtil::setContents(const string& file, const string& contents)
+bool FSUtil::setContents(const string& file, const string& contents)
 {
 	std::ofstream filestream(file);
 	filestream << contents;
+	filestream.close();
+	return filestream.good();
 }
 
-void FSUtil::deleteFile(const string& file)
+bool FSUtil::deleteFile(const string& file)
 {
-	::remove(file.c_str());
+	return (::remove(file.c_str()) == 0);
 }
 
 #ifndef _MSC_VER
