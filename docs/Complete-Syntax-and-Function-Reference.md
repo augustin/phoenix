@@ -121,6 +121,8 @@ for all of them. Note that if no languages are specified here, then the
 language definition files and compilers will be located when `CreateTarget`
 is called.
 
+**NOTE:** Setting the project name outside the root directory will have no effect.
+
 ### `CreateTarget(0: string, language: string)`
 Creates a new build target with the name `0`, written in the programming language
 `language`. The returned Target object will have the following members:

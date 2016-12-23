@@ -37,6 +37,7 @@ public:
 	inline void pushDir(const std::string& dir) { fDirectoryStack.push_back(dir); }
 	inline void popDir() { fDirectoryStack.pop_back(); }
 	inline std::string currentDir() { return fDirectoryStack[fDirectoryStack.size() - 1]; }
+	inline size_t dirDepth() { return fDirectoryStack.size(); }
 
 	inline void appendInputFile(const std::string& path) { fInputFiles.push_back(path); }
 	inline std::string currentInputFile() { return fInputFiles[fInputFiles.size() - 1]; }

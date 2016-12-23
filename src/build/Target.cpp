@@ -154,11 +154,13 @@ void Target::generate(Generator* gen)
 
 void Target::addGlobalFunction(Script::Stack* stack)
 {
-	stack->GlobalFunctions.insert({"Project", Function([](Stack*, Object, ObjectMap& params)
+	stack->GlobalFunctions.insert({"Project", Function([](Stack* stack, Object, ObjectMap& params)
 		-> Script::Object {
-		NativeFunction_COERCE_OR_THROW("0", zero, Type::String);
-		// TODO: Do not let this get called for subprojects.
-		Generators::actual->setProjectName(zero->string);
+		// If we aren't in the root file, don't set the name.
+		if (stack->dirDepth() <= 1) {
+			NativeFunction_COERCE_OR_THROW("0", zero, Type::String);
+			Generators::actual->setProjectName(zero->string);
+		}
 		Object langs = params.get("languages");
 		if (langs->type() == Type::List) {
 			for (Object itm : *langs->list)
