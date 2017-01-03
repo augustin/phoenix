@@ -7,6 +7,10 @@
 
 #include "Phoenix.h"
 
+#ifdef _WIN32
+#error It's Win32!
+#endif
+
 #include "build/Generators.h"
 #include "build/LanguageInfo.h"
 #include "build/Target.h"
