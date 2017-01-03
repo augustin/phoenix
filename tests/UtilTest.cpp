@@ -148,10 +148,10 @@ int main(int, char* argv[])
 	t.beginGroup("XmlUtil");
 	XmlGenerator gen("test_tag", {{"bla", "tru"}, {"wat","els"}});
 	gen.beginTag("hello_world");
-	gen.beginTag("thing", {{"ok", "nop!e\"<>"}}, true);
+	gen.beginTag("thing", {{"ok", "nop!e\"<>&"}}, true);
 	t.result(gen.finish() == "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<test_tag bla=\"tru\" wat=\"els\">\n\t<hello_world>\n\t\t<thing "
-		"ok=\"nop!e&quot;&lt;&gt;\"/>\n\t</hello_world>\n</test_tag>\n", "xmlgen-1");
+		"ok=\"nop!e&quot;&lt;&gt;&amp;\"/>\n\t</hello_world>\n</test_tag>\n", "xmlgen-1");
 	t.endGroup();
 
 	return t.done();
