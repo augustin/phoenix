@@ -13,6 +13,9 @@ The basics:
    `function`, `list`, or `map` in type.
  - The control-flow keywords `if`, `while`, and `return` behave identically to
    their C/C++/JS counterparts.
+ - The `subdirectory` keyword works much like CMake's `add_subdirectory` function does,
+   but has syntax more like the `return` keyword: `subdirectory "dir_name";`. It evaluates
+   to the return value of the subdirectory (if there is one).
  - **Setting a first variable to a second variable *copies* the contents of the**
    **second variable overtop of the first,** unlike JavaScript, where only primitive
    types (strings, integers, etc.) behave this way.
