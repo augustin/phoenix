@@ -1,24 +1,25 @@
-sudo: false
 language: cpp
-os:
-  - linux
-  - osx
-dist:
-  - precise
-  - trusty
+sudo: false
+
+matrix:
+  include:
+    - os: linux
+      dist: precise
+      compiler: clang
+    - os: linux
+      dist: precise
+      compiler: gcc
+    - os: linux
+      dist: trusty
+      compiler: clang
+    - os: linux
+      dist: trusty
+      compiler: gcc
+    - os: osx
 addons:
   apt:
     packages:
     - ninja-build
-compiler:
-  - gcc
-  - clang
-matrix:
-  fast_finish: true
-  exclude:
-    - os: osx
-      compiler: gcc
-      # "gcc" on OS X is just Clang in fake-GCC mode
 
 before_install:
   - "if [ $TRAVIS_OS_NAME = 'osx' ]; then brew install ninja; fi"
