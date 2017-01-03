@@ -16,7 +16,7 @@ using std::string;
 int main(int argc, char* argv[])
 {
 	vector<string> files = FSUtil::searchForFiles(FSUtil::combinePaths({__FILE__,
-		"..", "script-tests"}), {""}, false);
+		"..", "script-tests"}), {".phnx"}, false);
 	Tester t(true);
 
 	const string opener = "#EXPECT: ";

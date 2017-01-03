@@ -188,10 +188,10 @@ ExprNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, stri
 	return realRet;
 }
 
-ExprNode ParseString(Stack*, const string& code, uint32_t& line, string::size_type& i,
-	char endChar)
+ExprNode ParseString(Stack*, const string& code, uint32_t& line, string::size_type& i)
 {
 	string ret = "";
+	const char endChar = code[i];
 	i++;
 	bool needs_dereferencing = false;
 	while (i < code.length() && code[i] != endChar) {
@@ -322,7 +322,7 @@ Object ParseCallAndEval(Stack* stack, const string& code, uint32_t& line, string
 					if (pastEndOfParamName)
 						throw UNEXPECTED_TOKEN;
 					if (paramName.length() == 0) {
-						paramName = ParseString(PARSER_PARAMS, c).toObject(stack)->string;
+						paramName = ParseString(PARSER_PARAMS).toObject(stack)->string;
 						pastEndOfParamName = true;
 					} else
 						throw UNEXPECTED_TOKEN;
@@ -617,10 +617,8 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 			expression.push_back(EvalVariableName(PARSER_PARAMS));
 		break;
 		case '"': // String
-			expression.push_back(ParseString(PARSER_PARAMS, '"'));
-		break;
 		case '\'': // String literal
-			expression.push_back(ParseString(PARSER_PARAMS, '\''));
+			expression.push_back(ParseString(PARSER_PARAMS));
 		break;
 		case NUMERIC_CASES: // Number
 			expression.push_back(ExprNode(ExprNode::Literal, ParseNumber(PARSER_PARAMS)));
@@ -688,6 +686,14 @@ Object ParseAndEvalExpression(Stack* stack, const string& code, uint32_t& line, 
 				expression.push_back(ExprNode(ExprNode::Literal,
 					FunctionObject(new Function(func, stack->currentInputFile(), line))));
 				i = funcEnd;
+			} else if (thing == "subdirectory") {
+				i++;
+				IgnoreWhitespace(PARSER_PARAMS);
+				if (code[i] == '"' || code[i] == '\'') {
+					string path = ParseString(PARSER_PARAMS).toObject(stack)->asStringRaw();
+					expression.push_back(ExprNode(ExprNode::Literal,
+						Run(stack, FSUtil::combinePaths({stack->currentDir(), path}))));
+				}
 			} else { // This better be a function call
 				i++;
 				IgnoreWhitespace(PARSER_PARAMS);

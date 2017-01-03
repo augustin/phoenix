@@ -1,0 +1,6 @@
+#EXPECT: <String:"hello, world6">
+
+$str = "hello, world";
+$result = (subdirectory "subdir-1");
+
+return $result();

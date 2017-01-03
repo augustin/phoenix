@@ -1,0 +1,7 @@
+
+$blah = function () {
+	# blah
+	return $str + 6;
+};
+
+return $blah;
