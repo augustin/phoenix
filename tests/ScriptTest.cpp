@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 		const string name = i.substr(i.find_last_of("/") + 1, string::npos);
 
 		if (!StringUtil::startsWith(test, opener)) {
-			t.result(false, name + " (failed to get expectation)");
+			t.result(false, i + " (failed to get expectation)");
 			continue;
 		}
 		string expect = test.substr(openerLen, test.find_first_of("\n") - openerLen);
