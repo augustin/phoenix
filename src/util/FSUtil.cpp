@@ -157,7 +157,8 @@ void FSUtil_fileSearchHelper(vector<string>& ret, const string& dir,
 		path = dir + "\\" + file.cFileName;
 
 		if (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-			FSUtil_fileSearchHelper(ret, path, exts, recursive);
+			if (recursive)
+				FSUtil_fileSearchHelper(ret, path, exts, recursive);
 		} else {
 			for (string ext : exts) {
 				if (StringUtil::endsWith(path, ext)) {
