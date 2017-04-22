@@ -11,5 +11,3 @@
 #define PHOENIX_VERSION_MAJOR (0)
 #define PHOENIX_VERSION_MINOR (0)
 #define PHOENIX_VERSION_PATCH (1)
-
-int PhoenixMain(std::vector<std::string> arguments);

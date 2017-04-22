@@ -2,10 +2,11 @@
  * (C) 2015-2016 Augustin Cavalier
  * All rights reserved. Distributed under the terms of the MIT license.
  */
+#include "Phoenix.h"
+
+#include <clocale>
 #include <iostream>
 #include <vector>
-
-#include "Phoenix.h"
 
 #include "build/Generators.h"
 #include "build/LanguageInfo.h"
@@ -53,8 +54,11 @@ void printUsage(string program, bool full)
 		std::endl;
 }
 
-int PhoenixMain(vector<string> arguments)
+int main(int argc, char* argv[])
 {
+	setlocale(LC_ALL, "C"); // Force C locale
+	vector<string> arguments(argv, argv + argc);
+
 	if (arguments.size() < 2) {
 		printUsage(arguments[0], false);
 		cerr << std::endl;

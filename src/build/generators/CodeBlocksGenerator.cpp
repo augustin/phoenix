@@ -28,8 +28,7 @@ CodeBlocksGenerator::~CodeBlocksGenerator()
 bool CodeBlocksGenerator::check()
 {
 	// CodeBlocks may or may not be installed, or we may be generating
-	// files for something else altogether (e.g. Qt Creator), so just
-	// return true reguardeless.
+	// files for something else altogether, so just return true regardless.
 	return true;
 }
 

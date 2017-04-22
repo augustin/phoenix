@@ -6,6 +6,7 @@
 
 #include "generators/CodeBlocksGenerator.h"
 #include "generators/NinjaGenerator.h"
+#include "generators/QtCreatorGenerator.h"
 
 #include "util/PrintUtil.h"
 
@@ -111,7 +112,7 @@ vector<string> Generators::list()
 }
 vector<string> Generators::listSecondary()
 {
-	return {"CodeBlocks"};
+	return {"CodeBlocks", "QtCreator"};
 }
 
 Generator* Generators::create(string name, vector<string> secondary)
@@ -131,10 +132,13 @@ Generator* Generators::create(string name, vector<string> secondary)
 
 	ret = new MultiGenerator(ret);
 	for (string gen : secondary) {
-		if (gen == "CodeBlocks")
+		if (gen == "CodeBlocks") {
 			static_cast<MultiGenerator*>(ret)->add(new CodeBlocksGenerator);
-		else
+		} else if (gen == "QtCreator") {
+			static_cast<MultiGenerator*>(ret)->add(new QtCreatorGenerator);
+		} else {
 			PrintUtil::warning("there is no secondary generator with name '" + gen + "'");
+		}
 	}
 	actual = ret;
 	return ret;
