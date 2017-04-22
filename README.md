@@ -1,6 +1,6 @@
 Phoenix [![Build Status](https://travis-ci.org/phoenix-build/phoenix.svg?branch=master)](https://travis-ci.org/phoenix-build/phoenix) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/phoenix-build/phoenix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ====================================
-Phoenix is a high-level build system with refreshingly familiar syntax, designed for speed and functionality.
+A high-level build system with refreshingly straightforward syntax, designed for flexibility and portability.
 
 ### Simple example
 Assuming the `src` directory contains the source code for a C++ "Hello, world!" program, the following `Phoenixfile.phnx` will tell Phoenix how to compile it:
@@ -12,7 +12,7 @@ $helloworld.addSourceDirectory("src");
 
 ## Getting started
 ### Installing
-Phoenix requires a limited subset of C++11, but should still compile with GCC 4.6 or better. Phoenix should build and run on all systems where this dependency is met, but it may require tweaking for OS-specific paths and locations.
+Phoenix requires a limited subset of C++11, but will compile with GCC 4.6 or better. On all systems where this dependency is met, Phoenix should build and run out of the box, but it might require tweaking for OS-specific paths and locations.
 
 One-liner templates to compile Phoenix:
  * Any UNIX shell: `g++ $(find src -name "*.cpp") -Isrc -o phoenix_bootstrapped -std=c++0x -O2`
