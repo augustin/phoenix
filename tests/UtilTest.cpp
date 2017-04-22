@@ -100,12 +100,19 @@ int main(int, char* argv[])
 	t.result(!FSUtil::exists("this_file_exists.txt"), "deleteFile-1/exists-3");
 
 	std::string dir = FSUtil::parentDirectory(__FILE__);
-	std::vector<std::string> files = FSUtil::searchForFiles(dir, {".cpp"}, false);
+	const std::vector<std::string> files = FSUtil::searchForFiles(dir, {".cpp"}, false);
 	bool pass = files.size() == 3 &&
 		std::find(files.begin(), files.end(), FSUtil::combinePaths({dir, "ScriptTest.cpp"})) != files.end() &&
 		std::find(files.begin(), files.end(), FSUtil::combinePaths({dir, "Tester.cpp"})) != files.end() &&
 		std::find(files.begin(), files.end(), FSUtil::combinePaths({dir, "UtilTest.cpp"})) != files.end();
 	t.result(pass, "searchForFiles-1");
+
+	const std::vector<std::string> files2 = FSUtil::searchForFiles(dir, {".phnx"}, false);
+	t.result(files2.size() == 0, "searchForFiles-2");
+
+	const std::vector<std::string> files3 =
+		FSUtil::searchForFiles(FSUtil::combinePaths({dir, "../src/"}), {"Util.h"}, true);
+	t.result(files3.size() == 5, "searchForFiles-3");
 
 	// We can't really do much here besides test that it actually finds something.
 	t.result(!FSUtil::which("find").empty(), "which-1");
