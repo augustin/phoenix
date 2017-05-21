@@ -8,11 +8,9 @@
 
 #ifdef _WIN32
 #  include <windows.h>
-#  ifndef _MSC_VER
-#    include <unistd.h>
-#  else
-#    include <io.h>
-#  endif
+#  include <io.h>
+#else
+#  include <unistd.h>
 #endif
 
 #ifndef _WIN32
