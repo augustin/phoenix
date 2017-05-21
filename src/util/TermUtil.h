@@ -24,8 +24,13 @@ public:
 	static void init();
 
 	static void setColor(TermColor color, bool onStdErr = false);
+	static void setBackgroundColor(TermColor color, bool onStdErr = false);
 	static void resetColors(bool onStdErr = false);
 
 private:
 	static const bool sIsTTY;
+#ifdef _WIN32
+	static int sCurrentColor;
+	static int sCurrentBackgroundColor;
+#endif
 };
