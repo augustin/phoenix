@@ -1,0 +1,3 @@
+#EXPECT: <String:"smi😊ley">
+
+return "smi😊ley";

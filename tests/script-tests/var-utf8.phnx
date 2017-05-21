@@ -1,0 +1,4 @@
+#EXPECT: <Integer:5>
+
+$smi😊ley = 5;
+return $smi😊ley;
