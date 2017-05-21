@@ -136,10 +136,10 @@ ExprNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, stri
 	assert(code[i] == '$');
 	i++;
 
-	ExprNode realRet(ExprNode::Variable);
-	std::string ret = "";
+	ExprNode ret(ExprNode::Variable);
+	std::string chunk = "";
 	if (code[i] == '$') { // superglobal reference
-		ret += '$';
+		chunk += '$';
 		i++;
 	}
 	if (code[i] == '{') { // reference guard
@@ -149,43 +149,57 @@ ExprNode EvalVariableName(Stack* stack, const string& code, uint32_t& line, stri
 	while (!atEOE && i < code.length()) {
 		char c = code[i];
 		switch (c) {
-		case ALPHANUMERIC_CASES:
-			ret += c;
-		break;
-
 		case '[': {
-			if (ret.size() > 0) {
-				realRet.variable.push_back(ret);
-				ret = "";
+			if (chunk.size() > 0) {
+				ret.variable.push_back(chunk);
+				chunk = "";
 			}
 			i++;
 			Object result = ParseAndEvalExpression(PARSER_PARAMS);
-			realRet.variable.push_back(result->asStringRaw());
+			ret.variable.push_back(result->asStringRaw());
 		} break;
 
-		case '.':
-		case WHITESPACE_CASES: {
-			if (ret.size() > 0) {
-				realRet.variable.push_back(ret);
-				ret = "";
+		case WHITESPACE_CASES:
+			IgnoreWhitespace(PARSER_PARAMS);
+			if (code[i] != '.') {
+				if (chunk.size() > 0)
+					ret.variable.push_back(chunk);
+				i--;
+				atEOE = true;
+				break;
 			}
-			if (IgnoreWhitespace(PARSER_PARAMS, false))
+		// fall through
+		case '.': {
+			if (chunk.size() > 0) {
+				ret.variable.push_back(chunk);
+				chunk = "";
+			}
+			if (IgnoreWhitespace(PARSER_PARAMS))
 				i--;
 		} break;
 
-		case '}':
-			i++; // Cancels out the i-- below.
-		// fall through
-		default:
+		case ',':
+		case ';':
+		case ']':
+		case '(':
+		case ')':
+		case OPERS_CASES:
 			i--;
-			if (ret.size() > 0)
-				realRet.variable.push_back(ret);
-			return realRet;
+		// fall through
+		case '}':
+			if (chunk.size() > 0)
+				ret.variable.push_back(chunk);
+			atEOE = true;
+		break;
+
+		default:
+			chunk += c;
+		break;
 		}
 		i++;
 	}
-	i--; // so we're 1 before the last in the str
-	return realRet;
+	i--; // so we're 1 before the last of the variable
+	return ret;
 }
 
 ExprNode ParseString(Stack*, const string& code, uint32_t& line, string::size_type& i)
