@@ -930,6 +930,9 @@ Object EvalString(Stack* stack, const string& code, string fromPath, const uint3
 {
 	uint32_t line = fromLine;
 	string::size_type i = 0;
+	if (code[0] == (char)0xEF && code[1] == (char)0xBB && code[2] == (char)0xBF) {
+		i += 3;
+	}
 	try {
 		IgnoreWhitespace(PARSER_PARAMS);
 		while (i < code.length()) {

@@ -24,12 +24,16 @@ int main(int argc, char* argv[])
 	for (const string& i : files) {
 		const string test = FSUtil::getContents(i);
 		const string name = i.substr(i.find_last_of("/") + 1, string::npos);
+		string::size_type addToLen = 0;
 
-		if (!StringUtil::startsWith(test, opener)) {
+		if (test[0] == (char)0xEF && test[1] == (char)0xBB && test[2] == (char)0xBF
+			&& test.substr(3, openerLen) == opener) {
+			addToLen = 3;
+		} else if (!StringUtil::startsWith(test, opener)) {
 			t.result(false, i + " (failed to get expectation)");
 			continue;
 		}
-		string expect = test.substr(openerLen, test.find_first_of("\n") - openerLen);
+		string expect = test.substr(openerLen + addToLen, test.find_first_of("\n") - (openerLen + addToLen));
 
 		Script::Stack stack;
 		string result;

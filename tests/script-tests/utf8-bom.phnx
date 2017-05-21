@@ -1,0 +1,4 @@
+﻿#EXPECT: <Integer:6>
+
+$ñ = 6;
+return $ñ;
