@@ -1,10 +1,12 @@
 /*
- * (C) 2015-2016 Augustin Cavalier
+ * (C) 2015-2017 Augustin Cavalier
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #pragma once
 
 #include <string>
+
+#include "TermUtil.h"
 
 class PrintUtil
 {
@@ -19,5 +21,4 @@ public:
 
 private:
 	static bool sChecking;
-	static const bool sIsTTY;
 };
