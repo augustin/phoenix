@@ -112,7 +112,7 @@ int main(int, char* argv[])
 
 	const std::vector<std::string> files3 =
 		FSUtil::searchForFiles(FSUtil::combinePaths({dir, "../src/"}), {"Util.h"}, true);
-	t.result(files3.size() == 5, "searchForFiles-3");
+	t.result(files3.size() == 6, "searchForFiles-3");
 
 	// We can't really do much here besides test that it actually finds something.
 	t.result(!FSUtil::which("find").empty(), "which-1");
