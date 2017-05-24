@@ -23,14 +23,28 @@ public:
 
 	static void init();
 
-	static void setColor(TermColor color, bool onStdErr = false);
-	static void setBackgroundColor(TermColor color, bool onStdErr = false);
-	static void resetColors(bool onStdErr = false);
+	static void setColor(TermColor color);
+	static void setBackgroundColor(TermColor color);
+	static void resetColors();
+
+	TermUtil();
+	~TermUtil();
+
+	void startup();
+	void shutdown();
+
+	std::pair<int, int> size();
+
+	void moveCursorTo(int x, int y);
+	void write(char c);
+	void write(const std::string& str);
 
 private:
 	static const bool sIsTTY;
+	static bool fStarted;
 #ifdef _WIN32
 	static int sCurrentColor;
 	static int sCurrentBackgroundColor;
+	static void* fConsoleScreenBuffer;
 #endif
 };

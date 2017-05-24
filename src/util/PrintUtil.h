@@ -6,8 +6,6 @@
 
 #include <string>
 
-#include "TermUtil.h"
-
 class PrintUtil
 {
 public:

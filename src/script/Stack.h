@@ -23,6 +23,8 @@ public:
 
 	std::map<std::string, Function> GlobalFunctions;
 
+	inline std::vector<ObjectMap>& get() { return fStack; }
+
 	Object get_ptr(const std::vector<std::string> variable);
 	inline Object get(const std::vector<std::string> variable) {
 		Object o = get_ptr(variable); if (o == nullptr) return UndefinedObject(); else return o; }
@@ -44,6 +46,10 @@ public:
 	inline std::vector<std::string> inputFiles() { return fInputFiles; }
 
 	void print();
+
+	// Debugger hooks
+	std::function<void(const std::string& path, const std::string& code,
+		const uint32_t line)> mInterpreterHook;
 
 private:
 	ObjectMap fSuperglobalScope;

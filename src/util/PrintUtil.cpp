@@ -6,23 +6,25 @@
 
 #include <iostream>
 
+#include "TermUtil.h"
+
 using std::string;
 
 bool PrintUtil::sChecking = false;
 
 void PrintUtil::error(const string& str)
 {
-	TermUtil::setColor(TermUtil::Red, true);
+	TermUtil::setColor(TermUtil::Red);
 	std::cerr << "error: ";
-	TermUtil::resetColors(true);
+	TermUtil::resetColors();
 	std::cerr << str << std::endl;
 }
 
 void PrintUtil::warning(const string& str)
 {
-	TermUtil::setColor(TermUtil::Yellow, true);
+	TermUtil::setColor(TermUtil::Yellow);
 	std::cerr << "warning: ";
-	TermUtil::resetColors(true);
+	TermUtil::resetColors();
 	std::cerr << str << std::endl;
 }
 

@@ -936,6 +936,8 @@ Object EvalString(Stack* stack, const string& code, string fromPath, const uint3
 	try {
 		IgnoreWhitespace(PARSER_PARAMS);
 		while (i < code.length()) {
+			if (stack->mInterpreterHook)
+				stack->mInterpreterHook(fromPath, code, line);
 			ParseAndEvalExpression(PARSER_PARAMS);
 			i++;
 			IgnoreWhitespace(PARSER_PARAMS);

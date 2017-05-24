@@ -13,11 +13,13 @@
 #include "build/Target.h"
 
 #include "script/Interpreter.h"
+#include "script/Debugger.h"
 #include "script/Stack.h"
 
 #include "util/FSUtil.h"
 #include "util/StringUtil.h"
 #include "util/PrintUtil.h"
+#include "util/TermUtil.h"
 
 using std::vector;
 using std::string;
@@ -26,7 +28,7 @@ using std::cerr;
 void printUsage(string program, bool full)
 {
 	cerr << "Phoenix, version " PHOENIX_VERSION << ". ";
-	cerr << "(C) 2015-2016 Augustin Cavalier." << std::endl << std::endl;
+	cerr << "(C) 2015-2017 Augustin Cavalier." << std::endl << std::endl;
 	cerr << "Usage: " << std::endl;
 	cerr << "\t" << program << " [options] <path/to/source> [<path/to/build/directory = .>]" << std::endl;
 	//cerr << "\t" << program << " [options] <path/to/build/directory = .>" << std::endl; // TODO
@@ -52,11 +54,15 @@ void printUsage(string program, bool full)
 	// cerr << "\t-X<target>\tCross-compile to <target>." << std::endl; // TODO
 	cerr << "\t-C:<lang>:<compiler>\tPreferred compiler for <lang> to use." <<
 		std::endl;
+	cerr << "\t--debugger\tLaunch into the interactive Phoenix script debugger." <<
+		std::endl;
 }
 
 int main(int argc, char* argv[])
 {
 	setlocale(LC_ALL, "C"); // Force C locale
+	TermUtil::init(); // Set up the terminal, if we're on a TTY
+
 	vector<string> arguments(argv, argv + argc);
 
 	if (arguments.size() < 2) {
@@ -69,11 +75,14 @@ int main(int argc, char* argv[])
 
 	string buildDirectory = ".", sourceDirectory, generator;
 	vector<string> secondaryGenerators;
+	bool debugger = false;
 	for (vector<string>::size_type i = 1; i < arguments.size(); i++) {
 		string arg = arguments[i];
 		if (arg == "--help") {
 			printUsage(arguments[0], true);
 			return 0;
+		} else if (arg == "--debugger") {
+			debugger = true;
 		} else if (StringUtil::startsWith(arg, "-C:")) {
 			vector<string> item = StringUtil::split(arg, ":");
 			if (item.size() != 3) {
@@ -123,7 +132,11 @@ int main(int argc, char* argv[])
 			return 1;
 		}
 
-		Script::Run(stack, sourceDirectory);
+		if (!debugger) {
+			Script::Run(stack, sourceDirectory);
+		} else {
+			Script::Debugger(stack, sourceDirectory);
+		}
 
 		std::cout << "generating build files for " << generator;
 		for (string gen : secondaryGenerators)
