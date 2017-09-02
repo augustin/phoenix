@@ -155,12 +155,9 @@ Object Debugger(Stack* stack, std::string path)
 		std::getline(std::cin, str);
 	};
 
-	stack->set({"Thing"}, IntegerObject(6));
-	Script::Run(stack, path);
-
+	Object ret = Script::Run(stack, path);
 	tu.shutdown();
-	exit(0);
-	//return Run(stack, path);
+	return ret;
 }
 
 }
